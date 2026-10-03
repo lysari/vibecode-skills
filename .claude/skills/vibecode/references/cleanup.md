@@ -2,7 +2,7 @@
 
 ## Before finishing a change
 - Delete code your change made unused: functions, imports, variables, parameters, files.
-- Delete debug output (`console.log`, `print`), commented-out code, and stray TODOs you added.
+- Delete debug output (log and print statements), commented-out code, and stray TODOs you added.
 - Delete scratch files, test output, and backups you created.
 - Remove any dependency or config entry your change made unnecessary.
 

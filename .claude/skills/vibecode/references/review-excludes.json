@@ -1,0 +1,25 @@
+{
+  "directories": {
+    "dependencies": ["node_modules/", "vendor/", ".venv/", "venv/", "__pycache__/", ".terraform/"],
+    "buildOutput": ["dist/", "build/", "out/", "target/", ".gradle/", "coverage/"],
+    "frameworkCaches": [".next/", ".nuxt/", ".cache/", ".turbo/"],
+    "toolingAndLocalState": [".git/", ".devbox/", ".idea/", ".vscode/"],
+    "agentScratch": [".claude/"]
+  },
+  "files": {
+    "lockfiles": [
+      "package-lock.json", "bun.lock", "bun.lockb", "yarn.lock", "pnpm-lock.yaml",
+      "poetry.lock", "Pipfile.lock", "uv.lock", "go.sum", "Cargo.lock", "composer.lock", "Gemfile.lock",
+      ".terraform.lock.hcl"
+    ],
+    "generated": ["*.log", "*.map", "*.min.*", ".DS_Store"]
+  },
+  "countOnly": ["*.woff", "*.woff2", "*.ttf", "*.otf", "*.png", "*.jpg", "*.jpeg", "*.webp", "*.ico"],
+  "keep": [".claude/skills/"],
+  "stacks": {
+    "angular-firebase": {
+      "directories": [".angular/", ".firebase/", "functions/lib/", "components-docs/"],
+      "files": ["firestore-debug.log"]
+    }
+  }
+}
