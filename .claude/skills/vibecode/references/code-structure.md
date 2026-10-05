@@ -6,6 +6,11 @@
 - Keep nesting shallow: return early for error and edge cases instead of wrapping the main path in `if` blocks.
 - Limit function parameters to what is needed. Group related ones into an object when there are more than three.
 
+## Explicit over generated
+- Write each fixed item (a form field, a table column, a menu entry, a route) out as its own line, so it is easy to read and customize on its own.
+- Do not build a config array plus a loop to produce a fixed list of items.
+- Loop only over data whose count changes at runtime (rows the user adds or removes, records from a server).
+
 ## Reuse and abstraction
 - Search for an existing helper before writing a new one.
 - Extract shared code on the third repeat, not the first. Two similar blocks are fine.

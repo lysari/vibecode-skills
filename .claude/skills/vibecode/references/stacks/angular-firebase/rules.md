@@ -15,6 +15,11 @@ Apply these on top of the generic rules when the project root has an `angular.js
 - A reusable component lives in its own folder under `shared/components/<name>/`. The 4-file limit does not apply to it.
 - Keep every file that belongs to that component in its folder (directive, types, specs), and keep unrelated code out of it.
 
+## Forms
+- Write every fixed form field as its own control in the template and its own entry in the form definition. Do not generate fixed fields from a config array with `@for`.
+- Use `@for` only over a `FormArray` whose rows the user adds or removes.
+- Give each field its own label, validators, and error text where it is written, so changing one field touches one place.
+
 ## Constants and data
 - Put constants, enums, and dummy data in `src/app/shared/constants/`, never in a page folder, even when only one page uses them.
 - Put fake data used only for testing in `src/app/shared/constants/fake.ts`.
