@@ -1,1 +1,0 @@
-- always use skill `/vibecode-design` to write code in this project
