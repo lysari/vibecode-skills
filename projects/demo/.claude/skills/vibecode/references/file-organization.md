@@ -8,7 +8,8 @@
 ## Structure
 - Follow the project's existing layout. Add a new folder only when the project already groups files that way or the user asks.
 - One responsibility per file. Split a file when it covers two unrelated concerns.
-- Keep related files close: a module, its tests, and its types sit side by side or follow the project's test convention.
+- Keep related files close: a module and its types sit side by side.
+- Put tests in the project's dedicated test folder, at the same relative path as the code they test. Never put a test file beside the code it tests.
 
 ## Files not to add unless asked
 - Extra READMEs, notes, changelogs.

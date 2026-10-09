@@ -9,7 +9,7 @@ The list lives in `references/review-excludes.json`. Edit that file to change it
 | `files` | File names and globs to skip. Read a lockfile only to learn which package manager the project uses. |
 | `countOnly` | Globs to count but never read (fonts, images). |
 | `keep` | Paths inside an excluded directory that stay in scope. |
-| `stacks` | Extra `directories` and `files` for one stack. Apply a stack's entries only when that stack's rules apply to the project. |
+| `frameworks` | Extra `directories` and `files` for one technology. Apply its entries only when that technology's row in `SKILL.md` matches the project. |
 
 ## Matching
 - `node_modules/` (a name with only a trailing slash) matches a directory with that name anywhere in the project.

@@ -16,9 +16,12 @@
   },
   "countOnly": ["*.woff", "*.woff2", "*.ttf", "*.otf", "*.png", "*.jpg", "*.jpeg", "*.webp", "*.ico"],
   "keep": [".claude/skills/"],
-  "stacks": {
-    "angular-firebase": {
-      "directories": [".angular/", ".firebase/", "functions/lib/", "components-docs/"],
+  "frameworks": {
+    "angular": {
+      "directories": [".angular/"]
+    },
+    "firebase": {
+      "directories": [".firebase/", "functions/lib/"],
       "files": ["firestore-debug.log"]
     }
   }
