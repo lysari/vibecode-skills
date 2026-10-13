@@ -1,0 +1,39 @@
+$compact: 480px;
+$emit-custom-properties: true !default;
+
+@if $emit-custom-properties {
+  :root {
+    --rail-width: 56px;
+    --rail-item-size: 40px;
+    --rail-bar-height: 64px;
+    --page-width: 960px;
+    --page-gutter: 24px;
+    --page-top: 16px;
+
+    --space-10: 10px;
+    --space-16: 16px;
+    --space-20: 20px;
+    --space-26: 26px;
+    --space-34: 34px;
+
+    --control-height: 46px;
+    --control-padding-x: 17.5px;
+    --control-padding-start: 16px;
+    --control-padding-end: 24px;
+    --control-icon-gap: 8px;
+    --icon-size: 24px;
+    --icon-stroke: 2.2;
+
+    --radius-card: 35px;
+    --radius-item: 12px;
+    --radius-pill: 999px;
+
+    --border-width: 1px;
+    --shadow-card: 0 1px 1px rgb(150 200 255 / 0.14), 0 4px 18px rgb(150 177 244 / 0.07);
+    --shadow-pill: 0 1px 1.5px rgb(0 0 0 / 0.05);
+
+    @media (max-width: $compact) {
+      --page-gutter: 16px;
+    }
+  }
+}

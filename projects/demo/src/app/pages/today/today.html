@@ -1,0 +1,90 @@
+<h1 class="page-title">Today</h1>
+
+<section class="focus-card" aria-labelledby="focus-title">
+  <div class="focus-text">
+    <p class="focus-label">Daily focus</p>
+    <h2 class="focus-title" id="focus-title">{{ dailyFocus.title }}</h2>
+    <p class="focus-meta">
+      {{ dailyFocus.coach }}
+      <span aria-hidden="true">•</span>
+      {{ dailyFocus.minutes }} min
+    </p>
+  </div>
+
+  <div class="focus-actions">
+    <button class="button is-primary" type="button">Continue</button>
+    <button class="button" type="button">Change</button>
+  </div>
+
+  <svg class="rings" viewBox="0 0 141 141" role="img" [attr.aria-label]="activityLabel">
+    <g transform="translate(141 0) scale(-1 1) rotate(-90 70.5 70.5)">
+      <circle class="track" cx="70.5" cy="70.5" r="65.5" />
+      <circle
+        class="ring is-steps"
+        cx="70.5"
+        cy="70.5"
+        r="65.5"
+        pathLength="100"
+        [attr.stroke-dasharray]="percentOf(activity.steps) + ' 100'"
+      />
+      <circle class="track" cx="70.5" cy="70.5" r="40.5" />
+      <circle
+        class="ring is-move"
+        cx="70.5"
+        cy="70.5"
+        r="40.5"
+        pathLength="100"
+        [attr.stroke-dasharray]="percentOf(activity.move) + ' 100'"
+      />
+      <circle class="track" cx="70.5" cy="70.5" r="15.5" />
+      <circle
+        class="ring is-exercise"
+        cx="70.5"
+        cy="70.5"
+        r="15.5"
+        pathLength="100"
+        [attr.stroke-dasharray]="percentOf(activity.exercise) + ' 100'"
+      />
+    </g>
+    <g transform="rotate(-6 70.5 70.5)">
+      <circle class="badge" cx="70.5" cy="30" r="14" />
+      <svg class="badge-icon" x="62.5" y="22" width="16" height="16" viewBox="0 0 24 24">
+        <path
+          d="M7 6.5 9.6 5l2.2 3.3 1.6-1 1 1.6-1.6 1 .9 1.4 1.6-1 1 1.6-1.6 1 1 1.5c2.6.4 4.8 1.4 5.3 2.9.2.6-.3 1.2-.9 1.2H6.6c-.9 0-1.6-.7-1.6-1.6V8.4c0-.8.8-1.4 2-1.9Z"
+        />
+        <path d="M1 11h3M2 14.5h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </g>
+  </svg>
+</section>
+
+<div class="quick-actions">
+  <button class="action-button is-accent" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 4.4V1.6a10.4 10.4 0 1 1-9.5 6.17" />
+      <circle cx="12" cy="12" r="2.2" />
+      <path d="m10.4 10.2-3.6-4.4" />
+    </svg>
+    Quick start
+  </button>
+  <button class="action-button" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="2.65" y="4.3" width="18.7" height="16.85" rx="4" />
+      <path d="M2.65 9.6h18.7M7 1.45v2.85M17 1.45v2.85" />
+    </svg>
+    Browse Classes
+  </button>
+</div>
+
+<section aria-labelledby="trainers-title">
+  <h2 class="section-title" id="trainers-title">Trainers you follow</h2>
+  <ul class="trainers">
+    @for (trainer of trainers; track trainer.id) {
+      <li class="trainer">
+        <span class="avatar" aria-hidden="true">{{ trainer.name.charAt(0) }}</span>
+        <span class="trainer-name">{{ trainer.name }}</span>
+        <span class="trainer-meta">{{ trainer.specialty }} • {{ trainer.classCount }} classes</span>
+      </li>
+    }
+  </ul>
+</section>

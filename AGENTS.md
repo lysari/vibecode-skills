@@ -1,0 +1,1 @@
+- always use skill `/vibecode` to write code in this project
