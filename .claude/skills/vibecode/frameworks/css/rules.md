@@ -3,11 +3,20 @@
 Apply these on top of the generic rules when the project has `.css`, `.scss`, `.sass` or `.less` files.
 
 ## Custom properties
-- Declare a custom property that reads another custom property on the element a caller overrides, never on `:root`, e.g. `--cell: calc(var(--line) + 2 * var(--pad))` on the component's host. A custom property resolves its `var()`s where it is declared.
+- Declare a custom property that reads a custom property callers override on the element they override it on, never on `:root`, e.g. `--cell: calc(var(--line) + 2 * var(--pad))` on the component's host. A custom property resolves its `var()`s where it is declared.
+- Keep a component's own custom properties in that component's stylesheet, named `--<component>-*`, e.g. `--card-gap` in the card's stylesheet.
 - Size every inner part of a component (padding, gap, icon, handle, mark, default font) from the component's size custom properties, e.g. `height: calc(var(--_height) * 3 / 8)` for a handle. Never give an inner part a fixed px value that only fits the default size.
 
 ## Colours
 - Write every colour value as hex, e.g. `#0066d6`, or as `rgb()` when it has transparency, e.g. `rgb(16 24 40 / 0.08)`. Never write `oklch()`, `oklab()`, `lch()`, `lab()`, `hsl()` or `hwb()`.
+- Put every global colour in one palette file, e.g. `_palette.scss`: first each base colour with its value, e.g. `--primary: #0066d6`, `--gray-200: #e3e7ed`, then each design colour as a `var()` of a base colour, e.g. `--border: var(--gray-200)`. Never give a design colour a literal value.
+- Read only design colours outside the palette file, e.g. `var(--brand)`, never `var(--primary)`. To change a colour for one part of the page, override the design colour there, never a base colour.
+
+## Global styles
+- Declare every global style variable (a custom property on `:root`, or a preprocessor variable read by 2 or more files) in a file of the project's global styles folder. Never declare one in the entry stylesheet or in a page or component stylesheet; the entry stylesheet only loads the global files, e.g. `@use 'palette';`.
+- Put every `@font-face` and every font variable in one fonts file, e.g. `--font-sans` in `_fonts.scss`. Serve the font files from the project's own static folder, never from a font CDN `<link>` or `@import url()`.
+- Put every other global variable (radius, shadow, layout size) in one variables file, e.g. `--radius-lg`, `--page-width` in `_variables.scss`.
+- Put every global style rule (element defaults, form controls, shared classes such as `.eyebrow`) in one global rules file, e.g. `body { margin: 0; }` in `_global.scss`.
 
 ## Nesting in `.scss`, `.sass` and `.less`
 - Nest every selector inside the rule of the element it sits in, as deep as the markup goes. Never write the parent again at the top level, e.g. `.card { ul { … } li { span { … } } }`, not `.card ul { … }` and `.card li span { … }`.
