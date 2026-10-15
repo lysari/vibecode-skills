@@ -20,7 +20,7 @@ Do not use it for work that needs live back-and-forth with the running system, o
 
 ## Where the coder runs
 
-The skill takes one optional tag:
+The skill takes optional tags. `--host` picks where the coder runs (below); `--direct` skips the sub-agent (see "Run through a sub-agent"). They combine.
 
 | Tag | Where | Command |
 | --- | --- | --- |
@@ -54,7 +54,7 @@ A brief can take from a few minutes to half an hour. Run it in the background an
 
 ## Watch progress
 
-Waiting silently and reporting "it is running, I will review when it finishes" gives the user nothing to act on. Stream the coder's steps and relay them.
+Waiting silently and reporting "it is running, I will review when it finishes" gives the user nothing to act on. Stream the coder's steps and relay them. The sub-agent does this by default; with `--direct`, the operator does it.
 
 1. Run the coder in the background with `stream-json` into a log file, as above.
 2. Follow the log through a filter that prints one line per step, and let each line reach you as it appears (the harness's monitor tool, or `tail -f`):
@@ -70,6 +70,24 @@ tail -f run.ndjson | jq -R -r --unbuffered 'fromjson? | select(.type=="assistant
 6. When the run ends, read the `result` event (`jq 'select(.type=="result")' run.ndjson`), then start the review. Do not rely on the last line of the log as the report.
 
 Ask in the brief for the coder to say in one line what it is about to do before each step, so the log reads as a narrative.
+
+## Run through a sub-agent (default)
+
+By default the operator does not start or tail the coder itself. It starts a background sub-agent (the Agent tool, on a cheap model such as haiku) that runs the coder and watches the log. The user can open the sub-agent's row to see each step, and the operator's own context stays free of log lines. With the `--direct` tag, skip the sub-agent: the operator runs the coder and tails the log itself, as in "Watch progress".
+
+Give the sub-agent a prompt that stands alone, since it starts with no context:
+
+1. The exact coder command (with `command claude` if `--host` is set), in the background, with the log path and the path of the brief file. Pass the path, not the brief text.
+2. The progress filter from "Watch progress", and an instruction to check it and `git diff --stat` every few minutes instead of every line.
+3. Limits: run only the coder command and read-only checks; do not edit code, fix problems, commit, stage, stash, reset, or checkout.
+4. What to return: the final `result` event, the files changed, anything denied or stuck, and the elapsed time.
+
+When the sub-agent finishes, the operator reads its report, then does the review as usual. Notes:
+
+- The sub-agent uses its own model's tokens. They stay out of the main session but still count toward usage.
+- It cannot message the user while it runs. The user sees progress only by opening its details, and the operator hears only when it finishes.
+- It does not review. Judging the diff, building, and testing stay with the operator.
+- For a review comment, start a new sub-agent with the `--continue` command.
 
 ## Write the brief
 
