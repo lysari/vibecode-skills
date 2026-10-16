@@ -9,7 +9,7 @@
     max-width     : calc(100vw - 32px);
     height        : 480px;
     max-height    : calc(100dvh - 160px);
-    font-family   : var.$appFont;
+    font-family   : var.$fontFamilySans;
     color         : #1d1d1f;
 
     // The app blue, so the buttons ignore whichever service accent is around.

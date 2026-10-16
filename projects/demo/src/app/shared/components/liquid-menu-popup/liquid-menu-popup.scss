@@ -231,7 +231,7 @@
         font-size     : 16px;
         font-weight   : 600;
         line-height   : 1.25;
-        font-family   : var.$appFont;
+        font-family   : var.$fontFamilySans;
 
         // Sized off its own font-size, so an `ng-icon` (1em by default) just fits.
         .liquid-menu-popup-title-icon {
@@ -254,13 +254,13 @@
     .liquid-menu-popup-header {
         flex       : none;
         padding    : 4px 4px 8px;
-        font-family: var.$appFont;
+        font-family: var.$fontFamilySans;
     }
 
     // No padding of its own, so a footer that hides itself leaves no gap.
     .liquid-menu-popup-footer {
         flex       : none;
-        font-family: var.$appFont;
+        font-family: var.$fontFamilySans;
     }
 
     .liquid-menu-popup-body {
@@ -291,7 +291,7 @@
             border-radius  : 12px;
             background     : transparent;
             color          : #1d1d1f;
-            font-family    : var.$appFont;
+            font-family    : var.$fontFamilySans;
             font-size      : 13.5px;
             font-weight    : 500;
             text-align     : start;

@@ -7,7 +7,7 @@
 
 :host {
     display    : block;
-    font-family: var.$appFont;
+    font-family: var.$fontFamilySans;
     color      : var(--ink);
 }
 
@@ -83,7 +83,7 @@
 
     h1 {
         margin     : 0 0 10px;
-        font-family: var.$appFontStrong;
+        font-family: var.$fontFamilySans;
         font-size  : 30px;
         font-weight: 700;
     }
@@ -110,7 +110,7 @@
 
 .docs-divider {
     margin     : 26px 8px 8px;
-    font-family: var.$appFontStrong;
+    font-family: var.$fontFamilySans;
     font-size  : 22px;
     font-weight: 700;
 }
@@ -130,7 +130,7 @@
     h2,
     h3 {
         margin     : 0 0 6px;
-        font-family: var.$appFontStrong;
+        font-family: var.$fontFamilySans;
         font-weight: 700;
     }
 

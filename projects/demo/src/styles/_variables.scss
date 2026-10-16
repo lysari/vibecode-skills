@@ -1,16 +1,51 @@
 $compact: 960px;
 $emit-custom-properties: false !default;
 
-$appFont: 'Arial', sans-serif, 'Khmer OS Siemreap', 'Kh Siemreap', 'Siemreap', 'Hanuman',
-  'Khmer OS Battambang';
-$appFontForm: 'system-ui', BlinkMacSystemFont, '.SFNSText-Regular', 'Helvetica Neue', Helvetica,
-  Roboto, Open Sans, Arial, sans-serif, 'Khmer OS Battambang', 'khmeros_siemreap';
-$appFontStrong: 'system-ui', '-apple-system', BlinkMacSystemFont, '.SFNSText-Regular',
-  'Helvetica Neue', Helvetica, Roboto, Open Sans, Arial, sans-serif, 'auxswot-bold', 'auxswot',
-  'Hanuman-bold', 'Battambang', 'khmeros_siemreap';
+// Minimal font variables: local Google Fonts (Inter + Roboto + Battambang) with system fallbacks
+$fontFamilySans: 'Inter', 'Roboto', 'Battambang', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
 @if $emit-custom-properties {
   :root {
+    // Typography tokens
+    --font-sans: #{$fontFamilySans};
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --text-h1-size: 27px;
+    --text-h1-line: 33px;
+    --text-h1-tracking: -0.4px;
+
+    --text-h2-size: 16.5px;
+    --text-h2-line: 22px;
+    --text-h2-tracking: -0.2px;
+
+    --text-subheading-size: 16px;
+    --text-subheading-line: 22px;
+
+    --text-section-size: 13px;
+    --text-section-line: 18px;
+
+    --text-nav-size: 15.5px;
+    --text-nav-line: 20px;
+
+    --text-item-title-size: 15.5px;
+    --text-item-title-line: 21px;
+
+    --text-item-subtitle-size: 14px;
+    --text-item-subtitle-line: 19px;
+
+    --text-badge-size: 12px;
+    --text-badge-line: 15px;
+
+    --text-button-size: 16.5px;
+    --text-button-line: 20px;
+
+    --text-chart-axis-size: 13.5px;
+    --text-chart-axis-line: 16px;
+
+    // Layout & surface tokens
     --page-padding: 0px;
     --window-max-width: 100%;
     --window-radius: 0px;

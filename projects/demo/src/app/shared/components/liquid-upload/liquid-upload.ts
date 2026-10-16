@@ -271,7 +271,17 @@ export class LiquidUpload implements ControlValueAccessor {
 
   /** Opens the system picker. */
   pick(): void {
-    if (!this.isDisabled() && !this.busy()) this.picker().nativeElement.click();
+    if (this.isDisabled() || this.busy()) return;
+    const input = this.picker().nativeElement;
+    if (typeof input.showPicker === 'function') {
+      try {
+        input.showPicker();
+        return;
+      } catch {
+        // Fallback to click() below
+      }
+    }
+    input.click();
   }
 
   remove(): void {

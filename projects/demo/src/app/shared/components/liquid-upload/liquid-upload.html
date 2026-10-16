@@ -80,7 +80,7 @@
       type="button"
       i18n-aria-label="@@form.file.remove"
       aria-label="Remove file"
-      (click)="remove()"
+      (click)="remove(); $event.stopPropagation()"
     >
       <ng-icon name="ionCloseCircle"></ng-icon>
     </button>
@@ -96,7 +96,7 @@
     [attr.aria-label]="label() + ', ' + actionLabel()"
     [attr.aria-describedby]="describedByIds()"
     [attr.aria-invalid]="invalid() || rejection() !== null ? 'true' : null"
-    (click)="pick()"
+    (click)="pick(); $event.stopPropagation()"
   >
     {{ actionLabel() }}
   </button>

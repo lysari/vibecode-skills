@@ -1,40 +1,122 @@
-:root {
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+/* ==========================================================================
+   Google Fonts: Roboto (Latin/UI) & Battambang (Khmer) - Self-Hosted
+   ========================================================================== */
 
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+/* Roboto */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url('/assets/fonts/roboto-latin.woff2') format('woff2'),
+    url('/assets/fonts/Roboto-Regular.ttf') format('truetype');
+}
 
-  --text-h1-size: 27px;
-  --text-h1-line: 33px;
-  --text-h1-tracking: -0.4px;
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/Roboto-Italic.ttf') format('truetype');
+}
 
-  --text-h2-size: 16.5px;
-  --text-h2-line: 22px;
-  --text-h2-tracking: -0.2px;
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:
+    url('/assets/fonts/roboto-latin.woff2') format('woff2'),
+    url('/assets/fonts/Roboto-Medium.ttf') format('truetype');
+}
 
-  --text-subheading-size: 16px;
-  --text-subheading-line: 22px;
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/assets/fonts/Roboto-MediumItalic.ttf') format('truetype');
+}
 
-  --text-section-size: 13px;
-  --text-section-line: 18px;
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src:
+    url('/assets/fonts/roboto-latin.woff2') format('woff2'),
+    url('/assets/fonts/Roboto-Bold.ttf') format('truetype');
+}
 
-  --text-nav-size: 15.5px;
-  --text-nav-line: 20px;
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/Roboto-BoldItalic.ttf') format('truetype');
+}
 
-  --text-item-title-size: 15.5px;
-  --text-item-title-line: 21px;
+/* Battambang (Khmer) */
+@font-face {
+  font-family: 'Battambang';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url('/assets/fonts/battambang-400-khmer.woff2') format('woff2'),
+    url('/assets/fonts/battambang-400-latin.woff2') format('woff2'),
+    url('/assets/fonts/Battambang-Regular.ttf') format('truetype');
+}
 
-  --text-item-subtitle-size: 14px;
-  --text-item-subtitle-line: 19px;
+@font-face {
+  font-family: 'Battambang';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src:
+    url('/assets/fonts/battambang-700-khmer.woff2') format('woff2'),
+    url('/assets/fonts/battambang-700-latin.woff2') format('woff2'),
+    url('/assets/fonts/Battambang-Bold.ttf') format('truetype');
+}
 
-  --text-badge-size: 12px;
-  --text-badge-line: 15px;
+/* Inter */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url('/assets/fonts/inter-latin.woff2') format('woff2'),
+    url('/assets/fonts/Inter-Regular.ttf') format('truetype');
+}
 
-  --text-button-size: 16.5px;
-  --text-button-line: 20px;
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:
+    url('/assets/fonts/inter-latin.woff2') format('woff2'),
+    url('/assets/fonts/Inter-Medium.ttf') format('truetype');
+}
 
-  --text-chart-axis-size: 13.5px;
-  --text-chart-axis-line: 16px;
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src:
+    url('/assets/fonts/inter-latin.woff2') format('woff2'),
+    url('/assets/fonts/Inter-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src:
+    url('/assets/fonts/inter-latin.woff2') format('woff2'),
+    url('/assets/fonts/Inter-Bold.ttf') format('truetype');
 }

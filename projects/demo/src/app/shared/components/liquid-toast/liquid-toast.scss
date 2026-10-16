@@ -163,7 +163,7 @@
     width      : 100%;
     min-height : 52px;
     padding    : 10px;
-    font-family: var.$appFont;
+    font-family: var.$fontFamilySans;
 
     // A custom template owns its own layout; the card only paints around it.
     &.is-custom {
@@ -279,7 +279,7 @@
     backdrop-filter: saturate(180%) blur(12px);
     box-shadow     : 0 6px 16px -8px rgba(0, 0, 0, 0.45);
     color          : #fff;
-    font-family    : var.$appFont;
+    font-family    : var.$fontFamilySans;
     font-size      : 12px;
     font-weight    : 600;
     line-height    : 1;
