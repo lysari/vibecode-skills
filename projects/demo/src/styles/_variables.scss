@@ -3,46 +3,47 @@ $emit-custom-properties: true !default;
 
 @if $emit-custom-properties {
   :root {
-    --page-padding: 32px;
+    --page-padding: 0px;
     --window-max-width: 100%;
-    --window-radius: 28px;
-    --window-padding: 11px;
-    --panel-radius: calc(var(--window-radius) - var(--window-padding));
-    --sidebar-padding: 18px;
-    --panel-padding: 28px;
+    --window-radius: 0px;
+    --window-padding: 12px;
+    --panel-radius: 20px;
+    --sidebar-padding: 16px;
+    --panel-padding: 22px;
     --card-radius: 18px;
-    --card-padding: 20px;
-    --well-padding: 8px;
+    --card-padding: 18px;
+    --well-padding: 6px;
     --well-radius: calc(var(--card-radius) - var(--well-padding));
     --item-icon-radius: 10px;
-    --item-icon-size: 38px;
+    --item-icon-size: 36px;
     --control-radius: 10px;
     --pill-radius: 999px;
     --badge-radius: 6px;
     --logo-radius: 10px;
-    --logo-size: 40px;
+    --logo-size: 38px;
+    --glass-blur: 20px;
 
-    --sidebar-width: 304px;
-    --header-height: 62px;
-    --top-pill-height: 42px;
-    --search-height: 42px;
-    --nav-item-height: 38px;
-    --branch-btn-height: 42px;
-    --manage-btn-height: 44px;
+    --sidebar-width: 292px;
+    --header-height: 50px;
+    --top-pill-height: 38px;
+    --search-height: 38px;
+    --nav-item-height: 34px;
+    --branch-btn-height: 38px;
+    --manage-btn-height: 40px;
 
-    --space-between-cards: 20px;
-    --space-section: 20px;
-    --space-item-gap: 14px;
+    --space-between-cards: 16px;
+    --space-section: 14px;
+    --space-item-gap: 12px;
     --space-inline-gap: 10px;
 
     --border-width: 1px;
-    --shadow-window: 0 20px 60px rgb(0 0 0 / 0.16), 0 2px 8px rgb(0 0 0 / 0.06);
-    --shadow-card: 0 1px 3px rgb(0 0 0 / 0.03);
-    --shadow-pill: 0 1px 2px rgb(0 0 0 / 0.05);
+    --shadow-window: none;
+    --shadow-card: 0 2px 8px rgb(0 0 0 / 0.04);
+    --shadow-pill: 0 1px 3px rgb(0 0 0 / 0.06);
 
     @media (max-width: $compact) {
-      --page-padding: 12px;
-      --panel-padding: 18px;
+      --window-padding: 10px;
+      --panel-padding: 16px;
     }
   }
 }
