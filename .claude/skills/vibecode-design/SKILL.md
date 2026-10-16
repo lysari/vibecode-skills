@@ -2,7 +2,7 @@
 name: vibecode-design
 description: Use when building or changing user interface screens, components, layouts, or styles, so the UI reuses the project's existing components and design values, looks consistent across screens, and stays accessible
 metadata:
-  version: "0.0.1-20261016.1"
+  version: "0.0.1-20261016.2"
 ---
 
 # Vibecode design
@@ -25,6 +25,11 @@ Build UI that looks as if one careful designer and developer made every screen: 
 
 - Stretch a full-screen application layout across `100%` of the viewport width and height; never cap the outer shell with a fixed pixel `max-width` that leaves dead margins on wider monitors, e.g. `width: 100%`, never `max-width: 1200px`.
 - Lock the outer application shell to the viewport height on desktop (`height: 100dvh; overflow: hidden`) and make the content pane and sidebar navigation list scroll independently (`min-height: 0; overflow-y: auto`); never let the document body scroll the header or sidebar off-screen.
+- Place subsection or directory navigation in a layout-level secondary sidebar or split pane within the window shell; never embed a navigation rail or column inside the scrollable content panel, e.g. a desktop shell grid with a secondary sidebar beside the content pane, never a sidebar inside the page body.
+
+## Navigation and controls
+
+- Never squeeze a horizontal tab strip or segmented control into a narrow column or sidebar where tab labels cannot fit without clipping or overlapping; use a vertical navigation list, a dropdown selector, or horizontally scrollable pills instead, e.g. a vertical list of category links in a narrow sidebar, never five horizontal tab buttons stretched across a 240px column.
 
 ## Corner radius
 
