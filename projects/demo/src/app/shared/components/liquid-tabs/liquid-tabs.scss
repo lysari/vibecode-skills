@@ -1,0 +1,121 @@
+// Not encapsulated: the tabs are the consumer's own elements, projected in, and
+// encapsulated rules would never reach them. Every selector hangs off a class the
+// component or its directives put on their own hosts instead.
+//
+// Tunables are read with a fallback rather than declared here, so a
+// `--liquid-tabs-*` set on any ancestor reaches the bar too.
+
+@use 'liquid-tab-panel';
+
+.liquid-tabs {
+    // Resolved once, for the rules below that derive from them.
+    --_liquid-tabs-padding      : var(--liquid-tabs-padding, 3px);
+    --_liquid-tabs-radius       : var(--liquid-tabs-radius, 999px);
+    --liquid-tabs-selected-color: #1a73e8;
+
+    position         : relative;
+    // Keeps the pill-under-tabs stacking to the bar.
+    isolation        : isolate;
+    display          : inline-grid;
+    grid-auto-flow   : column;
+    grid-auto-columns: auto;
+    box-sizing       : border-box;
+    max-width        : 100%;
+    padding          : var(--_liquid-tabs-padding);
+    border-radius    : var(--_liquid-tabs-radius);
+    background-color : var(--liquid-tabs-background, rgba(0, 0, 0, 0.05));
+    font-size        : var(--liquid-tabs-font-size, 13px);
+
+    &.is-stretched {
+        display          : grid;
+        grid-auto-columns: minmax(0, 1fr);
+    }
+
+    // A pill-shaped column of tabs reads as a blob; a vertical bar gets corners.
+    &.is-vertical {
+        --_liquid-tabs-radius: var(--liquid-tabs-radius, 16px);
+
+        grid-auto-flow: row;
+
+        &.is-stretched {
+            grid-auto-rows: minmax(0, 1fr);
+        }
+    }
+}
+
+// Placed and sized by the component off the selected tab's box.
+.liquid-tabs-indicator {
+    position        : absolute;
+    top             : 0;
+    left            : 0;
+    z-index         : 0;
+    width           : var(--liquid-tabs-indicator-width, 0px);
+    height          : var(--liquid-tabs-indicator-height, 0px);
+    translate       : var(--liquid-tabs-indicator-x, 0px) var(--liquid-tabs-indicator-y, 0px);
+    border-radius   : calc(var(--_liquid-tabs-radius) - var(--_liquid-tabs-padding));
+    background-color: var(--liquid-tabs-indicator-color, #fff);
+    box-shadow      : var(--liquid-tabs-indicator-shadow, 0 1px 4px rgba(0, 0, 0, 0.12));
+    opacity         : 0;
+    pointer-events  : none;
+
+    .has-selection>& {
+        opacity: 1;
+    }
+
+    // Only the fade. The move between tabs is a Web Animation from the component —
+    // a CSS transition on the same properties would outrank it in the cascade.
+    .is-ready>& {
+        transition: opacity 150ms ease;
+    }
+}
+
+.liquid-tab {
+    position                   : relative;
+    z-index                    : 1;
+    display                    : inline-flex;
+    align-items                : center;
+    justify-content            : center;
+    gap                        : 6px;
+    min-width                  : 0;
+    padding                    : var(--liquid-tabs-tab-padding, 5px 14px);
+    border                     : none;
+    border-radius              : calc(var(--_liquid-tabs-radius) - var(--_liquid-tabs-padding));
+    background                 : none;
+    color                      : var(--liquid-tabs-color, rgba(29, 29, 31, 0.55));
+    font                       : inherit;
+    font-weight                : 500;
+    white-space                : nowrap;
+    cursor                     : pointer;
+    transition                 : color 150ms ease-in-out;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover:not(.is-selected, .is-disabled) {
+        color: var(--liquid-tabs-hover-color, rgba(29, 29, 31, 0.8));
+    }
+
+    &.is-selected {
+        color: var(--liquid-tabs-selected-color, #1d1d1f);
+    }
+
+    &.is-disabled {
+        opacity: 0.4;
+        cursor : default;
+    }
+
+    &:focus-visible {
+        outline       : 2px solid var(--color-primary, #1a73e8);
+        outline-offset: -2px;
+    }
+
+    .is-vertical>& {
+        justify-content: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .liquid-tabs.is-ready>.liquid-tabs-indicator,
+    .liquid-tab {
+        transition: none;
+    }
+}

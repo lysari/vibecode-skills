@@ -1,0 +1,203 @@
+<div class="docs-page">
+  <article>
+    <div class="docs-page-header">
+      <div class="docs-breadcrumb">Components / Overlays & Menus</div>
+      <h1 class="docs-title">Search</h1>
+      <p class="docs-lead">
+        Site search and command palette with section grouping, grapheme-cluster-safe
+        substring highlighting, recent history persistence, and keyboard roving navigation.
+      </p>
+    </div>
+
+  <section id="overview" class="docs-section">
+    <h2 class="docs-section-title">Overview</h2>
+    <p class="docs-text">
+      The Search component delivers a fast, accessible command palette experience designed to sit
+      inside an <code>&lt;x-liquid-menu-popup&gt;</code> or standalone container. Arrow keys navigate
+      through grouped results while keeping focus inside the search field, and matches are highlighted
+      without breaking Unicode grapheme clusters.
+    </p>
+
+    <div class="docs-preview-card">
+      <div class="docs-search-standalone-box">
+        <app-search [items]="items()" />
+      </div>
+    </div>
+  </section>
+
+  <section id="playground" class="docs-section">
+    <h2 class="docs-section-title">Playground</h2>
+    <p class="docs-text">
+      Filter the catalog dataset passed into <code>[items]</code> and test keyboard navigation and recent item caching.
+    </p>
+
+    <div class="docs-playground-card">
+      <div class="docs-playground-controls">
+        <div class="docs-control-group">
+          <label class="docs-control-label">Catalog Dataset</label>
+          <div class="docs-btn-group">
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="sectionFilter() === 'all'"
+              (click)="setSectionFilter('all')"
+            >
+              All Sections (6)
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="sectionFilter() === 'Analytics'"
+              (click)="setSectionFilter('Analytics')"
+            >
+              Analytics Only
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="sectionFilter() === 'Security'"
+              (click)="setSectionFilter('Security')"
+            >
+              Security Only
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="docs-stage-box">
+        <div class="docs-search-standalone-box">
+          <app-search [items]="items()" />
+        </div>
+      </div>
+
+      <div class="docs-code-container">
+        <div class="docs-code-header">
+          <span class="docs-code-title">Live Template Preview</span>
+        </div>
+        <pre class="docs-code">{{ playMarkup() }}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="sizes" class="docs-section">
+    <h2 class="docs-section-title">Contexts & Overlays</h2>
+    <p class="docs-text">
+      Search is designed to pair natively with <code>LiquidMenuPopup</code> to provide a floating
+      global command palette anchored to a header trigger.
+    </p>
+
+    <div class="docs-sizes-grid">
+      <div class="docs-size-card">
+        <div class="docs-size-header">
+          <span class="docs-size-badge">Modal Command Palette</span>
+          <span class="docs-size-desc">Anchored popup dialog with lazy content projection and auto-focus</span>
+        </div>
+        <div class="docs-size-preview">
+          <button
+            type="button"
+            liquidButton="filled"
+            [liquidMenuTriggerFor]="commandMenu"
+          >
+            Open Command Palette
+          </button>
+
+          <x-liquid-menu-popup
+            #commandMenu="liquidMenu"
+            role="dialog"
+            title="Search"
+          >
+            <ng-template liquidMenuContent>
+              <app-search [items]="allItems" />
+            </ng-template>
+          </x-liquid-menu-popup>
+        </div>
+      </div>
+
+      <div class="docs-size-card">
+        <div class="docs-size-header">
+          <span class="docs-size-badge">Embedded Sidebar Filter</span>
+          <span class="docs-size-desc">Fixed in-flow catalog navigation</span>
+        </div>
+        <div class="docs-size-preview">
+          <div class="docs-mini-search-frame">
+            <app-search [items]="allItems" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="setup" class="docs-section">
+    <h2 class="docs-section-title">Setup & Usage</h2>
+    <div class="docs-setup-block">
+      <pre class="docs-code">import &#123; Search, type SearchItem &#125; from '@app/shared/components/search/search';
+import &#123; LiquidMenuPopup &#125; from '@app/shared/components/liquid-menu-popup/liquid-menu-popup';
+import &#123; LiquidMenuContent &#125; from '@app/shared/components/liquid-menu-popup/liquid-menu-content.directive';
+import &#123; LiquidMenuTrigger &#125; from '@app/shared/components/liquid-menu-popup/liquid-menu-trigger.directive';
+
+&#64;Component(&#123;
+  imports: [Search, LiquidMenuPopup, LiquidMenuContent, LiquidMenuTrigger],
+  template: `
+    &lt;button type="button" [liquidMenuTriggerFor]="searchMenu"&gt;Search&lt;/button&gt;
+
+    &lt;x-liquid-menu-popup #searchMenu="liquidMenu" role="dialog" title="Search"&gt;
+      &lt;ng-template liquidMenuContent&gt;
+        &lt;app-search [items]="searchItems" /&gt;
+      &lt;/ng-template&gt;
+    &lt;/x-liquid-menu-popup&gt;
+  `,
+&#125;)
+export class HeaderNavigation &#123;
+  protected readonly searchItems: SearchItem[] = [
+    &#123; title: 'Cluster Overview', path: '/monitoring', section: 'Analytics', icon: 'ionGlobeOutline' &#125;,
+  ];
+&#125;</pre>
+    </div>
+  </section>
+
+  <section id="api" class="docs-section">
+    <h2 class="docs-section-title">API Reference</h2>
+    <div class="docs-table-wrapper">
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of apiRows; track row.name) {
+            <tr>
+              <td><code>{{ row.name }}</code></td>
+              <td><code>{{ row.type }}</code></td>
+              <td><code>{{ row.default }}</code></td>
+              <td>{{ row.description }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <span class="docs-toc-title">On this page</span>
+      <ul>
+        @for (sec of sections; track sec.id) {
+          <li>
+            <a
+              class="docs-toc-link"
+              [href]="'#' + sec.id"
+              (click)="jumpTo($event, sec.id)"
+            >
+              {{ sec.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>

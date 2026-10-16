@@ -1,0 +1,211 @@
+// Styles for the `[numberPopIn]` directive — Transitions.dev "Number pop-in",
+// plus the matching way out.
+//
+// A directive has no view encapsulation, so — same reason as `_liquid-glass.scss`
+// — these rules have to live globally. The upstream class names are kept as
+// authored (`.t-digit-group` / `.t-digit` / `.is-animating`) so markup that was
+// hand-written against the original snippet keeps working next to the directive.
+//
+// Every knob is a custom property, so a single group can be retuned by setting
+// them on the host — which is exactly what the directive's inputs do.
+
+:root {
+  --digit-dur                                         : 500ms;
+  --digit-distance                                    : 8px;
+  --digit-stagger                                     : 70ms;
+  --digit-blur                                        : 2px;
+  --digit-ease                                        : cubic-bezier(0.34, 1.45, 0.64, 1);
+  // Unit-less multipliers applied to --digit-distance: 1 / -1 / 0 per axis.
+  // The default starts each digit below its resting place and lifts it up.
+  --digit-dir-x                                       : 0;
+  --digit-dir-y                                       : 1;
+
+  // The way out. Shorter than the way in, because the value being replaced is
+  // no longer the thing worth looking at — and while both run at once, a long
+  // exit is what makes the swap read as two numbers overlapping instead of one
+  // becoming another.
+  --digit-exit-dur              : calc(var(--digit-dur) * 0.6);
+  --digit-exit-distance         : var(--digit-distance);
+  // No overshoot on the way out: a digit that sprang back before leaving would
+  // read as indecision. This accelerates away instead.
+  --digit-exit-ease             : cubic-bezier(0.4, 0, 1, 1);
+
+  // How long the incoming value waits during a swap. Without it the two values
+  // are at full strength in the same place at the same time and neither can be
+  // read; a wait of roughly half the exit lets the old one thin out first, and
+  // the two still overlap enough to read as one value becoming another. Applies
+  // to a swap only — the delay is carried by the incoming layer, so a first
+  // paint has nothing to wait for.
+  --digit-swap-delay : calc(var(--digit-exit-dur) * 0.45);
+  --digit-enter-delay: 0ms;
+}
+
+@keyframes t-digit-pop-in {
+  0% {
+    transform: translate(calc(var(--digit-distance) * var(--digit-dir-x)),
+        calc(var(--digit-distance) * var(--digit-dir-y)));
+    opacity: 0;
+    filter : blur(var(--digit-blur));
+  }
+
+  100% {
+    transform: translate(0, 0);
+    opacity  : 1;
+    filter   : blur(0);
+  }
+}
+
+// The mirror of the entrance, but *continuing* rather than reversing: the
+// direction is negated, so digits that rise into place carry on upward and out.
+// Reversing it would send the old value back where the new one is coming from,
+// and the two would visibly cross.
+@keyframes t-digit-pop-out {
+  0% {
+    transform: translate(0, 0);
+    opacity  : 1;
+    filter   : blur(0);
+  }
+
+  100% {
+    transform: translate(calc(var(--digit-exit-distance) * var(--digit-dir-x) * -1),
+        calc(var(--digit-exit-distance) * var(--digit-dir-y) * -1));
+    opacity: 0;
+    filter : blur(var(--digit-blur));
+  }
+}
+
+.t-digit-group {
+  display    : inline-flex;
+  align-items: baseline;
+  // The containing block for the layer on its way out.
+  position   : relative;
+
+  * {
+    font-size: inherit !important;
+  }
+}
+
+// One per value. Two exist only during a swap — the incoming one in flow, the
+// outgoing one on top of it.
+.t-digit-layer {
+  display    : inline-flex;
+  align-items: baseline;
+}
+
+// Which way a value travels when the call site hasn't said: a number that went
+// up arrives from below and the one it replaces carries on upward, a number that
+// went down does the reverse — the way an odometer reads, so the direction is
+// the change itself rather than decoration.
+//
+// A class rather than an inline style, which is what keeps the precedence
+// straight: `popDirection` and a hand-written `--digit-dir-*` are both inline on
+// the host, and inline beats this. Only the vertical axis is set, so a diagonal
+// configured anywhere else keeps its x.
+.t-digit-group.is-rising {
+  --digit-dir-y: 1;
+}
+
+.t-digit-group.is-falling {
+  --digit-dir-y: -1;
+}
+
+// The layer arriving into a swap, as opposed to onto an empty group. Inherited
+// by its digits, whose inline `animation-delay` adds it to their stagger — a
+// stylesheet rule could not, since inline styles outrank it. The outgoing layer
+// is a sibling and so never inherits it; `:not()` covers the moment it becomes
+// the outgoing one.
+.t-digit-layer.is-swapping-in:not(.is-leaving) {
+  --digit-enter-delay: var(--digit-swap-delay);
+}
+
+// Out of flow, so the incoming value alone defines the box: left in flow the two
+// layers would sit side by side and the group would double in width mid-swap.
+// Anchored to the start edge, since a number that gains or loses a digit does it
+// at the tail.
+.t-digit-layer.is-leaving {
+  position          : absolute;
+  top               : 0;
+  inset-inline-start: 0;
+  pointer-events    : none;
+}
+
+.t-digit {
+  display    : inline-block;
+  // Each character is its own span, so a space is a span holding nothing but a
+  // space — which an inline-flex parent would otherwise collapse away.
+  white-space: pre;
+}
+
+.t-digit-group.is-animating .t-digit {
+  animation                                                                  : t-digit-pop-in var(--digit-dur) var(--digit-ease) both;
+  // Scoped to the animating state rather than sitting on `.t-digit` outright:
+  // `will-change` promotes a layer per digit, and a page of counters would hold
+  // all of them for the whole session. The directive drops `.is-animating` once
+  // the last digit's `animationend` lands, which releases them again.
+  will-change                                                                : transform, opacity, filter;
+}
+
+// Specificity (0,4,0) against the entrance rule's (0,3,0), which is what lets a
+// leaving layer keep its exit while the host still carries `.is-animating` for
+// the layer coming in — both live inside the same host during a swap.
+.t-digit-group .t-digit-layer.is-leaving .t-digit {
+  animation  : t-digit-pop-out var(--digit-exit-dur) var(--digit-exit-ease) both;
+  will-change: transform, opacity, filter;
+}
+
+// A position that holds the same character as the value it replaced: drawn where
+// it belongs, no keyframes, and no layer held for it. (0,4,0) against the
+// entrance rule, and the directive strips the class the moment this layer
+// becomes the outgoing one — a digit that didn't move on the way in still has to
+// leave when the position finally does change.
+.t-digit-group.is-animating .t-digit.is-static {
+  animation  : none;
+  will-change: auto;
+}
+
+// The outgoing half of the same position. The incoming layer is already painting
+// this character in this spot, so animating a second copy of it away would read
+// as the digit that *didn't* change being the one that left. It keeps its box —
+// the layer is out of flow, and the digits leaving beside it line up against
+// these widths. (0,5,0) against the exit rule's (0,4,0).
+.t-digit-group .t-digit-layer.is-leaving .t-digit.is-held {
+  animation  : none;
+  visibility : hidden;
+  will-change: auto;
+}
+
+// The directive sets `animation-delay` inline, which covers any index and is
+// reused as-is by the exit; these two rules exist so hand-written
+// `data-stagger="1"` / `"2"` markup still staggers.
+.t-digit-group.is-animating .t-digit[data-stagger='1'] {
+  animation-delay: var(--digit-stagger);
+}
+
+.t-digit-group.is-animating .t-digit[data-stagger='2'] {
+  animation-delay: calc(var(--digit-stagger) * 2);
+}
+
+// Holds the value as one unsplit string for assistive tech: the digit layers are
+// `aria-hidden`, since a screen reader walking them one character at a time
+// reads "1 2 . 3" instead of "12.3".
+.t-digit-sr {
+  position   : absolute;
+  width      : 1px;
+  height     : 1px;
+  margin     : -1px;
+  padding    : 0;
+  border     : 0;
+  overflow   : hidden;
+  white-space: nowrap;
+  clip-path  : inset(50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  // Covers both directions — the directive also skips the swap entirely, so no
+  // outgoing layer is left behind waiting for an `animationend` that the
+  // stylesheet just cancelled.
+  .t-digit-group .t-digit {
+    animation: none !important;
+  }
+}

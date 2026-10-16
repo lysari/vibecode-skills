@@ -1,4 +1,10 @@
 @use 'styles/palette';
 @use 'styles/font';
-@use 'styles/variables';
+@use 'styles/variables' with (
+  $emit-custom-properties: true
+);
 @use 'styles/global';
+@use 'styles/liquid-glass';
+@use 'styles/number-pop-in';
+@use 'styles/number-slot';
+@use 'styles/text-states-swap';

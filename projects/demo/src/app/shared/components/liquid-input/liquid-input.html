@@ -1,0 +1,196 @@
+@if (label(); as text) {
+  @if (!bare()) {
+    <label class="liquid-input-label" [for]="inputId()">
+      <span>{{ text }}</span>
+      @if (optional()) {
+        <span class="liquid-input-optional" i18n="@@form.optional">Optional</span>
+      } @else if (isRequired()) {
+        <span class="liquid-input-required" aria-hidden="true">*</span>
+      }
+    </label>
+  }
+}
+
+<!--
+  The press squashes an element's children, so this holds exactly one: the field.
+  Scaling each of the field's own children instead would deform them about their
+  own centres — the box would spread 6px while the icon at its edge moved half a
+  pixel and stayed where it was, which reads as the paint sliding out from under
+  its contents. Moved as one box, everything on the surface travels with it.
+
+  The wrapper takes no space of its own, and a scale is not a layout: the row
+  keeps exactly the size the grid gave it however far the field squashes past it.
+-->
+<div #press class="liquid-input-press">
+  <div class="liquid-input-field">
+    @if (prefixIcon(); as icon) {
+      <ng-icon class="liquid-input-icon is-prefix" [name]="icon" aria-hidden="true"></ng-icon>
+    }
+    <!-- An affix nobody filled is an empty element, and `:empty` takes it out of
+         the row — so there must be no whitespace of its own inside it. -->
+    <!-- prettier-ignore -->
+    <span class="liquid-input-affix is-prefix"><ng-content select="[liquidInputPrefix]" /></span>
+
+    @if (options(); as choices) {
+      <select
+        #field
+        class="liquid-input-control liquid-input-choices"
+        [id]="inputId()"
+        [value]="text()"
+        [disabled]="isDisabled()"
+        [required]="isRequired()"
+        [attr.name]="name()"
+        [attr.aria-label]="label() && bare() ? label() : null"
+        [attr.aria-invalid]="hasError() ? 'true' : null"
+        [attr.aria-describedby]="describedByIds()"
+        (change)="onInput(field)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+      >
+        @if (placeholder(); as empty) {
+          <option value="">{{ empty }}</option>
+        }
+        @for (choice of choices; track choice.value) {
+          <option [value]="choice.value">{{ choice.label }}</option>
+        }
+      </select>
+    } @else if (type() === 'textarea') {
+      <textarea
+        #field
+        class="liquid-input-control"
+        [id]="inputId()"
+        [value]="text()"
+        [rows]="rows()"
+        [placeholder]="placeholder()"
+        [disabled]="isDisabled()"
+        [readOnly]="readonly()"
+        [required]="isRequired()"
+        [class.is-upper]="uppercase()"
+        [attr.name]="name()"
+        [attr.lang]="lang()"
+        [attr.autocomplete]="autocomplete()"
+        [attr.inputmode]="inputmode()"
+        [attr.spellcheck]="spellcheck()"
+        [attr.maxlength]="maxlength()"
+        [attr.minlength]="minlength()"
+        [attr.aria-label]="bare() && label() ? label() : label() ? null : placeholder() || null"
+        [attr.aria-invalid]="hasError() ? 'true' : null"
+        [attr.aria-describedby]="describedByIds()"
+        (beforeinput)="onBeforeInput($event, field)"
+        (input)="onInput(field)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+      ></textarea>
+    } @else {
+      <input
+        #field
+        class="liquid-input-control"
+        [id]="inputId()"
+        [type]="fieldType()"
+        [value]="text()"
+        [placeholder]="placeholder()"
+        [disabled]="isDisabled()"
+        [readOnly]="readonly()"
+        [required]="isRequired()"
+        [class.is-upper]="uppercase()"
+        [attr.name]="name()"
+        [attr.lang]="lang()"
+        [attr.autocomplete]="autocomplete()"
+        [attr.inputmode]="inputmode()"
+        [attr.spellcheck]="spellcheck()"
+        [attr.maxlength]="maxlength()"
+        [attr.minlength]="minlength()"
+        [attr.min]="min()"
+        [attr.max]="max()"
+        [attr.step]="step()"
+        [attr.aria-label]="bare() && label() ? label() : label() ? null : placeholder() || null"
+        [attr.aria-invalid]="hasError() ? 'true' : null"
+        [attr.aria-describedby]="describedByIds()"
+        (beforeinput)="onBeforeInput($event, field)"
+        (input)="onInput(field)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+      />
+    }
+
+    @if (showClear()) {
+      <button
+        class="liquid-input-action"
+        type="button"
+        liquidPress
+        animate.enter="liquid-input-action-in"
+        animate.leave="liquid-input-action-out"
+        [attr.aria-label]="clearLabel"
+        (mousedown)="$event.preventDefault()"
+        (click)="clear()"
+      >
+        <ng-icon name="ionCloseCircle"></ng-icon>
+      </button>
+    }
+
+    @if (showReveal()) {
+      <button
+        class="liquid-input-action"
+        type="button"
+        liquidPress
+        [attr.aria-label]="revealLabel()"
+        [attr.aria-pressed]="revealed()"
+        (mousedown)="$event.preventDefault()"
+        (click)="toggleReveal()"
+      >
+        <ng-icon [name]="revealed() ? 'ionEyeOffOutline' : 'ionEyeOutline'"></ng-icon>
+      </button>
+    }
+
+    @if (showPickerButton()) {
+      <button
+        class="liquid-input-action"
+        type="button"
+        liquidPress
+        [attr.aria-label]="pickerLabel()"
+        (mousedown)="$event.preventDefault()"
+        (click)="openPicker()"
+      >
+        <ng-icon [name]="pickerIcon()"></ng-icon>
+      </button>
+    }
+
+    @if (suffixIcon(); as icon) {
+      <ng-icon class="liquid-input-icon is-suffix" [name]="icon" aria-hidden="true"></ng-icon>
+    }
+    <!-- prettier-ignore -->
+    <span class="liquid-input-affix is-suffix"><ng-content select="[liquidInputSuffix]" /></span>
+  </div>
+</div>
+
+@if (hint() || errorText() || (showCount() && maxlength() !== null)) {
+  <div class="liquid-input-below">
+    <div class="liquid-input-said">
+      @if (errorText(); as message) {
+        <p
+          class="liquid-input-error"
+          role="alert"
+          animate.enter="liquid-input-said-in"
+          animate.leave="liquid-input-said-out"
+          [id]="errorId()"
+        >
+          <ng-icon name="ionAlertCircleOutline" aria-hidden="true"></ng-icon>
+          <span>{{ message }}</span>
+        </p>
+      } @else if (hint(); as message) {
+        <p
+          class="liquid-input-hint"
+          animate.enter="liquid-input-said-in"
+          animate.leave="liquid-input-said-out"
+          [id]="hintId()"
+        >
+          {{ message }}
+        </p>
+      }
+    </div>
+
+    @if (showCount() && countLimit(); as limit) {
+      <p class="liquid-input-count" aria-live="off" [id]="countId()">{{ count() }} / {{ limit }}</p>
+    }
+  </div>
+}

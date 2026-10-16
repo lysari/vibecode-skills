@@ -1,0 +1,29 @@
+<div
+  class="pincode"
+  [class.is-invalid]="invalid()"
+  [class.is-disabled]="disabled()"
+  [class.is-loading]="loading()"
+  [attr.aria-busy]="loading()"
+  role="group"
+  [attr.aria-label]="ariaLabel()"
+>
+  @for (slot of slots(); track slot.index) {
+    <input
+      #box
+      class="pincode-digit"
+      [class.is-filled]="!!slot.digit"
+      [class.is-active]="isFocused(slot.index)"
+      [type]="masked() ? 'password' : 'text'"
+      inputmode="numeric"
+      autocomplete="one-time-code"
+      [attr.aria-label]="'Digit ' + (slot.index + 1) + ' of ' + length()"
+      [disabled]="disabled()"
+      [tabindex]="slot.index === activeIndex() ? 0 : -1"
+      (input)="onInput($event, slot.index)"
+      (keydown)="onKeydown($event, slot.index)"
+      (paste)="onPaste($event, slot.index)"
+      (focus)="onFocus(slot.index)"
+      (blur)="onBlur(slot.index)"
+    />
+  }
+</div>

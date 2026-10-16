@@ -1,0 +1,319 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Number slot</h1>
+      <p class="docs-lede">
+        A number whose digits spin like the reels of a slot machine. Each digit that changed
+        travels through the window, blurs while it is fast, slips past its place, and settles.
+        A comma, a dot, or a currency mark stays put. Khmer digits <code>០</code>–<code>៩</code>
+        spin the same way and roll through Khmer digits. It is the reel beside
+        <code>numberPopIn</code>, which pops a digit into place instead of spinning it.
+      </p>
+
+      <div class="slot-figure">
+        <div>
+          <p class="slot-readout is-hero">
+            <span #hero="numberSlot" [numberSlot]="jackpotText()"></span>
+          </p>
+          <p class="slot-caption docs-note">{{ jackpotText() }}</p>
+        </div>
+        <div>
+          <p class="slot-readout is-price">
+            <span [numberSlot]="price()"></span>
+          </p>
+          <p class="slot-caption docs-note">Separators stay still</p>
+        </div>
+        <div>
+          <p class="slot-readout is-price">
+            <span [numberSlot]="jackpotKhmer()"></span>
+          </p>
+          <p class="slot-caption docs-note">Khmer digits spin too</p>
+        </div>
+      </div>
+
+      <div class="docs-actions">
+        <button class="docs-submit" type="button" liquidPress (click)="addJackpot(1)">Add 1</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="addJackpot(250)">Add 250</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="setJackpot(48)">Set to 48</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="setJackpot(8642)">Set to 8,642</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="hero.replay()">Replay the spin</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="swapPrice()">Swap the price</button>
+      </div>
+
+      <div class="slot-compare">
+        <div>
+          <p class="docs-note">numberPopIn</p>
+          <p class="slot-compare-value">
+            <span [numberPopIn]="compareText()"></span>
+          </p>
+        </div>
+        <div>
+          <p class="docs-note">numberSlot</p>
+          <p class="slot-compare-value">
+            <span [numberSlot]="compareText()"></span>
+          </p>
+        </div>
+      </div>
+      <div class="docs-actions">
+        <button class="docs-ghost" type="button" liquidPress (click)="addCompare(1)">Add 1 to both</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="setCompare(2048)">Jump both to 2,048</button>
+      </div>
+    </header>
+
+    <section class="docs-case" id="playground">
+      <h2>Playground</h2>
+      <p class="docs-note">
+        Every input, <code>replay()</code>, and every custom property on one number.
+      </p>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          value
+          <input type="text" [value]="playValue()" (input)="setPlayValue($event)" />
+        </label>
+        <label class="docs-control">
+          slotDirection
+          <select (change)="setDirection($event)">
+            <option value="auto" [selected]="play.direction() === 'auto'">auto</option>
+            <option value="up" [selected]="play.direction() === 'up'">up</option>
+            <option value="down" [selected]="play.direction() === 'down'">down</option>
+          </select>
+        </label>
+        <label class="docs-control">
+          slotStaggerFrom
+          <select (change)="setStaggerFrom($event)">
+            <option value="start" [selected]="play.staggerFrom() === 'start'">start</option>
+            <option value="end" [selected]="play.staggerFrom() === 'end'">end</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          <span>slotSpins · {{ play.spins() }}</span>
+          <input type="range" min="0" max="4" step="1" [value]="play.spins()" (input)="setSpins($event)" />
+        </label>
+        <label class="docs-control">
+          <span>slotDuration · {{ play.duration() ?? 'default' }}</span>
+          <input type="range" min="200" max="1600" step="20" [value]="play.duration() ?? 820" (input)="setOptional('duration', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>slotStagger · {{ play.stagger() ?? 'default' }}</span>
+          <input type="range" min="0" max="240" step="10" [value]="play.stagger() ?? 80" (input)="setOptional('stagger', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>slotBlur · {{ play.blur() ?? 'default' }}</span>
+          <input type="range" min="0" max="16" step="1" [value]="play.blur() ?? 5" (input)="setOptional('blur', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>slotOvershoot · {{ play.overshoot() ?? 'default' }}</span>
+          <input type="range" min="0" max="12" step="1" [value]="play.overshoot() ?? 3" (input)="setOptional('overshoot', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--slot-pad · {{ play.pad() === null ? 'default' : play.pad() + 'em' }}</span>
+          <input type="range" min="0" max="0.4" step="0.02" [value]="play.pad() ?? 0.12" (input)="setPad($event)" />
+        </label>
+      </div>
+
+      <div class="docs-flags">
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.init()" (change)="setFlag('init', $event)" />
+          slotAnimateOnInit
+        </label>
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.changedOnly()" (change)="setFlag('changedOnly', $event)" />
+          slotAnimateChangedOnly
+        </label>
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.disabled()" (change)="setFlag('disabled', $event)" />
+          slotDisabled
+        </label>
+      </div>
+
+      <div class="slot-figure">
+        @for (key of [playKey()]; track key) {
+          <p class="slot-readout is-hero">
+            <span
+              #playSlot="numberSlot"
+              [numberSlot]="playValue()"
+              [slotDirection]="play.direction()"
+              [slotSpins]="play.spins()"
+              [slotStaggerFrom]="play.staggerFrom()"
+              [slotDuration]="play.duration()"
+              [slotStagger]="play.stagger()"
+              [slotBlur]="play.blur()"
+              [slotOvershoot]="play.overshoot()"
+              [slotAnimateOnInit]="play.init()"
+              [slotAnimateChangedOnly]="play.changedOnly()"
+              [slotDisabled]="play.disabled()"
+              [style.--slot-pad]="play.pad() === null ? null : play.pad() + 'em'"
+            ></span>
+          </p>
+        }
+      </div>
+
+      <div class="docs-actions">
+        <button class="docs-submit" type="button" liquidPress (click)="setPlayPreset('1,280')">Show 1,280</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="setPlayPreset('1,281')">Show 1,281</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="setPlayPreset('48')">Show 48</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="setPlayPreset('8,642')">Show 8,642</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="setPlayPreset('$1,280.50')">Show a price</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="setPlayPreset('១,២៨០')">Show ១,២៨០</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="replayPlay()">Replay the spin</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="playEntrance()">Play the entrance</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="resetMotion()">Reset motion</button>
+      </div>
+
+      <pre class="docs-code">{{ playMarkup() }}</pre>
+    </section>
+
+    <section class="docs-case" id="sizes">
+      <h2>Sizes</h2>
+      <p class="docs-note">
+        The reel is one em tall, so it follows the font. Compact, body, large, and one kept to a
+        narrow column.
+      </p>
+      <div class="slot-sizes">
+        <div class="slot-size">
+          <p class="docs-note">Compact · 14px</p>
+          <p class="slot-size-value is-compact">
+            <span [numberSlot]="sized()" slotAnimateOnInit="false"></span>
+          </p>
+        </div>
+        <div class="slot-size">
+          <p class="docs-note">Body · 32px</p>
+          <p class="slot-size-value is-body">
+            <span [numberSlot]="sized()" slotAnimateOnInit="false"></span>
+          </p>
+        </div>
+        <div class="slot-size">
+          <p class="docs-note">Large · 64px</p>
+          <p class="slot-size-value is-large">
+            <span [numberSlot]="sized()" slotAnimateOnInit="false"></span>
+          </p>
+        </div>
+        <div class="slot-size">
+          <p class="docs-note">Narrow · 140px</p>
+          <p class="slot-size-value is-narrow">
+            <span [numberSlot]="sized()" slotAnimateOnInit="false"></span>
+          </p>
+        </div>
+      </div>
+      <div class="docs-actions">
+        <button class="docs-ghost" type="button" liquidPress (click)="resizeSamples()">
+          {{ sized() === '128' ? 'Show 86,420' : 'Show 128' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="motion">
+      <h2>Motion</h2>
+      <p class="docs-note">
+        The same change, three ways. A short roll, a reel that comes from above, and two extra turns.
+      </p>
+      <div class="slot-motion">
+        <div class="slot-motion-card">
+          <p class="docs-note">Short roll · slotSpins 0</p>
+          <p class="slot-motion-value">
+            <span [numberSlot]="motion()" [slotSpins]="0"></span>
+          </p>
+        </div>
+        <div class="slot-motion-card">
+          <p class="docs-note">From above · down</p>
+          <p class="slot-motion-value">
+            <span [numberSlot]="motion()" slotDirection="down"></span>
+          </p>
+        </div>
+        <div class="slot-motion-card">
+          <p class="docs-note">Two extra turns</p>
+          <p class="slot-motion-value">
+            <span [numberSlot]="motion()" [slotSpins]="2"></span>
+          </p>
+        </div>
+      </div>
+      <div class="docs-actions">
+        <button class="docs-submit" type="button" liquidPress (click)="spinMotion()">Spin to the next number</button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <pre class="docs-code">{{ setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API</h2>
+      <p class="docs-note"><code>[numberSlot]</code> · exportAs <code>numberSlot</code></p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: api }" />
+
+      <p class="docs-note">Members</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: members, head: 'Type' }" />
+
+      <p class="docs-note">CSS custom properties</p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: cssApi }" />
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<ng-template #inputs let-rows>
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td><code>{{ row.value }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #calls let-rows let-head="head">
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>{{ head }}</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>

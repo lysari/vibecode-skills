@@ -1,0 +1,67 @@
+<div class="liquid-toggle-row">
+  @if (label(); as text) {
+    <label class="liquid-toggle-label" [for]="inputId()">{{ text }}</label>
+  }
+  <div
+    class="liquid-toggle-switch"
+    (pointerdown)="onPointerDown($event)"
+    (pointerup)="onPointerUp()"
+    (pointercancel)="onPointerUp()"
+    (pointerleave)="onPointerUp()"
+    (click)="onSwitchClick($event)"
+  >
+    <div #press class="liquid-toggle-press">
+      <div #track class="liquid-toggle-track">
+        <span #fill class="liquid-toggle-fill" aria-hidden="true"></span>
+        @if (io()) {
+          <span class="liquid-toggle-i" aria-hidden="true"></span>
+          <span class="liquid-toggle-o" aria-hidden="true"></span>
+        }
+      </div>
+    </div>
+    <span #thumb class="liquid-toggle-thumb" aria-hidden="true"></span>
+    <input
+      #control
+      class="liquid-toggle-control"
+      type="checkbox"
+      role="switch"
+      [id]="inputId()"
+      [checked]="value()"
+      [disabled]="isDisabled()"
+      [attr.name]="name()"
+      [attr.aria-label]="label() ? null : ariaLabel()"
+      [attr.aria-invalid]="hasError() ? 'true' : null"
+      [attr.aria-describedby]="describedBy()"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    />
+  </div>
+</div>
+
+@if (error() || hint()) {
+  <div class="liquid-input-below">
+    <div class="liquid-input-said">
+      @if (error(); as message) {
+        <p
+          class="liquid-input-error"
+          role="alert"
+          animate.enter="liquid-input-said-in"
+          animate.leave="liquid-input-said-out"
+          [id]="errorId()"
+        >
+          <ng-icon name="ionAlertCircleOutline" aria-hidden="true"></ng-icon>
+          <span>{{ message }}</span>
+        </p>
+      } @else if (hint(); as message) {
+        <p
+          class="liquid-input-hint"
+          animate.enter="liquid-input-said-in"
+          animate.leave="liquid-input-said-out"
+          [id]="hintId()"
+        >
+          {{ message }}
+        </p>
+      }
+    </div>
+  </div>
+}

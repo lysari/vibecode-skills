@@ -1,0 +1,282 @@
+@use 'variables'as var;
+
+// A fixed height keeps the popup's measured size honest: the results change
+// with every keystroke, and the popup pins its box once per open. The key hints
+// live in the popup's footer, under this.
+:host {
+    display       : flex;
+    flex-direction: column;
+    width         : 440px;
+    max-width     : calc(100vw - 32px);
+    height        : 384px;
+    font-family   : var.$appFont;
+    color         : #1d1d1f;
+}
+
+.search-field {
+    display         : flex;
+    align-items     : center;
+    gap             : 8px;
+    height          : 42px;
+    margin          : 10px 10px 4px;
+    padding         : 0 8px 0 12px;
+    border-radius   : 14px;
+    background-color: rgba(0, 0, 0, 0.05);
+    transition      : background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    &:focus-within {
+        background-color: var(--surface);
+        box-shadow      : 0 0 0 2px color-mix(in srgb, var(--color-primary) 55%, transparent),
+            0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+}
+
+.search-field-icon {
+    flex     : none;
+    color    : rgba(29, 29, 31, 0.45);
+    font-size: 18px;
+}
+
+.search-input {
+    flex      : 1 1 auto;
+    min-width : 0;
+    height    : 100%;
+    padding   : 0;
+    border    : none;
+    outline   : none;
+    background: none;
+    color     : inherit;
+    font      : inherit;
+    font-size : 15px;
+
+    &::placeholder {
+        color: rgba(29, 29, 31, 0.4);
+    }
+
+    // The field draws its own clear button.
+    &::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+        appearance        : none;
+    }
+}
+
+.search-clear {
+    display      : grid;
+    place-items  : center;
+    flex         : none;
+    width        : 26px;
+    height       : 26px;
+    padding      : 0;
+    border       : none;
+    border-radius: 50%;
+    background   : none;
+    color        : rgba(29, 29, 31, 0.35);
+    cursor       : pointer;
+    transition   : color 0.15s ease-in-out;
+
+    ng-icon {
+        font-size: 18px;
+    }
+
+    &:hover,
+    &:focus-visible {
+        color: rgba(29, 29, 31, 0.6);
+    }
+}
+
+.search-results {
+    flex               : 1 1 auto;
+    min-height         : 0;
+    padding            : 0 6px 6px;
+    overflow-y         : auto;
+    overscroll-behavior: contain;
+    scrollbar-width    : thin;
+}
+
+.search-group-title {
+    display        : flex;
+    align-items    : center;
+    justify-content: space-between;
+    min-height     : 22px;
+    padding        : 10px 10px 4px;
+    color          : rgba(29, 29, 31, 0.5);
+    font-size      : 12px;
+    font-weight    : 600;
+    letter-spacing : 0.02em;
+}
+
+// The shared liquid button's plain treatment, at the size this row wants. The
+// hue is `--color-primary`'s own, so the label lands on the app blue rather than
+// on whichever service accent the panel happens to be sitting in.
+.search-group-action {
+    --liquid-button-hue      : 257.9;
+    --liquid-button-radius   : 8px;
+    --liquid-button-padding  : 2px 8px;
+    --liquid-button-font-size: 12px;
+
+    font-weight: 500;
+}
+
+.search-option {
+    display              : grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items          : center;
+    gap                  : 12px;
+    padding              : 8px 10px;
+    border-radius        : 14px;
+    cursor               : pointer;
+    transition           : background-color 0.12s ease-in-out;
+
+    &.is-active {
+        background-color: rgba(0, 0, 0, 0.05);
+
+        .search-option-icon {
+            background-color: var(--color-primary);
+            color           : var(--text-inverse);
+        }
+
+        .search-option-go {
+            opacity  : 1;
+            translate: 0 0;
+        }
+    }
+}
+
+.search-option-icon {
+    display         : grid;
+    place-items     : center;
+    width           : 32px;
+    height          : 32px;
+    border-radius   : 10px;
+    background-color: color-mix(in srgb, var(--color-secondary) 12%, transparent);
+    color           : var(--color-secondary);
+    transition      : background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+
+    ng-icon {
+        font-size: 17px;
+    }
+}
+
+.search-option-text {
+    display       : flex;
+    flex-direction: column;
+    min-width     : 0;
+}
+
+.search-option-title {
+    overflow     : hidden;
+    font-size    : 14px;
+    font-weight  : 500;
+    // Khmer stacks subscripts below the line; the extra leading keeps them clear.
+    line-height  : 1.5;
+    text-overflow: ellipsis;
+    white-space  : nowrap;
+
+    mark {
+        background : none;
+        color      : var(--color-primary);
+        font-weight: 700;
+    }
+}
+
+.search-option-section {
+    color      : rgba(29, 29, 31, 0.5);
+    font-size  : 12px;
+    line-height: 1.45;
+}
+
+.search-option-go {
+    color     : var(--color-primary);
+    font-size : 16px;
+    opacity   : 0;
+    translate : -4px 0;
+    transition: opacity 0.15s ease-out, translate 220ms var(--menu-spring, ease);
+}
+
+.search-empty {
+    display        : flex;
+    flex-direction : column;
+    align-items    : center;
+    justify-content: center;
+    gap            : 6px;
+    height         : 100%;
+    padding        : 24px;
+    box-sizing     : border-box;
+    text-align     : center;
+}
+
+.search-empty-icon {
+    display         : grid;
+    place-items     : center;
+    width           : 56px;
+    height          : 56px;
+    margin-bottom   : 6px;
+    border-radius   : 50%;
+    background-color: rgba(0, 0, 0, 0.05);
+    color           : rgba(29, 29, 31, 0.45);
+
+    ng-icon {
+        font-size: 26px;
+    }
+}
+
+.search-empty-title {
+    font-size  : 15px;
+    font-weight: 600;
+}
+
+.search-empty-text {
+    color    : rgba(29, 29, 31, 0.55);
+    font-size: 13px;
+}
+
+// Drawn in the popup's footer, under the results card.
+.search-hints {
+    display    : flex;
+    flex-wrap  : wrap;
+    align-items: center;
+    gap        : 6px 16px;
+    padding    : 10px 10px 4px;
+    color      : rgba(29, 29, 31, 0.55);
+    font-size  : 12px;
+
+    // Keyboard hints mean nothing on a phone.
+    @media (hover: none) {
+        display: none;
+    }
+
+    .search-hint {
+        display    : inline-flex;
+        align-items: center;
+        gap        : 4px;
+
+        > span {
+            margin-inline-start: 2px;
+        }
+    }
+
+    kbd {
+        display         : inline-grid;
+        place-items     : center;
+        min-width       : 20px;
+        height          : 20px;
+        padding         : 0 5px;
+        box-sizing      : border-box;
+        border-radius   : 6px;
+        background-color: var(--surface);
+        box-shadow      : 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(0, 0, 0, 0.08);
+        font-family     : inherit;
+        font-size       : 11px;
+        font-weight     : 500;
+
+        ng-icon {
+            font-size: 12px;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .search-option-go {
+        transition: none;
+    }
+}

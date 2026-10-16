@@ -1,0 +1,200 @@
+<div class="liquid-autocomplete-field">
+  <button
+    #trigger
+    class="liquid-autocomplete-trigger"
+    type="button"
+    [id]="inputId()"
+    [disabled]="isDisabled()"
+    [attr.aria-label]="label()"
+    [attr.aria-invalid]="invalid() ? 'true' : null"
+    [attr.aria-describedby]="describedBy() ? valueId() + ' ' + describedBy() : valueId()"
+    [liquidMenuTriggerFor]="menu"
+    (focus)="onTriggerFocus()"
+    (blur)="onTriggerBlur()"
+  >
+    <span
+      class="liquid-autocomplete-value"
+      [id]="valueId()"
+      [class.is-placeholder]="selected() === null"
+      [textStatesSwap]="selected() === null ? placeholder() : selectedLabel()"
+      swapAnimateOnInit="false"
+    ></span>
+  </button>
+
+  <!-- Beside the trigger, not inside it: a button cannot hold another one. -->
+  @if (clearable() && selected() !== null && !isDisabled()) {
+    <button
+      class="liquid-autocomplete-clear"
+      type="button"
+      i18n-aria-label="@@autocomplete.clear"
+      aria-label="Clear selection"
+      (click)="clear()"
+    >
+      <ng-icon name="ionCloseCircle"></ng-icon>
+    </button>
+  }
+  <ng-icon
+    class="liquid-autocomplete-chevron"
+    name="ionChevronDownOutline"
+    aria-hidden="true"
+  ></ng-icon>
+</div>
+
+<x-liquid-menu-popup
+  #menu="liquidMenu"
+  role="dialog"
+  [title]="label() ?? placeholder()"
+  (opened)="onOpened()"
+  (closed)="onClosed($event)"
+>
+  <ng-template liquidMenuHeaderIcon>
+    <ng-icon [name]="hasSearch() ? 'ionSearchOutline' : 'ionChevronDownOutline'"></ng-icon>
+  </ng-template>
+
+  <ng-template liquidMenuFooter>
+    <div class="liquid-autocomplete-hints" aria-hidden="true">
+      <span class="liquid-autocomplete-hint">
+        <kbd><ng-icon name="ionArrowUpOutline"></ng-icon></kbd>
+        <kbd><ng-icon name="ionArrowDownOutline"></ng-icon></kbd>
+        <span i18n="@@search.hintNavigate">navigate</span>
+      </span>
+      <span class="liquid-autocomplete-hint">
+        <kbd><ng-icon name="ionReturnDownBackOutline"></ng-icon></kbd>
+        <span i18n="@@autocomplete.hintSelect">select</span>
+      </span>
+      <span class="liquid-autocomplete-hint">
+        <kbd>esc</kbd>
+        <span i18n="@@search.hintClose">close</span>
+      </span>
+    </div>
+  </ng-template>
+
+  <!-- Built on each open and thrown away after the close, so a list of a few
+       thousand options costs nothing while the field is just sitting there. -->
+  <ng-template liquidMenuContent>
+    <div
+      class="liquid-autocomplete-panel"
+      [class.has-search]="hasSearch()"
+      [class.has-captions]="captionWith() !== null"
+      [style.--_trigger-width.px]="triggerWidth()"
+      [style.--_rows]="options().length"
+      (keydown)="onKeydown($event)"
+    >
+      @if (hasSearch()) {
+        <div class="liquid-autocomplete-search">
+          <ng-icon name="ionSearchOutline" aria-hidden="true"></ng-icon>
+          <input
+            #field
+            type="search"
+            autofocus
+            autocomplete="off"
+            spellcheck="false"
+            enterkeyhint="done"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="true"
+            [attr.aria-label]="searchPlaceholder()"
+            [placeholder]="searchPlaceholder()"
+            [attr.aria-controls]="listboxId()"
+            [attr.aria-activedescendant]="activeView() ? optionId(activeIndex()) : null"
+            [value]="query()"
+            (input)="onInput(field.value)"
+          />
+          @if (query()) {
+            <button
+              class="liquid-autocomplete-clear"
+              type="button"
+              i18n-aria-label="@@search.clear"
+              aria-label="Clear search"
+              (click)="clearQuery(field)"
+            >
+              <ng-icon name="ionCloseCircle"></ng-icon>
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Without a search field the list takes the focus itself, and the arrow
+           keys reach it through the same `aria-activedescendant`. -->
+      <div
+        class="liquid-autocomplete-list"
+        role="listbox"
+        [id]="listboxId()"
+        [attr.aria-label]="label() ?? placeholder()"
+        [attr.tabindex]="hasSearch() ? null : 0"
+        [attr.autofocus]="hasSearch() ? null : ''"
+        [attr.aria-activedescendant]="!hasSearch() && activeView() ? optionId(activeIndex()) : null"
+      >
+        @for (group of groups(); track group.title) {
+          <div
+            class="liquid-autocomplete-group"
+            role="group"
+            [attr.aria-label]="group.title || null"
+          >
+            @if (group.title) {
+              <div class="liquid-autocomplete-group-title" aria-hidden="true">
+                {{ group.title }}
+              </div>
+            }
+            @for (view of group.options; track view.index) {
+              <div
+                class="liquid-autocomplete-option"
+                role="option"
+                [id]="optionId(view.index)"
+                [class.is-active]="view.index === activeIndex()"
+                [class.is-selected]="view.selected"
+                [class.is-disabled]="view.disabled"
+                [class.has-icon]="view.icon"
+                [attr.aria-selected]="view.selected"
+                [attr.aria-disabled]="view.disabled || null"
+                (mouseenter)="view.disabled || activeIndex.set(view.index)"
+                (mousedown)="$event.preventDefault()"
+                (click)="select(view)"
+              >
+                @if (view.icon) {
+                  <span class="liquid-autocomplete-option-icon" aria-hidden="true">
+                    <ng-icon [name]="view.icon"></ng-icon>
+                  </span>
+                }
+                <span class="liquid-autocomplete-option-text">
+                  @if (optionTemplate(); as custom) {
+                    <ng-container
+                      [ngTemplateOutlet]="custom.template"
+                      [ngTemplateOutletContext]="{
+                        $implicit: view.option,
+                        selected: view.selected,
+                        active: view.index === activeIndex(),
+                      }"
+                    />
+                  } @else {
+                    <!-- One line, and kept that way: whitespace between these three
+                         is a visible gap in the middle of a word. The mark is always
+                         there — empty, it draws nothing — so no block has to sit
+                         inside the text for a formatter to break across lines. -->
+                    <!-- prettier-ignore -->
+                    <span class="liquid-autocomplete-option-title">{{ view.before }}<mark>{{ view.match }}</mark>{{ view.after }}</span>
+                    @if (view.caption) {
+                      <span class="liquid-autocomplete-option-caption">{{ view.caption }}</span>
+                    }
+                  }
+                </span>
+                <ng-icon
+                  class="liquid-autocomplete-option-check"
+                  name="ionCheckmarkOutline"
+                  aria-hidden="true"
+                ></ng-icon>
+              </div>
+            }
+          </div>
+        } @empty {
+          <div class="liquid-autocomplete-empty">
+            <span class="liquid-autocomplete-empty-icon" aria-hidden="true">
+              <ng-icon name="ionSearchOutline"></ng-icon>
+            </span>
+            <span i18n="@@search.noResults">No results found</span>
+          </div>
+        }
+      </div>
+    </div>
+  </ng-template>
+</x-liquid-menu-popup>

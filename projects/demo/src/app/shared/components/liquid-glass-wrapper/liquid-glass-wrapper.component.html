@@ -1,0 +1,17 @@
+<!--
+  Layer order, back to front:
+    defs    zero-sized host for the generated <filter> (never overflow:hidden)
+    layer   carries backdrop-filter — the refraction itself
+    tint    colour wash + flat-mode rim, when refraction is unavailable
+    glow    pointer-tracked specular sheen
+    content projected children
+-->
+<svg #defs class="lg-defs" aria-hidden="true" focusable="false"></svg>
+
+<div #layer class="lg-layer"></div>
+<div class="lg-tint"></div>
+<!-- <div class="lg-glow"></div> -->
+
+<div class="lg-content">
+  <ng-content />
+</div>

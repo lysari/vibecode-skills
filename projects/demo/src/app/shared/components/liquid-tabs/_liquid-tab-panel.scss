@@ -1,0 +1,50 @@
+// What a panel looks like, whichever bar it follows: `liquid-tabs.scss` and
+// `liquid-stepper.scss` both use it, since a component's styles only load with it.
+
+// `hidden` loses to any `display` the page gives the panel; it has to win here.
+.liquid-tab-panel[hidden] {
+    display: none !important;
+}
+
+// A slider panel is a carousel frame: the selected content sits in the middle at
+// `--liquid-slider-width`, and because that is narrower than the panel the
+// content before and the content after show at the edges either side of it. The
+// selected one is left in the normal flow, so the panel still takes its height
+// from whatever is selected and eases between heights on a switch; its two
+// neighbours are lifted out and centred on top of it, then carried out to their
+// own side. Setting the width to 100% and the gap to 0 gives a plain full-width
+// slider instead, with nothing showing at the edges.
+//
+// Neighbours are laid out against the panel's padding box, so a slider panel
+// should carry no padding of its own — the contents carry theirs.
+.liquid-tab-panel.is-slider {
+    width               : 100%;
+    overflow            : hidden;
+    position            : relative;
+    // overflow            : clip;
+    // Enough for a slide's own shadow to clear the frame; not enough for the
+    // neighbours waiting past the edges to show through it.
+    overflow-clip-margin: 8px;
+
+    >.liquid-tab-slide {
+        width        : var(--liquid-slider-width, 72%);
+        margin-inline: auto;
+        // Both properties are driven from script, so a slide changes over and is
+        // played down in the same motion rather than snapping at either end.
+        will-change  : translate, scale, opacity;
+    }
+
+    >.liquid-tab-slide:not(.is-current) {
+        position         : absolute;
+        inset-block-start: 0;
+        inset-inline     : 0;
+        margin-block     : 0;
+        pointer-events   : none;
+    }
+
+    // A vertical bar steps down the panel, where a slide is already its full
+    // width and there is no room at the sides for a neighbour to show in.
+    &.is-vertical>.liquid-tab-slide {
+        width: var(--liquid-slider-width, 100%);
+    }
+}

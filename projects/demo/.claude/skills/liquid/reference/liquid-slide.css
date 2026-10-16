@@ -1,0 +1,82 @@
+/* ── Liquid slide ───────────────────────────────────────────────────────────
+   The frame and the two arrangements. All the timing is in `liquid-slide.js`,
+   because both the travel and the frame's resize need values measured at the
+   moment of the switch — a CSS transition cannot start from a live translate.
+*/
+.liquid-slide {
+  --slide-scale: 0.94;
+  --slide-dim  : 0.5;
+  --slide-blur : 3px;
+
+  position     : relative;
+  overflow     : hidden;
+  border-radius: 20px;
+  background   : #fff;
+  box-shadow   : 2px 4px 12px rgb(0 0 0 / 0.08);
+  /* Set inline by the script and animated on switch. `auto` here so the frame
+     is right before any script runs. */
+  height       : auto;
+}
+
+.liquid-slide-track {
+  display: flex;
+  /* Each panel keeps its own height. Without this, flex stretches them all to
+     the tallest and the frame has nothing left to resize to — the switch loses
+     its height change entirely and the panels grow blank space instead. */
+  align-items: flex-start;
+  /* Owned by the script; no transition on it, or the transition and the Web
+     Animation fight over the same property and the track stutters. */
+  translate: 0 0;
+}
+
+.liquid-slide-panel {
+  flex      : 0 0 100%;
+  min-width : 0;
+  padding   : 22px 24px;
+  box-sizing: border-box;
+}
+
+/* ── slide: the neighbours stay on screen ─────────────────────────────────── */
+/* They are what makes the travel read as one surface moving past a window
+   rather than as pages being replaced. Only the non-current ones are touched,
+   so the current panel never carries a scale of its own for the travel to
+   argue with. */
+.liquid-slide.is-slide .liquid-slide-panel {
+  scale     : var(--slide-scale);
+  opacity   : var(--slide-dim);
+  filter    : blur(var(--slide-blur));
+  transition: scale 420ms cubic-bezier(0.32, 0.72, 0, 1),
+              opacity 420ms cubic-bezier(0.32, 0.72, 0, 1),
+              filter 420ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.liquid-slide.is-slide .liquid-slide-panel.is-current {
+  scale  : 1;
+  opacity: 1;
+  filter : blur(0);
+}
+
+/* ── swap: the two cross over in the same spot ────────────────────────────── */
+/* Stacked, so the frame is covered by the two of them between them at every
+   frame of the cross. The track does not travel in this mode. */
+.liquid-slide.is-swap .liquid-slide-track { display: grid; }
+.liquid-slide.is-swap .liquid-slide-panel {
+  grid-area: 1 / 1;
+  flex     : none;
+  opacity  : 0;
+  /* Out of the way of the pointer while it is invisible; `is-current` alone
+     would leave a dead panel catching clicks over the live one. */
+  pointer-events: none;
+}
+.liquid-slide.is-swap .liquid-slide-panel.is-current {
+  opacity       : 1;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-slide.is-slide .liquid-slide-panel {
+    transition: none;
+    scale     : 1;
+    opacity   : 1;
+    filter    : none;
+  }
+}

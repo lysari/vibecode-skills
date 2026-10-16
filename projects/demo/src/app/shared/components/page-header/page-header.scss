@@ -35,39 +35,14 @@
       align-items: center;
       gap: var(--space-inline-gap);
 
-      .range-pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 4px;
-        border-radius: var(--pill-radius);
-        background: var(--color-card-border);
-
-        .range-btn {
-          height: 32px;
-          padding: 0 12px;
-          border-radius: var(--pill-radius);
-          font-size: var(--text-item-subtitle-size);
-          font-weight: var(--font-weight-medium);
-          color: var(--color-text-subheading);
-
-          &.is-active {
-            background: var(--color-card-bg);
-            color: var(--color-text);
-            box-shadow: var(--shadow-pill);
-          }
-        }
-      }
-
       .refresh-btn {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        height: 40px;
+        height: 38px;
         padding: 0 14px;
-        border: var(--border-width) solid var(--color-card-border);
-        border-radius: var(--pill-radius);
-        background: var(--color-card-bg);
-        box-shadow: var(--shadow-pill);
+        --liquid-button-border: var(--border-width) solid var(--color-card-border);
+        --liquid-button-shadow: var(--shadow-pill);
         font-size: var(--text-item-subtitle-size);
         font-weight: var(--font-weight-medium);
         color: var(--color-text);

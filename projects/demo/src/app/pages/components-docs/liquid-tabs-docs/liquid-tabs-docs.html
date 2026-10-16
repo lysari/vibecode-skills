@@ -1,0 +1,307 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid tabs</h1>
+      <p class="docs-lede">
+        A segmented bar whose white pill pours from one tab to the next. The tabs are your own
+        elements — a count or an icon sits inside them as it would anywhere — and the pill is
+        measured off the selected one, so tabs of any width work.
+      </p>
+      <div class="tabs-stage">
+        <x-liquid-tabs aria-label="Filter" [(value)]="filter">
+          <button type="button" liquidTab="all">All</button>
+          <button type="button" liquidTab="unread">Unread <span class="tabs-count">3</span></button>
+          <button type="button" liquidTab="flagged">Flagged</button>
+          <button type="button" liquidTab="archived" disabled>Archived</button>
+        </x-liquid-tabs>
+        <pre class="docs-log">value: {{ filter() === null ? 'null' : '"' + filter() + '"' }}</pre>
+      </div>
+    </header>
+
+    <section class="docs-case" id="panels">
+      <h2>Panels</h2>
+      <p class="docs-note">
+        A <code>liquidTabPanel</code> can sit anywhere, so it names its bar with
+        <code>liquidTabPanelFor</code>. It is <code>hidden</code> while its tab is not selected,
+        and the tabs and panels point <code>aria-controls</code> and
+        <code>aria-labelledby</code> at each other.
+      </p>
+      <div class="tabs-stage">
+        <x-liquid-tabs #account="liquidTabs" aria-label="Account" [(value)]="section">
+          <button type="button" liquidTab="profile">Profile</button>
+          <button type="button" liquidTab="security">Security</button>
+          <button type="button" liquidTab="devices">Devices</button>
+        </x-liquid-tabs>
+        <div class="tabs-panel" liquidTabPanel="profile" [liquidTabPanelFor]="account" tabindex="0">
+          Profile — name, date of birth, photo.
+        </div>
+        <div class="tabs-panel" liquidTabPanel="security" [liquidTabPanelFor]="account" tabindex="0">
+          Security — PIN, recovery phone.
+        </div>
+        <div class="tabs-panel" liquidTabPanel="devices" [liquidTabPanelFor]="account" tabindex="0">
+          Devices — two phones signed in.
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="content">
+      <h2>Content</h2>
+      <p class="docs-note">
+        A panel without a value is shared. Put each tab's content in an
+        <code>ng-template liquidTabContent</code> inside it and it is built only while its tab is
+        selected. Switching crossfades with a blur — the old content drifts away from the tab
+        picked while the new one drifts in from its side — and the panel eases to the new height.
+      </p>
+      <div class="tabs-stage">
+        <x-liquid-tabs #state="liquidTabs" aria-label="Status" [(value)]="status">
+          <button type="button" liquidTab="pending">Pending</button>
+          <button type="button" liquidTab="approved">Approved</button>
+          <button type="button" liquidTab="rejected">Rejected</button>
+        </x-liquid-tabs>
+        <div liquidTabPanel [liquidTabPanelFor]="state" tabindex="0">
+          <ng-template liquidTabContent="pending">
+            <div class="tabs-panel">Two applications are waiting for review.</div>
+          </ng-template>
+          <ng-template liquidTabContent="approved">
+            <div class="tabs-panel is-tall">
+              Five approved this month. A taller block, so the panel has a height to ease to.
+            </div>
+          </ng-template>
+          <ng-template liquidTabContent="rejected">
+            <div class="tabs-panel">None rejected.</div>
+          </ng-template>
+        </div>
+      </div>
+      <pre class="docs-code">{{ panelsSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="slider">
+      <h2>Slider</h2>
+      <p class="docs-note">
+        <code>panelMode="slider"</code> carries the contents like a carousel: the selected one sits
+        in the middle with its neighbours showing at the edges, and a switch slides the row. It is
+        what the home page's services use. Leave the panel's own padding off — the contents carry
+        theirs.
+      </p>
+      <div class="tabs-stage">
+        <x-liquid-tabs #catalogue="liquidTabs" aria-label="Services" [(value)]="service">
+          @for (item of services; track item.key) {
+            <button type="button" [liquidTab]="item.key">{{ item.name_en }}</button>
+          }
+        </x-liquid-tabs>
+        <div liquidTabPanel [liquidTabPanelFor]="catalogue" panelMode="slider">
+          @for (item of services; track item.key) {
+            <ng-template [liquidTabContent]="item.key">
+              <div class="tabs-slide" [style.--svc-accent]="item.accent">
+                <strong>{{ item.name_en }}</strong>
+                <span>{{ item.caption_en }}</span>
+              </div>
+            </ng-template>
+          }
+        </div>
+      </div>
+      <pre class="docs-code">{{ sliderSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="options">
+      <h2>Options</h2>
+
+      <h3>Default and persist</h3>
+      <p class="docs-note">
+        With nothing bound, <code>default</code> picks the starting tab. Given a
+        <code>persist</code> key the bar remembers its selection and starts there next time —
+        pick one, leave the page and come back.
+      </p>
+      <div class="tabs-stage">
+        <x-liquid-tabs
+          #remembered="liquidTabs"
+          aria-label="Range"
+          default="week"
+          persist="docs:tabs-range"
+          persistIn="session"
+          [(value)]="range"
+        >
+          <button type="button" liquidTab="day">Day</button>
+          <button type="button" liquidTab="week">Week</button>
+          <button type="button" liquidTab="month">Month</button>
+          <button type="button" liquidTab="year">Year</button>
+        </x-liquid-tabs>
+        <div class="docs-actions">
+          <button class="docs-ghost" type="button" liquidPress (click)="remembered.clearPersisted()">
+            clearPersisted()
+          </button>
+          <button class="docs-ghost" type="button" liquidPress (click)="remembered.select('year')">
+            select('year')
+          </button>
+          <span class="docs-note">value: {{ range() }}</span>
+        </div>
+      </div>
+
+      <h3>Stretch</h3>
+      <p class="docs-note">The tabs share the width equally and the bar fills its container.</p>
+      <div class="tabs-stage">
+        <x-liquid-tabs aria-label="Stretched" stretch default="one">
+          <button type="button" liquidTab="one">One</button>
+          <button type="button" liquidTab="two">Two</button>
+          <button type="button" liquidTab="three">A longer third</button>
+        </x-liquid-tabs>
+      </div>
+
+      <h3>Manual activation and disabled</h3>
+      <p class="docs-note">
+        With <code>activation="manual"</code> the arrow keys only move focus; Enter or Space
+        selects. A disabled tab is skipped by both, and <code>disabled</code> on the bar turns
+        every tab off at once.
+      </p>
+      <div class="tabs-stage tabs-stack">
+        <x-liquid-tabs aria-label="Manual" activation="manual" default="a">
+          <button type="button" liquidTab="a">Alpha</button>
+          <button type="button" liquidTab="b" disabled>Beta</button>
+          <button type="button" liquidTab="c">Gamma</button>
+        </x-liquid-tabs>
+        <x-liquid-tabs aria-label="Disabled" disabled default="a">
+          <button type="button" liquidTab="a">Alpha</button>
+          <button type="button" liquidTab="b">Beta</button>
+        </x-liquid-tabs>
+      </div>
+      <pre class="docs-code">{{ optionsSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="vertical">
+      <h2>Vertical</h2>
+      <p class="docs-note">
+        <code>orientation="vertical"</code> stacks the tabs; the up and down arrows move between
+        them, and the content drifts along the same axis.
+      </p>
+      <div class="tabs-stage tabs-vertical">
+        <x-liquid-tabs #settings="liquidTabs" aria-label="Settings" orientation="vertical" [(value)]="side">
+          <button type="button" liquidTab="general">General</button>
+          <button type="button" liquidTab="language">Language</button>
+          <button type="button" liquidTab="notifications">Notifications</button>
+        </x-liquid-tabs>
+        <div liquidTabPanel [liquidTabPanelFor]="settings" tabindex="0">
+          <ng-template liquidTabContent="general">
+            <div class="tabs-panel">General settings.</div>
+          </ng-template>
+          <ng-template liquidTabContent="language">
+            <div class="tabs-panel">ខ្មែរ · English</div>
+          </ng-template>
+          <ng-template liquidTabContent="notifications">
+            <div class="tabs-panel is-tall">Notify me when an application changes status.</div>
+          </ng-template>
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="colour">
+      <h2>Colour</h2>
+      <p class="docs-note">
+        Everything is a <code>--liquid-tabs-*</code> custom property. Set them on the bar itself:
+        it declares its own <code>--liquid-tabs-selected-color</code>, which hides one set further
+        up.
+      </p>
+      <div class="tabs-stage tabs-stage-dark">
+        <x-liquid-tabs class="tabs-dark" aria-label="Dark" default="map">
+          <button type="button" liquidTab="map">Map</button>
+          <button type="button" liquidTab="list">List</button>
+          <button type="button" liquidTab="grid">Grid</button>
+        </x-liquid-tabs>
+      </div>
+      <pre class="docs-code">{{ colourSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">
+        Put <code>liquidTab</code> on a <code>&lt;button&gt;</code> where you can. Any other element
+        works, but needs its own <code>aria-label</code> if it has no text.
+      </p>
+      <pre class="docs-code">{{ setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API</h2>
+
+      <p class="docs-note"><code>&lt;x-liquid-tabs&gt;</code> · exportAs <code>liquidTabs</code></p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: api }" />
+
+      <p class="docs-note">Members</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: members }" />
+
+      <p class="docs-note"><code>[liquidTab]</code></p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: tabApi }" />
+
+      <p class="docs-note"><code>[liquidTabPanel]</code></p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: panelApi }" />
+
+      <p class="docs-note"><code>ng-template[liquidTabContent]</code></p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: contentApi }" />
+
+      <p class="docs-note">CSS custom properties</p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: cssApi }" />
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<ng-template #inputs let-rows>
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td><code>{{ row.value }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #calls let-rows>
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Member</th>
+          <th>Returns</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>

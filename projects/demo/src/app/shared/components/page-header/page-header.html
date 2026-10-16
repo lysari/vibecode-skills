@@ -6,21 +6,23 @@
     </div>
 
     <div class="header-controls">
-      <div class="range-pill" role="group" aria-label="Time range">
+      <x-liquid-tabs
+        [value]="activeRange()"
+        (valueChange)="activeRange.set($event ?? '24h')"
+        aria-label="Time range"
+        style="--liquid-tabs-padding: 3px; --liquid-tabs-tab-padding: 5px 12px; --liquid-tabs-radius: var(--pill-radius);"
+      >
         @for (range of config().ranges; track range) {
-          <button
-            type="button"
-            class="range-btn"
-            [class.is-active]="range === config().activeRange"
-          >
-            {{ range }}
-          </button>
+          <button type="button" [liquidTab]="range">{{ range }}</button>
         }
-      </div>
-      <button type="button" class="refresh-btn">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M21 12a9 9 0 1 1-2.64-6.36L21 8" />
-          <path d="M21 3v5h-5" />
+      </x-liquid-tabs>
+
+      <button type="button" liquidButton variant="tinted" class="refresh-btn">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6.979 4.60132V17.2193" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2.8999 8.69998C2.8999 8.69998 5.0689 4.59998 6.9779 4.59998C8.8859 4.59998 11.0559 8.69998 11.0559 8.69998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16.9058 19.4274V6.80945" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20.9849 15.3284C20.9849 15.3284 18.8149 19.4284 16.9069 19.4284C14.9989 19.4284 12.8289 15.3284 12.8289 15.3284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Refresh
       </button>

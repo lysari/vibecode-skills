@@ -1,5 +1,13 @@
 $compact: 960px;
-$emit-custom-properties: true !default;
+$emit-custom-properties: false !default;
+
+$appFont: 'Arial', sans-serif, 'Khmer OS Siemreap', 'Kh Siemreap', 'Siemreap', 'Hanuman',
+  'Khmer OS Battambang';
+$appFontForm: 'system-ui', BlinkMacSystemFont, '.SFNSText-Regular', 'Helvetica Neue', Helvetica,
+  Roboto, Open Sans, Arial, sans-serif, 'Khmer OS Battambang', 'khmeros_siemreap';
+$appFontStrong: 'system-ui', '-apple-system', BlinkMacSystemFont, '.SFNSText-Regular',
+  'Helvetica Neue', Helvetica, Roboto, Open Sans, Arial, sans-serif, 'auxswot-bold', 'auxswot',
+  'Hanuman-bold', 'Battambang', 'khmeros_siemreap';
 
 @if $emit-custom-properties {
   :root {
@@ -24,6 +32,7 @@ $emit-custom-properties: true !default;
     --glass-blur: 20px;
 
     --sidebar-width: 292px;
+    --secondary-sidebar-width: 250px;
     --header-height: 50px;
     --top-pill-height: 38px;
     --search-height: 38px;

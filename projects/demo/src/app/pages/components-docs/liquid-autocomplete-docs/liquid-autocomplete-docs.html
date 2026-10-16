@@ -1,0 +1,286 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid autocomplete</h1>
+      <p class="docs-lede">
+        A select whose list is a search. The field grows a liquid popup out of its own box; the
+        arrow keys move the active row while the focus stays in the search, and the matched text
+        is marked up. Its API is a select's: any array of <code>options</code>, and a
+        <code>value</code> that is one of them.
+      </p>
+      <div class="docs-hero-field">
+        <label class="ac-label" for="docs-province">Province</label>
+        <x-liquid-autocomplete
+          inputId="docs-province"
+          label="Province"
+          [options]="provinces"
+          [(value)]="province"
+          [displayWith]="optionName"
+          [captionWith]="optionCaption"
+          [compareWith]="sameKey"
+        />
+        <pre class="docs-log">value: {{ province() ? province()!.key + ' · ' + province()!.name_en : 'null' }}</pre>
+      </div>
+    </header>
+
+    <section class="docs-case" id="groups">
+      <h2>Search and groups</h2>
+      <p class="docs-note">
+        From seven options up the popup carries a search field; it matches the label and the
+        caption. <code>groupWith</code> lists the options under headings, in the order they are
+        first seen, and <code>iconWith</code> gives each a tile — the icon names are the caller's to
+        register.
+      </p>
+      <div class="docs-stage">
+        <x-liquid-autocomplete
+          label="Service"
+          clearable
+          [options]="subServices"
+          [(value)]="subService"
+          [displayWith]="optionName"
+          [captionWith]="optionCaption"
+          [groupWith]="serviceOf"
+          [iconWith]="iconOf"
+          (opened)="log('opened')"
+          (closed)="log('closed', $event)"
+          (focused)="log('focused')"
+          (blurred)="log('blurred')"
+        />
+      </div>
+      <pre class="docs-log">{{ events().length ? events().join('\n') : 'Events land here.' }}</pre>
+      <pre class="docs-code">{{ groupsSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="template">
+      <h2>Option template</h2>
+      <p class="docs-note">
+        An <code>ng-template liquidAutocompleteOption</code> replaces the text of each row. The row
+        around it — the highlight, the check, the icon tile — stays the list's. The template is
+        handed the option, and whether it is <code>selected</code> or <code>active</code>. The
+        option arrives as <code>unknown</code> — the directive cannot see the field's
+        <code>options</code> — so cast it once with a typed helper.
+      </p>
+      <div class="docs-stage">
+        <x-liquid-autocomplete
+          label="Nationality"
+          [options]="countries"
+          [(value)]="country"
+          [displayWith]="optionCaption"
+          [compareWith]="sameKey"
+        >
+          <ng-template liquidAutocompleteOption let-option let-active="active">
+            @let country = asOption(option);
+            <span class="ac-code" [class.is-active]="active">{{ country.key }}</span>
+            {{ country.name_en }} <span class="ac-native">{{ country.name }}</span>
+          </ng-template>
+        </x-liquid-autocomplete>
+      </div>
+      <pre class="docs-code">{{ templateSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="states">
+      <h2>States</h2>
+      <div class="docs-grid">
+        <div>
+          <p class="docs-note"><code>clearable</code></p>
+          <x-liquid-autocomplete
+            label="Clearable"
+            clearable
+            [options]="provinces"
+            [value]="provinces[2]"
+            [displayWith]="optionName"
+            [captionWith]="optionCaption"
+          />
+        </div>
+        <div>
+          <p class="docs-note"><code>disabledWith</code> — Student is out of reach</p>
+          <x-liquid-autocomplete
+            label="Occupation"
+            [options]="occupations"
+            [displayWith]="optionName"
+            [captionWith]="optionCaption"
+            [disabledWith]="isStudent"
+          />
+        </div>
+        <div>
+          <p class="docs-note"><code>searchable</code> on a short list</p>
+          <x-liquid-autocomplete
+            label="Occupation"
+            searchable
+            [options]="occupations"
+            [displayWith]="optionName"
+            [captionWith]="optionCaption"
+          />
+        </div>
+        <div>
+          <p class="docs-note"><code>invalid</code></p>
+          <x-liquid-autocomplete
+            label="Invalid"
+            invalid
+            [options]="provinces"
+            [displayWith]="optionName"
+          />
+        </div>
+        <div>
+          <p class="docs-note"><code>disabled</code></p>
+          <x-liquid-autocomplete
+            label="Disabled"
+            disabled
+            [options]="provinces"
+            [value]="provinces[0]"
+            [displayWith]="optionName"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="forms">
+      <h2>Forms</h2>
+      <p class="docs-note">
+        It is a form control: <code>[formControl]</code>, <code>formControlName</code> and
+        <code>ngModel</code> all work, <code>disable()</code> reaches it, and the control is marked
+        touched when the popup closes. The error state is still yours to bind, through
+        <code>invalid</code>.
+      </p>
+      <div class="docs-grid">
+        <div>
+          <p class="docs-note">Reactive · <code>Validators.required</code></p>
+          <x-liquid-autocomplete
+            label="Province"
+            [formControl]="provinceControl"
+            [options]="provinces"
+            [displayWith]="optionName"
+            [captionWith]="optionCaption"
+            [compareWith]="sameKey"
+            [invalid]="provinceControl.touched && provinceControl.invalid"
+          />
+          <pre class="docs-log">{{ provinceControl.touched ? 'touched' : 'untouched' }} · {{ provinceControl.status }} · {{ provinceControl.value?.name_en ?? 'null' }}</pre>
+        </div>
+        <div>
+          <p class="docs-note">Template-driven · <code>ngModel</code></p>
+          <x-liquid-autocomplete
+            #model="ngModel"
+            label="Occupation"
+            name="occupation"
+            required
+            [(ngModel)]="occupation"
+            [options]="occupations"
+            [displayWith]="optionName"
+            [captionWith]="optionCaption"
+            [compareWith]="sameKey"
+            [invalid]="!!model.touched && !!model.invalid"
+          />
+          <pre class="docs-log">{{ model.touched ? 'touched' : 'untouched' }} · {{ model.status }} · {{ occupation?.name_en ?? 'null' }}</pre>
+        </div>
+      </div>
+      <div class="docs-actions">
+        <button class="docs-submit" type="button" liquidPress (click)="touchAll(); model.control.markAsTouched()">
+          Submit
+        </button>
+        <button class="docs-ghost" type="button" liquidPress (click)="provinceControl.setValue(provinces[3])">
+          setValue(Siem Reap)
+        </button>
+        <button
+          class="docs-ghost"
+          type="button"
+          liquidPress
+          (click)="provinceControl.disabled ? provinceControl.enable() : provinceControl.disable()"
+        >
+          {{ provinceControl.disabled ? 'enable()' : 'disable()' }}
+        </button>
+      </div>
+      <pre class="docs-code">{{ formsSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">
+        Give <code>compareWith</code> whenever the value can come from somewhere other than the
+        <code>options</code> array itself — a saved draft, a server response.
+      </p>
+      <pre class="docs-code">{{ setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API</h2>
+
+      <p class="docs-note"><code>&lt;x-liquid-autocomplete&gt;</code> · exportAs <code>liquidAutocomplete</code></p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: api }" />
+
+      <p class="docs-note">Outputs</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: outputs, head: 'Payload' }" />
+
+      <p class="docs-note">Members</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: members, head: 'Returns' }" />
+
+      <p class="docs-note"><code>ng-template[liquidAutocompleteOption]</code> context</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: optionContext, head: 'Type' }" />
+
+      <p class="docs-note">CSS custom properties</p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: cssApi }" />
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<ng-template #inputs let-rows>
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td><code>{{ row.value }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #calls let-rows let-head="head">
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>{{ head }}</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>

@@ -1,0 +1,316 @@
+@use 'variables'as var;
+
+.liquid-menu-popup-overlay {
+    position: fixed;
+    width   : 100vw;
+    height  : 100vh;
+    z-index : 99998;
+    left    : 0;
+    top     : 0;
+
+    // Under the covering popup's backdrop wherever the two sit in the DOM, so a
+    // click outside reaches that one and only steps back.
+    &.is-covered {
+        z-index: 99996;
+    }
+}
+
+// In the top layer (see `promote()`), both pick up the UA's popover sheet. These
+// take back what it sets and the rules here do not: a popover is centred with
+// `inset: 0; margin: auto`, bordered, and painted in system colours.
+.liquid-menu-popup-overlay,
+.liquid-menu-popup {
+    &[popover] {
+        right : auto;
+        bottom: auto;
+        margin: 0;
+        border: 0;
+        color : inherit;
+    }
+}
+
+.liquid-menu-popup-overlay[popover] {
+    padding   : 0;
+    background: none;
+    overflow  : hidden;
+}
+
+.liquid-menu-popup {
+    // Tunables for the open/close animation.
+    --menu-open-duration  : 340ms;
+    --menu-close-duration : 200ms;
+    // Overshoots and settles, so the panel lands with a little weight.
+    --menu-spring         : cubic-bezier(0.34, 1.32, 0.4, 1);
+    --menu-collapse       : cubic-bezier(0.4, 0, 0.9, 0.5);
+    --menu-radius         : 26px;
+    // How much of the panel is left while another popup is stacked on it.
+    --menu-covered-opacity: 0.7;
+    --menu-covered-scale  : 0.94;
+
+    position              : fixed;
+    // Measured here before `place()` moves it; never wider than the viewport.
+    left                  : 0;
+    top                   : 0;
+    max-width             : calc(100vw - 16px);
+    z-index               : 99999;
+    box-sizing            : border-box;
+    background-color      : rgba(#fff, 0.9);
+    width                 : fit-content;
+    height                : fit-content;
+    border-radius         : var(--menu-radius);
+    // padding         : 16px;
+    padding               : 8px;
+    // box-shadow         : 2px 4px 32px rgba(0, 0, 0, 0.1);
+    outline               : none;
+    overflow              : hidden;
+    opacity               : 0;
+    backdrop-filter       : saturate(180%) blur(20px);
+    will-change           : auto;
+    background            : linear-gradient(0deg, rgba(#fff, 0.5) 0%, rgba(#fff, 0.6) 25%, rgba(#fff, 0.8) 50%, rgba(#fff, 0.9) 100%);
+    background            : rgba(#fff, 0.8);
+    box-shadow            : 0 11px 34px 0 rgba(0, 0, 0, 0.65);
+
+    &.is-open,
+    &.is-closing {
+        opacity: 1;
+        // Pinned to the measured size — `fit-content` cannot be animated to.
+        width  : var(--menu-width);
+        height : var(--menu-height);
+
+        .liquid-menu-popup-wrapper {
+            // Frozen at its final layout, or the text would re-wrap as the box grows.
+            width : var(--menu-content-width);
+            height: var(--menu-content-height);
+        }
+    }
+
+    &.is-open {
+        animation: menu-grow var(--menu-open-duration) var(--menu-spring) both;
+
+        .liquid-menu-popup-wrapper {
+            animation: menu-content-in calc(var(--menu-open-duration) - 40ms) 40ms ease-out both;
+        }
+    }
+
+    // The grow's fill would otherwise keep holding width/height while `refit()` measures.
+    &.is-open.is-settled {
+        animation: none;
+    }
+
+    // One synchronous frame in `refit()`: laid out at its natural size, never painted.
+    &.is-measuring {
+        width : fit-content;
+        height: fit-content;
+
+        .liquid-menu-popup-wrapper {
+            width : auto;
+            height: auto;
+        }
+    }
+
+    &.is-closing {
+        animation: menu-shrink var(--menu-close-duration) var(--menu-collapse) both;
+
+        .liquid-menu-popup-wrapper {
+            animation: menu-content-out calc(var(--menu-close-duration) - 60ms) ease-in both;
+        }
+    }
+
+    // Waiting under a popup opened from it: still there to come back to, just out
+    // of focus. The blur goes on the content — a `filter` on the panel would drop
+    // its own backdrop blur, and the wrapper's open animation holds `filter` at 0.
+    // Only once the grow has played out: an `opacity` transition any earlier would
+    // turn every open into a fade-in.
+    // Kept through the close too, so a covered panel closed with `closeAll()` eases
+    // back to full size instead of snapping as it shrinks away.
+    &.is-settled {
+        transition: opacity 260ms ease, scale 320ms var(--menu-spring);
+    }
+
+    &.is-covered {
+        z-index                    : 99997;
+        pointer-events             : none;
+        // opacity       : var(--menu-covered-opacity);
+        scale                      : var(--menu-covered-scale);
+        filter                     : blur(3px) saturate(70%);
+        // .liquid-menu-popup-content {
+        // }
+    }
+}
+
+// Both halves of the panel animation leave the closing/open state implicit, so the
+// keyframes describe only the trigger end of it: a trigger-sized circle sitting
+// exactly where the trigger is.
+//
+// Moved by `margin`, never `translate`: Safari runs `translate` on the compositor and
+// `width`/`height` on the main thread, so a main-thread hitch slid the panel out from
+// under the trigger instead of growing it out of it.
+@keyframes menu-grow {
+    from {
+        width           : var(--menu-origin-width);
+        height          : var(--menu-origin-height);
+        // border-radius: 50%;
+        margin-left     : var(--menu-origin-x);
+        margin-top      : var(--menu-origin-y);
+        box-shadow      : 0 1px 6px rgba(0, 0, 0, 0.06);
+    }
+}
+
+@keyframes menu-shrink {
+    to {
+        width           : var(--menu-origin-width);
+        height          : var(--menu-origin-height);
+        // border-radius: 50%;
+        margin-left     : var(--menu-origin-x);
+        margin-top      : var(--menu-origin-y);
+        box-shadow      : 0 1px 6px rgba(0, 0, 0, 0.06);
+        opacity         : 0;
+    }
+}
+
+@keyframes menu-content-in {
+    from {
+        opacity: 0;
+        filter : blur(12px);
+        scale  : 0.96;
+    }
+
+    60% {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 1;
+        filter : blur(0);
+        scale  : 1;
+    }
+}
+
+@keyframes menu-content-out {
+    to {
+        opacity: 0;
+        filter : blur(8px);
+        scale  : 0.96;
+    }
+}
+
+// Same shape, no motion. Kept at 1ms rather than `none` so `animationend` still
+// fires — the close waits on it before the panel leaves the DOM.
+@media (prefers-reduced-motion: reduce) {
+
+    .liquid-menu-popup.is-open,
+    .liquid-menu-popup.is-closing,
+    .liquid-menu-popup.is-open .liquid-menu-popup-wrapper,
+    .liquid-menu-popup.is-closing .liquid-menu-popup-wrapper {
+        animation-duration: 1ms;
+        animation-delay   : 0s;
+    }
+
+    .liquid-menu-popup,
+    .liquid-menu-popup-content {
+        transition: none;
+    }
+}
+
+// A column that fills the frozen wrapper, so when `place()` caps the height the
+// body is what gives way and scrolls.
+.liquid-menu-popup-content {
+    display       : flex;
+    flex-direction: column;
+    height        : 100%;
+    transition    : filter 260ms ease;
+
+    .liquid-menu-popup-title {
+        margin        : 0;
+        display       : flex;
+        align-items   : center;
+        gap           : 6px;
+        padding-bottom: 8px;
+        padding-top   : 4px;
+        padding-left  : 8px;
+        font-size     : 16px;
+        font-weight   : 600;
+        line-height   : 1.25;
+        font-family   : var.$appFont;
+
+        // Sized off its own font-size, so an `ng-icon` (1em by default) just fits.
+        .liquid-menu-popup-title-icon {
+            display        : inline-flex;
+            align-items    : center;
+            justify-content: center;
+            flex           : none;
+            color          : var(--color-secondary);
+            font-size      : 18px;
+            line-height    : 1;
+            translate      : 0 -1px;
+
+            ng-icon {
+                display: flex;
+            }
+        }
+    }
+
+    // Just the room the default heading gets; what goes inside is the template's call.
+    .liquid-menu-popup-header {
+        flex       : none;
+        padding    : 4px 4px 8px;
+        font-family: var.$appFont;
+    }
+
+    // No padding of its own, so a footer that hides itself leaves no gap.
+    .liquid-menu-popup-footer {
+        flex       : none;
+        font-family: var.$appFont;
+    }
+
+    .liquid-menu-popup-body {
+        flex            : 1 1 auto;
+        min-height      : 0;
+        border-radius   : 22px;
+        // padding      : 16px;
+        overflow-y      : auto;
+        background      : linear-gradient(0deg, rgba(#fff, 0.6) 0%, rgba(#fff, 0.7) 25%, rgba(#fff, 0.8) 50%, rgba(#fff, 0.95) 100%);
+        box-shadow      : 2px 4px 24px rgba(0, 0, 0, 0.1);
+
+        ::ng-deep .liquid-menu-popup-body-inner {
+            display       : flex;
+            flex-direction: column;
+            gap           : 2px;
+            padding       : 4px;
+        }
+
+        ::ng-deep [liquidMenuItem],
+        ::ng-deep .liquid-menu-item {
+            display        : flex;
+            align-items    : center;
+            width          : 100%;
+            min-width      : 140px;
+            box-sizing     : border-box;
+            padding        : 8px 12px;
+            border         : none;
+            border-radius  : 12px;
+            background     : transparent;
+            color          : #1d1d1f;
+            font-family    : var.$appFont;
+            font-size      : 13.5px;
+            font-weight    : 500;
+            text-align     : start;
+            cursor         : pointer;
+            transition     : background-color 0.15s ease, color 0.15s ease;
+
+            &:hover,
+            &:focus-visible,
+            &.cdk-focused {
+                outline         : none;
+                background-color: rgba(0, 0, 0, 0.06);
+            }
+
+            &.is-disabled,
+            &:disabled {
+                opacity       : 0.45;
+                cursor        : not-allowed;
+                pointer-events: none;
+            }
+        }
+    }
+}

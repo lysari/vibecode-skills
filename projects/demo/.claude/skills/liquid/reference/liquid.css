@@ -1,0 +1,165 @@
+/* ── Liquid disclosure ─────────────────────────────────────────────────────
+   Standalone: no build step, no framework, no dependencies. Copy this block,
+   the markup below it, and the ~40 lines of script.
+*/
+.liquid {
+  /* Tunables. Everything else is a calc() off these, so retuning is one edit. */
+  --liquid-open    : 250ms;
+  --liquid-close   : 220ms;
+  /* The box's own curves. Both are the square root of what you want to see —
+     see the `fr` note in the traps section. */
+  --liquid-grow    : cubic-bezier(0.25, 1, 0.5, 1);
+  --liquid-shrink  : cubic-bezier(0.6, 0.45, 0.35, 1);
+  /* Overshoots and settles. For anything whose overshoot is actually visible. */
+  --liquid-spring  : cubic-bezier(0.34, 1.32, 0.4, 1);
+  /* Non-geometry: colour, shadow. */
+  --liquid-collapse: cubic-bezier(0.4, 0, 0.9, 0.5);
+  --liquid-lag     : 40ms;  /* how far the content trails the box */
+  --liquid-stagger : 30ms;  /* between two pieces of that content */
+  --liquid-bounce  : 10px;  /* how far the row opens past its resting height */
+  --liquid-squash  : 5px;   /* how far it compresses past its closed height */
+  --liquid-pad     : 16px;  /* the header's resting padding */
+  --liquid-accent  : #1a73e8;
+
+  border-radius: 18px;
+  background   : #efeff2;
+  transition   : background var(--liquid-close) var(--liquid-collapse),
+                 box-shadow var(--liquid-close) var(--liquid-collapse);
+}
+
+.liquid.is-open {
+  background: #fff;
+  box-shadow: 2px 4px 12px rgb(0 0 0 / 0.08);
+  transition: background var(--liquid-open) var(--liquid-spring),
+              box-shadow var(--liquid-open) var(--liquid-spring);
+}
+
+/* The row's bounce. A spring on the track below is thrown away, so the
+   overshoot is spare padding that grows with the box, peaks as it lands, and
+   relaxes off. Driven by its own class so closing mid-bounce cannot cut it. */
+.liquid.is-settling { animation: liquid-settle calc(var(--liquid-open) + 90ms) ease-out; }
+
+@keyframes liquid-settle {
+  0%   { padding-bottom: 0; }
+  40%  { padding-bottom: calc(var(--liquid-bounce) * 0.5); }
+  62%  { padding-bottom: var(--liquid-bounce); }
+  100% { padding-bottom: 0; }
+}
+
+/* The mirror on the way out. A collapsing row is already at its floor, so the
+   compression comes out of the header, split across both edges to keep the
+   label centred. `ease-in-out` so the trough is approached and left gently —
+   `ease-out` makes leaving it read as a rebound off something solid. */
+.liquid.is-squashing .liquid-trigger {
+  animation: liquid-squash calc(var(--liquid-close) + 120ms) ease-in-out;
+}
+
+@keyframes liquid-squash {
+  0%   { padding-block: var(--liquid-pad); }
+  45%  { padding-block: calc(var(--liquid-pad) - var(--liquid-squash) * 0.3); }
+  68%  { padding-block: calc(var(--liquid-pad) - var(--liquid-squash) * 0.5); }
+  100% { padding-block: var(--liquid-pad); }
+}
+
+.liquid-trigger {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  padding: var(--liquid-pad) 18px;
+  border: 0; border-radius: 18px; background: none; text-align: start;
+  cursor: pointer; appearance: none; font: inherit;
+}
+.liquid-trigger:focus-visible { outline: none; box-shadow: 0 0 0 3px rgb(26 115 232 / 0.35); }
+
+.liquid-glyph {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 38px; height: 38px; border-radius: 12px; background: #fff; color: #6e6e73;
+  transition: background var(--liquid-close) var(--liquid-collapse),
+              color var(--liquid-close) var(--liquid-collapse);
+}
+.liquid.is-open .liquid-glyph {
+  background: rgb(26 115 232 / 0.1); color: var(--liquid-accent);
+  transition: background var(--liquid-open) var(--liquid-spring),
+              color var(--liquid-open) var(--liquid-spring);
+}
+/* No resting scale in either state, so the pop starts and ends at 1 and never
+   argues with a value a class sets. */
+.liquid.is-settling .liquid-glyph {
+  animation: liquid-pop calc(var(--liquid-open) + 90ms) ease-out;
+}
+/* Skipped while the pop is still running: this element would otherwise be handed
+   both animations, and the second starts from its own 0%. */
+.liquid.is-squashing:not(.is-settling) .liquid-glyph {
+  animation: liquid-squeeze calc(var(--liquid-close) + 120ms) ease-in-out;
+}
+
+@keyframes liquid-pop     { 0% { scale: 1; } 40% { scale: 1.16; } 70% { scale: 0.98; } 100% { scale: 1; } }
+@keyframes liquid-squeeze { 0% { scale: 1; } 45% { scale: 0.94; } 72% { scale: 1.01; } 100% { scale: 1; } }
+
+.liquid-label { flex: 1 1 auto; min-width: 0; font-weight: 600; color: #1d1d1f; }
+/* Same travel as the glyph, a beat behind and half as far. Shifted, never
+   scaled — type between subpixels goes soft while it moves. Delay + duration
+   must total what the class-owning animation runs for. */
+.liquid.is-settling .liquid-label {
+  animation: liquid-shift-in calc(var(--liquid-open) + 60ms) ease-out var(--liquid-stagger) both;
+}
+.liquid.is-squashing:not(.is-settling) .liquid-label {
+  animation: liquid-shift-out calc(var(--liquid-close) + 90ms) ease-in-out var(--liquid-stagger) both;
+}
+
+@keyframes liquid-shift-in  { 0% { translate: 0 0; } 40% { translate: 0 3px; }    70% { translate: 0 -1px; }   100% { translate: 0 0; } }
+@keyframes liquid-shift-out { 0% { translate: 0 0; } 45% { translate: 0 -1.5px; } 72% { translate: 0 0.5px; } 100% { translate: 0 0; } }
+
+.liquid-chevron {
+  flex: none; display: inline-flex; color: #6e6e73;
+  transition: rotate var(--liquid-close) var(--liquid-collapse),
+              color var(--liquid-close) var(--liquid-collapse);
+}
+/* `rotate`, not `transform`, so the spring's overshoot reads as the chevron
+   swinging a few degrees past upright and settling back. */
+.liquid.is-open .liquid-chevron {
+  rotate: 180deg; color: var(--liquid-accent);
+  transition: rotate var(--liquid-open) var(--liquid-spring),
+              color var(--liquid-open) var(--liquid-spring);
+}
+
+/* 0fr → 1fr animates to the content's own height: nothing is measured in JS and
+   no max-height guess can clip long copy. */
+.liquid-panel {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows var(--liquid-close) var(--liquid-shrink);
+}
+.liquid.is-open .liquid-panel {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--liquid-open) var(--liquid-grow);
+}
+/* Purely the clipping box. Nothing is transformed here: scaling an element that
+   clips scales the clip with it and shaves the content. */
+.liquid-clip { overflow: hidden; }
+
+.liquid-content {
+  margin: 0; padding: 0 18px 18px 70px; line-height: 1.8; color: #6e6e73;
+  /* Leaves ahead of the box, blurring and pulling up under its header… */
+  opacity: 0; filter: blur(8px); scale: 0.96; translate: 0 -12px;
+  transition: opacity calc(var(--liquid-close) - 60ms) ease-in,
+              filter calc(var(--liquid-close) - 60ms) ease-in,
+              scale var(--liquid-close) var(--liquid-shrink),
+              translate var(--liquid-close) var(--liquid-shrink);
+}
+/* …and is held for one lag on the way back, so the box reveals it rather than
+   racing it. Opacity lands early; the spring finishes the settle. */
+.liquid.is-open .liquid-content {
+  opacity: 1; filter: blur(0); scale: 1; translate: 0 0;
+  transition: opacity calc(var(--liquid-open) * 0.6) ease-out var(--liquid-lag),
+              filter calc(var(--liquid-open) - 40ms) ease-out var(--liquid-lag),
+              scale calc(var(--liquid-open) - 40ms) var(--liquid-spring) var(--liquid-lag),
+              translate calc(var(--liquid-open) - 40ms) var(--liquid-spring) var(--liquid-lag);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid, .liquid-glyph, .liquid-chevron, .liquid-panel, .liquid-content,
+  .liquid.is-open .liquid-glyph, .liquid.is-open .liquid-chevron,
+  .liquid.is-open .liquid-panel, .liquid.is-open .liquid-content { transition: none; }
+  .liquid.is-settling, .liquid.is-squashing .liquid-trigger,
+  .liquid.is-settling .liquid-glyph, .liquid.is-squashing .liquid-glyph,
+  .liquid.is-settling .liquid-label, .liquid.is-squashing .liquid-label { animation: none; }
+  .liquid-content { filter: none; scale: 1; translate: 0 0; }
+}

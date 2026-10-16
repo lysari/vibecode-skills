@@ -1,0 +1,321 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid toggle</h1>
+      <p class="docs-lede">
+        A boolean chosen by sliding a thumb across a pill. The thumb pours to the other end and the
+        on-color fills the track from the left edge. <code>fill="thumb"</code> grows that color out
+        from behind the thumb instead. <code>io</code> adds an I on the color and an O on the empty
+        track. Click the track, its label, or focus it and press Space.
+      </p>
+      <div class="toggle-panel">
+        <p class="toggle-panel-title">Connection</p>
+        <x-liquid-toggle label="Wi-Fi" [(value)]="wifi" />
+        <x-liquid-toggle label="Alerts" hint="Banners while the app is open" [(value)]="alerts" />
+        <x-liquid-toggle label="From the thumb" fill="thumb" [(value)]="fromThumb" />
+        <x-liquid-toggle label="Power" io [(value)]="power" />
+        <pre class="docs-log">wi-fi: {{ wifi() ? 'on' : 'off' }} · alerts: {{ alerts() ? 'on' : 'off' }} · from the thumb: {{ fromThumb() ? 'on' : 'off' }} · power: {{ power() ? 'on' : 'off' }}</pre>
+      </div>
+    </header>
+
+    <section class="docs-case" id="playground">
+      <h2>Playground</h2>
+      <p class="docs-note">
+        Every input, the <code>valueChange</code> output, and every custom property on one switch.
+      </p>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          label
+          <input type="text" [value]="play.label()" (input)="setText('label', $event)" />
+        </label>
+        <label class="docs-control">
+          ariaLabel
+          <input type="text" [value]="play.ariaLabel()" (input)="setText('ariaLabel', $event)" />
+        </label>
+        <label class="docs-control">
+          hint
+          <input type="text" [value]="play.hint()" (input)="setText('hint', $event)" />
+        </label>
+        <label class="docs-control">
+          error
+          <input type="text" [value]="play.error()" (input)="setText('error', $event)" />
+        </label>
+        <label class="docs-control">
+          fill
+          <select (change)="setFill($event)">
+            <option value="track" [selected]="play.fill() === 'track'">track</option>
+            <option value="thumb" [selected]="play.fill() === 'thumb'">thumb</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="docs-flags">
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.disabled()" (change)="setFlag('disabled', $event)" />
+          disabled
+        </label>
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.invalid()" (change)="setFlag('invalid', $event)" />
+          invalid
+        </label>
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.io()" (change)="setFlag('io', $event)" />
+          io
+        </label>
+      </div>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          <span>--liquid-toggle-height · {{ play.style()['--liquid-toggle-height'] ?? 'default' }}</span>
+          <input type="range" min="20" max="64" value="32" (input)="setStyle('--liquid-toggle-height', 'px', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-width · {{ play.style()['--liquid-toggle-width'] ?? 'default' }}</span>
+          <input type="range" min="36" max="120" value="56" (input)="setStyle('--liquid-toggle-width', 'px', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-radius · {{ play.style()['--liquid-toggle-radius'] ?? 'default' }}</span>
+          <input type="range" min="0" max="32" value="16" (input)="setStyle('--liquid-toggle-radius', 'px', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-font-size · {{ play.style()['--liquid-toggle-font-size'] ?? 'default' }}</span>
+          <input type="range" min="11" max="20" value="14" (input)="setStyle('--liquid-toggle-font-size', 'px', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-duration · {{ play.style()['--liquid-toggle-duration'] ?? 'default' }}</span>
+          <input type="range" min="80" max="800" step="10" value="340" (input)="setStyle('--liquid-toggle-duration', 'ms', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-reach · {{ play.style()['--liquid-toggle-reach'] ?? 'default' }}</span>
+          <input type="range" min="0" max="24" value="10" (input)="setStyle('--liquid-toggle-reach', 'px', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-press-duration · {{ play.style()['--liquid-toggle-press-duration'] ?? 'default' }}</span>
+          <input type="range" min="40" max="300" step="10" value="110" (input)="setStyle('--liquid-toggle-press-duration', 'ms', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-press-depth · {{ play.style()['--liquid-toggle-press-depth'] ?? 'default' }}</span>
+          <input type="range" min="0" max="1" step="0.05" value="0.45" (input)="setStyle('--liquid-toggle-press-depth', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-hue · {{ play.style()['--liquid-toggle-hue'] ?? 'default' }}</span>
+          <input type="range" min="0" max="360" value="262" (input)="setStyle('--liquid-toggle-hue', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-track · {{ play.style()['--liquid-toggle-track'] ?? 'default' }}</span>
+          <input type="color" value="#e1e1e6" (input)="setStyle('--liquid-toggle-track', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-fill · {{ play.style()['--liquid-toggle-fill'] ?? 'default' }}</span>
+          <input type="color" value="#4cc417" (input)="setStyle('--liquid-toggle-fill', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-thumb · {{ play.style()['--liquid-toggle-thumb'] ?? 'default' }}</span>
+          <input type="color" value="#ffffff" (input)="setStyle('--liquid-toggle-thumb', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-label-color · {{ play.style()['--liquid-toggle-label-color'] ?? 'default' }}</span>
+          <input type="color" value="#8a8a8e" (input)="setStyle('--liquid-toggle-label-color', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-toggle-tint · {{ play.style()['--liquid-toggle-tint'] ?? 'default' }}</span>
+          <input type="color" value="#3d5bd9" (input)="setStyle('--liquid-toggle-tint', '', $event)" />
+        </label>
+      </div>
+
+      <div class="toggle-panel">
+        <x-liquid-toggle
+          [label]="play.label() || null"
+          [ariaLabel]="play.ariaLabel() || null"
+          [disabled]="play.disabled()"
+          [invalid]="play.invalid()"
+          [hint]="play.hint() || null"
+          [error]="play.error() || null"
+          [fill]="play.fill()"
+          [io]="play.io()"
+          [style]="play.style()"
+          [value]="playValue()"
+          (valueChange)="onPlayChange($event)"
+        />
+      </div>
+      <pre class="docs-log" role="status">value: {{ playValue() ? 'on' : 'off' }} · valueChange fired {{ playChanges() }}×</pre>
+      <div class="docs-actions">
+        <button class="docs-ghost" type="button" liquidPress (click)="resetStyle()">Reset styles</button>
+      </div>
+      <pre class="docs-code">{{ playMarkup() }}</pre>
+    </section>
+
+    <section class="docs-case" id="sizes">
+      <h2>Sizes</h2>
+      <p class="docs-note">
+        The thumb, the inset, and the default font are fractions of
+        <code>--liquid-toggle-height</code>. <code>--liquid-toggle-width</code> sets how far the
+        thumb can travel.
+      </p>
+      <div class="toggle-sizes">
+        <div>
+          <p class="docs-note">Compact · <code>--liquid-toggle-height: 24px</code></p>
+          <x-liquid-toggle class="size-compact" label="Compact" [value]="true" />
+        </div>
+        <div>
+          <p class="docs-note">Default · 32px</p>
+          <x-liquid-toggle label="Default" [value]="true" />
+        </div>
+        <div>
+          <p class="docs-note">Large · <code>--liquid-toggle-height: 44px</code></p>
+          <x-liquid-toggle class="size-large" label="Large" [value]="true" />
+        </div>
+        <div>
+          <p class="docs-note">Narrow · <code>--liquid-toggle-width: 44px</code></p>
+          <x-liquid-toggle class="size-narrow" label="Narrow" [value]="true" />
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="states">
+      <h2>States</h2>
+      <div class="docs-grid">
+        <div>
+          <p class="docs-note">Off</p>
+          <x-liquid-toggle label="Off" [value]="false" />
+        </div>
+        <div>
+          <p class="docs-note">On</p>
+          <x-liquid-toggle label="On" [value]="true" />
+        </div>
+        <div>
+          <p class="docs-note"><code>hint</code></p>
+          <x-liquid-toggle label="Alerts" [value]="true" hint="Banners while the app is open" />
+        </div>
+        <div>
+          <p class="docs-note"><code>error</code></p>
+          <x-liquid-toggle label="Sync" error="Turn sync on" />
+        </div>
+        <div>
+          <p class="docs-note"><code>invalid</code></p>
+          <x-liquid-toggle label="Required" [value]="false" invalid />
+        </div>
+        <div>
+          <p class="docs-note"><code>disabled</code></p>
+          <x-liquid-toggle label="Locked" [value]="true" disabled />
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="forms">
+      <h2>Forms</h2>
+      <p class="docs-note">
+        It is a form control: <code>[formControl]</code>, <code>formControlName</code> and
+        <code>ngModel</code> all work. The control is marked touched when it loses focus. The error
+        message is yours to bind, through <code>error</code>.
+      </p>
+      <div class="docs-grid">
+        <div>
+          <p class="docs-note">Reactive · <code>Validators.requiredTrue</code></p>
+          <x-liquid-toggle
+            label="Sync"
+            [formControl]="sync"
+            [error]="sync.touched && sync.invalid ? 'Turn sync on' : null"
+          />
+          <pre class="docs-log">{{ sync.touched ? 'touched' : 'untouched' }} · {{ sync.status }} · {{ sync.value ? 'on' : 'off' }}</pre>
+        </div>
+        <div>
+          <p class="docs-note">Template-driven · <code>ngModel</code></p>
+          <x-liquid-toggle #model="ngModel" label="Alerts" name="alerts" [(ngModel)]="alertsOn" />
+          <pre class="docs-log">{{ model.touched ? 'touched' : 'untouched' }} · {{ model.status }} · {{ alertsOn ? 'on' : 'off' }}</pre>
+        </div>
+      </div>
+      <div class="docs-actions">
+        <button class="docs-submit" type="button" liquidPress (click)="sync.markAsTouched()">Mark as touched</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="turnSync(true)">Turn sync on</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="turnSync(false)">Turn sync off</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="toggleSyncDisabled()">
+          {{ sync.disabled ? 'Enable the control' : 'Disable the control' }}
+        </button>
+      </div>
+      <pre class="docs-code">{{ formsSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <pre class="docs-code">{{ setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API</h2>
+
+      <p class="docs-note"><code>&lt;x-liquid-toggle&gt;</code> · exportAs <code>liquidToggle</code></p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: api }" />
+
+      <p class="docs-note">Outputs and members</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: members, head: 'Type' }" />
+
+      <p class="docs-note">CSS custom properties</p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: cssApi }" />
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<ng-template #inputs let-rows>
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td><code>{{ row.value }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #calls let-rows let-head="head">
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>{{ head }}</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>

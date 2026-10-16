@@ -1,0 +1,16 @@
+
+.upload-rules {
+    margin      : 6px 0 0;
+    padding-left: 18px;
+    font-size   : 12px;
+    line-height : 1.7;
+    color       : var(--ink-soft);
+}
+
+.docs-grid .docs-note {
+    margin-bottom: 8px;
+}
+
+.docs-table + .docs-note {
+    margin-top: 24px;
+}

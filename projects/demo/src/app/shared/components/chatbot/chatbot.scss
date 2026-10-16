@@ -1,0 +1,207 @@
+@use 'variables' as var;
+
+// A fixed height, like the search popup's: the popup pins its box once per
+// open, and the log grows with every message.
+:host {
+    display       : flex;
+    flex-direction: column;
+    width         : 400px;
+    max-width     : calc(100vw - 32px);
+    height        : 480px;
+    max-height    : calc(100dvh - 160px);
+    font-family   : var.$appFont;
+    color         : #1d1d1f;
+
+    // The app blue, so the buttons ignore whichever service accent is around.
+    --liquid-button-hue: 257.9;
+}
+
+.chat-log {
+    display            : flex;
+    flex-direction     : column;
+    gap                : 10px;
+    flex               : 1 1 auto;
+    min-height         : 0;
+    padding            : 12px 12px 8px;
+    overflow-y         : auto;
+    overscroll-behavior: contain;
+    scrollbar-width    : thin;
+}
+
+.chat-row {
+    display    : flex;
+    align-items: flex-end;
+    gap        : 8px;
+    max-width       : 86%;
+    transform-origin: bottom left;
+
+    &.is-new {
+        animation: chat-arrive 340ms var(--menu-spring, ease-out) both;
+    }
+
+    &.is-user {
+        align-self      : flex-end;
+        transform-origin: bottom right;
+
+        .chat-bubble {
+            border-end-end-radius  : 6px;
+            border-end-start-radius: 18px;
+            background-color       : var(--color-primary);
+            color                  : var(--text-inverse);
+        }
+    }
+}
+
+.chat-avatar {
+    display         : grid;
+    place-items     : center;
+    flex            : none;
+    width           : 28px;
+    height          : 28px;
+    border-radius   : 50%;
+    background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    color           : var(--color-primary);
+
+    ng-icon {
+        font-size: 14px;
+    }
+}
+
+.chat-bubble {
+    margin                 : 0;
+    padding                : 9px 13px;
+    border-radius          : 18px;
+    border-end-start-radius: 6px;
+    background-color       : rgba(0, 0, 0, 0.05);
+    font-size              : 14px;
+    // Khmer stacks subscripts below the line; the extra leading keeps them clear.
+    line-height            : 1.55;
+    overflow-wrap          : anywhere;
+
+    &.is-typing {
+        display    : inline-flex;
+        align-items: center;
+        gap        : 4px;
+        height     : 40px;
+        box-sizing : border-box;
+    }
+}
+
+.chat-dot {
+    width           : 6px;
+    height          : 6px;
+    border-radius   : 50%;
+    background-color: rgba(29, 29, 31, 0.4);
+    animation       : chat-dot 1s ease-in-out infinite;
+
+    &:nth-child(2) {
+        animation-delay: 0.15s;
+    }
+
+    &:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+}
+
+.chat-suggestions {
+    display        : flex;
+    gap            : 6px;
+    flex           : none;
+    padding        : 4px 12px 8px;
+    overflow-x     : auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.chat-suggestion {
+    --liquid-button-radius   : 12px;
+    --liquid-button-padding  : 6px 12px;
+    --liquid-button-font-size: 13px;
+
+    flex       : none;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.chat-composer {
+    display         : flex;
+    align-items     : center;
+    gap             : 8px;
+    flex            : none;
+    height          : 46px;
+    margin          : 0 10px 10px;
+    padding         : 0 5px 0 14px;
+    border-radius   : 14px;
+    background-color: rgba(0, 0, 0, 0.05);
+    transition      : background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    &:focus-within {
+        background-color: var(--surface);
+        box-shadow      : 0 0 0 2px color-mix(in srgb, var(--color-primary) 55%, transparent),
+            0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+}
+
+.chat-input {
+    flex      : 1 1 auto;
+    min-width : 0;
+    height    : 100%;
+    padding   : 0;
+    border    : none;
+    outline   : none;
+    background: none;
+    color     : inherit;
+    font      : inherit;
+    font-size : 15px;
+
+    &::placeholder {
+        color: rgba(29, 29, 31, 0.4);
+    }
+}
+
+.chat-send {
+    --liquid-button-radius : 50%;
+    --liquid-button-padding: 0;
+
+    flex  : none;
+    width : 36px;
+    height: 36px;
+
+    ng-icon {
+        font-size: 18px;
+    }
+}
+
+// Grows out of its own corner, the way the popup grows out of its trigger.
+@keyframes chat-arrive {
+    from {
+        opacity  : 0;
+        scale    : 0.92;
+        translate: 0 8px;
+        filter   : blur(6px);
+    }
+}
+
+@keyframes chat-dot {
+    0%,
+    60%,
+    100% {
+        opacity  : 0.4;
+        translate: 0 0;
+    }
+
+    30% {
+        opacity  : 1;
+        translate: 0 -3px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chat-row.is-new,
+    .chat-dot {
+        animation: none;
+    }
+}

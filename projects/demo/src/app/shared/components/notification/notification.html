@@ -1,0 +1,83 @@
+<ng-template liquidMenuHeaderIcon>
+  <ng-icon name="ionNotificationsOutline"></ng-icon>
+</ng-template>
+
+<div class="notification-toolbar">
+  <x-liquid-tabs
+    #tabs="liquidTabs"
+    stretch
+    i18n-aria-label="@@notifications.filter"
+    aria-label="Filter notifications"
+    [value]="filter()"
+    (valueChange)="setFilter($event)"
+  >
+    <button type="button" liquidTab="all">
+      <span i18n="@@notifications.all">All</span>
+    </button>
+    <button type="button" liquidTab="unread">
+      <span i18n="@@notifications.unread">Unread</span>
+      @if (unreadCount()) {
+        <span class="notification-tab-count">{{ unreadCount() }}</span>
+      }
+    </button>
+  </x-liquid-tabs>
+  <button
+    class="notification-mark-all"
+    type="button"
+    i18n-title="@@notifications.markAllRead"
+    title="Mark all as read"
+    i18n-aria-label="@@notifications.markAllRead"
+    aria-label="Mark all as read"
+    [disabled]="!unreadCount()"
+    (click)="markAllRead()"
+  >
+    <ng-icon name="ionCheckmarkDoneOutline"></ng-icon>
+  </button>
+</div>
+
+<!-- One list both tabs filter: the shared panel, labelled by whichever tab is selected. -->
+<div class="notification-list" liquidTabPanel [liquidTabPanelFor]="tabs">
+  @for (group of groups(); track group.title) {
+    <section class="notification-group">
+      <h4 class="notification-group-title">{{ group.title }}</h4>
+      @for (item of group.items; track item.id) {
+        <button
+          class="notification-item"
+          type="button"
+          [class.is-unread]="!item.read"
+          [attr.data-kind]="item.kind"
+          (click)="open(item)"
+        >
+          <span class="notification-icon" aria-hidden="true">
+            <ng-icon [name]="icons[item.kind]"></ng-icon>
+          </span>
+          <span class="notification-text">
+            <span class="notification-heading">
+              <span class="notification-title">{{ item.title }}</span>
+              <time class="notification-time" [attr.datetime]="item.createdAt.toISOString()">{{
+                relativeTime(item.createdAt)
+              }}</time>
+            </span>
+            <span class="notification-body">{{ item.body }}</span>
+          </span>
+          <span class="notification-dot" aria-hidden="true"></span>
+          @if (!item.read) {
+            <span class="notification-sr" i18n="@@notifications.unread">Unread</span>
+          }
+        </button>
+      }
+    </section>
+  } @empty {
+    <div class="notification-empty">
+      <span class="notification-empty-icon" aria-hidden="true">
+        <ng-icon name="ionNotificationsOffOutline"></ng-icon>
+      </span>
+      <span class="notification-empty-title" i18n="@@notifications.emptyTitle"
+        >You're all caught up</span
+      >
+      <span class="notification-empty-text" i18n="@@notifications.emptyText"
+        >New notifications will show up here.</span
+      >
+    </div>
+  }
+</div>

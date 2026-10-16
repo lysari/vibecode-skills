@@ -1,0 +1,442 @@
+@use 'variables' as var;
+
+// Ported from `.claude/demo/liquid-toast/liquid-toast.css`.
+//
+// The resting state only. Every motion is played from `liquid-toast.ts` as Web
+// Animations, so nothing here transitions a property the script animates —
+// a transition on the same property fights the animation for it.
+//
+// `gap` and `offset` arrive from the toaster's inputs as `--_liquid-toast-*`;
+// everything else is read with a fallback, so a `--liquid-toast-*` set on any
+// ancestor retunes the stacks:
+//   --liquid-toast-open-duration    340ms
+//   --liquid-toast-close-duration   240ms
+//   --liquid-toast-resize-duration  280ms
+//   --liquid-toast-press-duration   the card's squash
+//   --liquid-toast-target-press-duration  the target's squash
+//   --liquid-toast-width            min(400px, 100vw - 32px)
+//   --liquid-toast-radius           22px
+//   --liquid-toast-max-height       a cap on an expanded stack
+
+:host {
+    --_offset: var(--_liquid-toast-offset, 16px);
+    --_gap   : var(--_liquid-toast-gap, 8px);
+
+    // Each stack places itself; the host is only where they live.
+    display  : contents;
+}
+
+// One stack. An edge stack is placed here; a target's stack is placed by the
+// script beside its target, since only the script knows where that is.
+.liquid-toast-list {
+    position      : fixed;
+    z-index       : 100000;
+    display       : flex;
+    flex-direction: column;
+    box-sizing    : border-box;
+    width         : var(--liquid-toast-width, min(400px, calc(100vw - 32px)));
+    margin        : 0;
+    padding       : 0;
+    list-style    : none;
+    outline       : none;
+    // The stack is a column of air over the page; only the toasts catch the pointer.
+    pointer-events: none;
+    // Every slot keeps the same margin and the list swallows the trailing one, so
+    // a fold always has spacing of its own to collapse. A `gap`, or a
+    // `:last-child` exemption, leaves a step after the last fold — measured at
+    // 8px, one frame after the removal, both ways round.
+    margin-bottom : calc(var(--_gap) * -1);
+
+    &.is-edge {
+        &.is-top { top   : max(var(--_offset), env(safe-area-inset-top)); }
+        &.is-up  { bottom: max(var(--_offset), env(safe-area-inset-bottom)); }
+
+        &:not(.is-left, .is-right) {
+            left     : 50%;
+            translate: -50% 0;
+        }
+        &.is-left  { left : var(--_offset); }
+        &.is-right { right: var(--_offset); }
+    }
+
+    // Expanded, a stack can outgrow the screen. An edge stack gets the screen
+    // less both offsets; a target's stack gets the room the script measured. A
+    // cap of your own applies on top of that, never past the room there is.
+    &.is-expanded {
+        max-height: min(
+            var(--liquid-toast-max-height, 100dvh),
+            var(--_liquid-toast-room, calc(100dvh - var(--_offset) * 2))
+        );
+    }
+
+    // It scrolls only once it actually overflows, which the script marks. A
+    // scroll container clips the cards' shadows and their overshoot, and changes
+    // what their frosted glass samples — a pale block shows behind the whole
+    // stack — so it is not worth paying for a stack that fits.
+    &.is-expanded.is-overflowing {
+        overflow-y         : auto;
+        overscroll-behavior: contain;
+        scrollbar-width    : none;
+        pointer-events     : auto;
+    }
+
+    // Scrolling, the stack's own control has to stay in reach: the ghost pins to
+    // the edge the stack grows away from, with the toasts running under it.
+    // Without this a hundred expanded toasts put "Show less" a hundred rows down.
+    &.is-expanded.is-overflowing > .liquid-toast-slot.is-ghost {
+        position: sticky;
+        // The gap it rests above at the end of the scroll, so pinning it there
+        // and letting go of it there are the same place: the handoff moves nothing.
+        bottom  : var(--_gap);
+        z-index : 1;
+    }
+
+    &.is-expanded.is-overflowing.is-up > .liquid-toast-slot.is-ghost,
+    &.is-expanded.is-overflowing.is-above > .liquid-toast-slot.is-ghost {
+        top   : 0;
+        bottom: auto;
+    }
+
+    // The newest toast is always first in the list, so a stack that grows upward
+    // runs in reverse and the newest still sits nearest the edge it came from.
+    &.is-up,
+    &.is-above {
+        flex-direction: column-reverse;
+    }
+}
+
+// The room a toast takes in the stack. The card is pinned to the slot's edge
+// nearest its origin and centred across; centred, a card that overshoots its
+// width spills evenly both ways rather than shunting sideways.
+.liquid-toast-slot {
+    position       : relative;
+    // Never squeezed: an expanded stack at its max height must overflow and
+    // scroll, not shrink every toast until they overlap.
+    flex           : none;
+    display        : flex;
+    justify-content: center;
+    align-items    : flex-start;
+    box-sizing     : border-box;
+    min-height     : 0;
+    margin-bottom  : var(--_gap);
+
+    .is-up > &,
+    .is-above > & { align-items: flex-end; }
+    .is-edge.is-left > &  { justify-content: flex-start; }
+    .is-edge.is-right > & { justify-content: flex-end; }
+}
+
+// The paint. Only its own size, translate, scale, radius and opacity animate.
+.liquid-toast {
+    --_h: 262;
+
+    flex           : none;
+    display        : flex;
+    justify-content: center;
+    align-items    : flex-start;
+    box-sizing     : border-box;
+    width          : 100%;
+    border-radius  : var(--liquid-toast-radius, 22px);
+    overflow       : hidden;
+    pointer-events : auto;
+    background     : rgba(#fff, 0.86);
+    backdrop-filter: saturate(180%) blur(20px);
+    box-shadow     :
+        0 12px 32px -10px rgba(0, 0, 0, 0.32),
+        0 0 0 0.5px rgba(0, 0, 0, 0.06);
+
+    &.is-info    { --_h: 262; }
+    &.is-success { --_h: 152; }
+    &.is-warning { --_h: 70; }
+    &.is-error   { --_h: 27; }
+
+    .is-up &,
+    .is-above & { align-items: flex-end; }
+}
+
+.liquid-toast-body {
+    flex       : none;
+    display    : flex;
+    align-items: center;
+    gap        : 10px;
+    box-sizing : border-box;
+    width      : 100%;
+    min-height : 52px;
+    padding    : 10px;
+    font-family: var.$appFont;
+
+    // A custom template owns its own layout; the card only paints around it.
+    &.is-custom {
+        display   : block;
+        min-height: 0;
+        padding   : 0;
+    }
+}
+
+// The ghost: a small pill after the last visible toast, counting what waits
+// behind it. Paler than a toast, so it reads as the stack's edge rather than one
+// more message.
+.liquid-toast-ghost {
+    --_h                       : 262;
+
+    width                      : auto;
+    padding                    : 0;
+    border                     : none;
+    border-radius              : 999px;
+    background                 : rgba(#fff, 0.62);
+    box-shadow                 :
+        0 8px 22px -12px rgba(0, 0, 0, 0.3),
+        0 0 0 0.5px rgba(0, 0, 0, 0.06);
+    color                      : rgba(#1d1d1f, 0.62);
+    font                       : inherit;
+    cursor                     : pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition                 : background-color 160ms ease, color 160ms ease;
+
+    // Pinned over the cards it has to read against them, not through them —
+    // otherwise it is the palest thing on a screen full of toasts.
+    .is-overflowing & {
+        background: rgba(#fff, 0.82);
+    }
+
+    &:hover {
+        background: rgba(#fff, 0.86);
+        color     : #1d1d1f;
+    }
+
+    // A ring rather than an outline: `styles.scss` suppresses outlines globally.
+    &:focus-visible {
+        box-shadow:
+            0 0 0 3px oklch(48% 0.16 var(--_h) / 0.35),
+            0 8px 22px -12px rgba(0, 0, 0, 0.3);
+    }
+
+    .liquid-toast-body {
+        // No gap: the label is one element, and the count inside it must not
+        // become a flex item with space either side — "+ 2 more".
+        gap            : 0;
+        justify-content: center;
+        width          : auto;
+        min-height     : 30px;
+        padding        : 6px 14px;
+        font-size      : 13px;
+        font-weight    : 600;
+        line-height    : 1.2;
+        white-space    : nowrap;
+    }
+}
+
+// The countdown pill. Its anchor spans the slot's height so the pill centres on
+// the card, and sits outside the stack on the side the script chose — or, with
+// no room either side, straddles the card's top edge (its bottom edge in a stack
+// that grows upward), clear of the close button.
+.liquid-toast-timer-anchor {
+    position      : absolute;
+    top           : 0;
+    bottom        : 0;
+    z-index       : 1;
+    display       : flex;
+    align-items   : center;
+    pointer-events: none;
+
+    [data-timer-side='right'] > .liquid-toast-slot > & {
+        left: calc(100% + 8px);
+    }
+
+    [data-timer-side='left'] > .liquid-toast-slot > & {
+        right          : calc(100% + 8px);
+        justify-content: flex-end;
+    }
+
+    [data-timer-side='inset'] > .liquid-toast-slot > & {
+        top            : -11px;
+        bottom         : auto;
+        right          : 48px;
+        justify-content: flex-end;
+    }
+
+    [data-timer-side='inset'].is-up > .liquid-toast-slot > &,
+    [data-timer-side='inset'].is-above > .liquid-toast-slot > & {
+        top   : auto;
+        bottom: -11px;
+    }
+}
+
+// Dark against the pale card, so it reads as the toast's clock rather than one
+// more piece of it. Its size, translate and opacity belong to the motion.
+.liquid-toast-timer {
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    box-sizing     : border-box;
+    height         : 26px;
+    // No minimum width: the pill opens out of a sliver against the card, and a
+    // floor would leave it popping out already most of the way open.
+    padding        : 0 9px;
+    border-radius  : 999px;
+    overflow       : hidden;
+    background     : rgba(#1d1d1f, 0.8);
+    backdrop-filter: saturate(180%) blur(12px);
+    box-shadow     : 0 6px 16px -8px rgba(0, 0, 0, 0.45);
+    color          : #fff;
+    font-family    : var.$appFont;
+    font-size      : 12px;
+    font-weight    : 600;
+    line-height    : 1;
+    white-space    : nowrap;
+
+    [data-timer-side='inset'] > .liquid-toast-slot & {
+        height : 22px;
+        padding: 0 8px;
+    }
+}
+
+// Hidden until shown. The motion animates opacity from and to this, so the
+// resting states need no animation holding them.
+.liquid-toast-timer-anchor:not([data-shown]) .liquid-toast-timer {
+    opacity: 0;
+}
+
+// Frozen at its own width, so the pill opening around it reveals it rather than
+// squeezing it.
+.liquid-toast-timer-content {
+    flex                : none;
+    display             : inline-flex;
+    align-items         : baseline;
+    gap                 : 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.liquid-toast-timer-unit {
+    opacity: 0.7;
+}
+
+// A glossy disc rather than a flat chip: light at the top, the hue gathering
+// toward the bottom, a hairline of white on the rim and a soft drop under it.
+// Lightness and chroma stay pinned and only the hue varies, so every type reads
+// at the same weight and keeps its icon legible on its own plate.
+.liquid-toast-plate {
+    flex          : none;
+    display       : grid;
+    place-items   : center;
+    width         : 38px;
+    height        : 38px;
+    border-radius : 50%;
+    background    : linear-gradient(155deg,
+            oklch(99% 0.012 var(--_h)) 0%,
+            oklch(96% 0.035 var(--_h)) 45%,
+            oklch(91% 0.075 var(--_h)) 100%);
+    box-shadow    :
+        inset 0 1px 1px rgba(#fff, 0.95),
+        inset 0 -1px 2px oklch(72% 0.1 var(--_h) / 0.3),
+        inset 0 0 0 0.5px oklch(80% 0.06 var(--_h) / 0.5),
+        0 1px 2px rgba(0, 0, 0, 0.07);
+    color         : oklch(55% 0.19 var(--_h));
+    font-size     : 20px;
+    line-height   : 1;
+
+    .is-loading & {
+        background: linear-gradient(155deg, #fff 0%, rgba(#1d1d1f, 0.05) 100%);
+        box-shadow:
+            inset 0 1px 1px rgba(#fff, 0.95),
+            inset 0 0 0 0.5px rgba(#1d1d1f, 0.06),
+            0 1px 2px rgba(0, 0, 0, 0.06);
+        color     : rgba(#1d1d1f, 0.5);
+    }
+}
+
+.liquid-toast-spinner {
+    box-sizing        : border-box;
+    width             : 18px;
+    height            : 18px;
+    border            : 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius     : 50%;
+    animation         : liquid-toast-spin 700ms linear infinite;
+}
+
+@keyframes liquid-toast-spin {
+    to { rotate: 360deg; }
+}
+
+.liquid-toast-copy {
+    flex          : 1 1 auto;
+    display       : flex;
+    flex-direction: column;
+    gap           : 2px;
+    min-width     : 0;
+    padding       : 2px 0 2px 4px;
+
+    .liquid-toast-plate + & {
+        padding-left: 0;
+    }
+}
+
+.liquid-toast-title,
+.liquid-toast-description {
+    margin       : 0;
+    overflow-wrap: anywhere;
+}
+
+.liquid-toast-title {
+    font-size  : 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color      : #1d1d1f;
+}
+
+.liquid-toast-description {
+    font-size  : 13px;
+    line-height: 1.35;
+    color      : rgba(#1d1d1f, 0.62);
+}
+
+// The twin styles these by hand; the app has the button, so it only has to be
+// sized and given the card's hue. Its own fill is a child, so the press squashes
+// paint and label together.
+.liquid-toast-button {
+    flex                     : none;
+    --liquid-button-hue      : var(--_h);
+    --liquid-button-padding  : 7px 14px;
+    --liquid-button-font-size: 13px;
+}
+
+.liquid-toast-close {
+    flex                       : none;
+    display                    : grid;
+    place-items                : center;
+    width                      : 28px;
+    height                     : 28px;
+    padding                    : 0;
+    border                     : none;
+    border-radius              : 50%;
+    background                 : rgba(#1d1d1f, 0.05);
+    color                      : rgba(#1d1d1f, 0.55);
+    font-size                  : 16px;
+    line-height                : 1;
+    cursor                     : pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition                 : background-color 160ms ease, color 160ms ease;
+
+    &:hover {
+        background: rgba(#1d1d1f, 0.09);
+        color     : #1d1d1f;
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 3px oklch(48% 0.16 var(--_h) / 0.35);
+    }
+}
+
+// The script lands every state without travel under reduced motion; this is the
+// rest of it. The spinner slows rather than stopping, so loading still reads as
+// loading.
+@media (prefers-reduced-motion: reduce) {
+    .liquid-toast-close,
+    .liquid-toast-ghost {
+        transition: none;
+    }
+    .liquid-toast-spinner {
+        animation-duration: 2s;
+    }
+}

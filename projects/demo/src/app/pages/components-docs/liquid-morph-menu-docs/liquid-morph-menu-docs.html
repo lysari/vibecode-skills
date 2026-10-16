@@ -1,0 +1,543 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid morph menu</h1>
+      <p class="docs-lede">
+        A row of items with one highlight that pours between them. It grows in on the first item
+        the pointer meets, follows the pointer and the keyboard focus, and drains away when the
+        pointer leaves — from wherever it stands, even mid-pour.
+      </p>
+      <p class="docs-lede">
+        Add <code>pill</code> and it is the header's icon bar: a glass pill of 24px icons, with a
+        count bubble for any item that needs one. Turn it on its side with
+        <code>orientation="vertical"</code>, pin it to a selection, or switch it off per item.
+      </p>
+      <div class="morph-stage">
+        <x-liquid-morph-menu pill>
+          @for (item of demoItems; track item.id) {
+            <button type="button" [attr.aria-label]="item.label" liquidMorphItem>
+              <ng-icon [name]="item.icon" />
+            </button>
+          }
+        </x-liquid-morph-menu>
+      </div>
+    </header>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">
+        Import the menu and the item directive. Items are your own elements with
+        <code>liquidMorphItem</code> — a <code>&lt;button&gt;</code>, a link, a
+        <code>&lt;div&gt;</code> — and keep their own semantics.
+      </p>
+      <pre class="docs-code">{{ code.setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="playground">
+      <h2>Playground</h2>
+      <p class="docs-note">
+        Every input on one menu. Hover it, tab through it, and change the controls while the
+        highlight is moving.
+      </p>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          liquidMorphActive on
+          <select (change)="choose('pinned', $event)">
+            <option value="" [selected]="!play.pinned()">none</option>
+            @for (item of demoItems; track item.id) {
+              <option [value]="item.id" [selected]="play.pinned() === item.id">{{ item.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="docs-control">
+          liquidMorphDisabled on
+          <select (change)="choose('disabledItem', $event)">
+            <option value="" [selected]="!play.disabledItem()">none</option>
+            @for (item of demoItems; track item.id) {
+              <option [value]="item.id" [selected]="play.disabledItem() === item.id">
+                {{ item.label }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <div class="docs-flags">
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.pill()" (change)="toggle('pill', $event)" />
+          pill
+        </label>
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.vertical()" (change)="toggle('vertical', $event)" />
+          vertical
+        </label>
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.disabledHighlight()"
+            (change)="toggle('disabledHighlight', $event)"
+          />
+          disabledHighlight
+        </label>
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.disabledHover()"
+            (change)="toggle('disabledHover', $event)"
+          />
+          disabledHover
+        </label>
+      </div>
+
+      <div class="morph-stage" [class.is-light]="!play.pill()">
+        <x-liquid-morph-menu
+          [class.morph-plain]="!play.pill()"
+          [pill]="play.pill()"
+          [orientation]="play.vertical() ? 'vertical' : 'horizontal'"
+          [disabledHighlight]="play.disabledHighlight()"
+          [disabledHover]="play.disabledHover()"
+        >
+          @for (item of demoItems; track item.id) {
+            <button
+              type="button"
+              [attr.aria-label]="item.label"
+              liquidMorphItem
+              [liquidMorphActive]="play.pinned() === item.id"
+              [liquidMorphDisabled]="play.disabledItem() === item.id"
+            >
+              <ng-icon [name]="item.icon" />
+            </button>
+          }
+        </x-liquid-morph-menu>
+      </div>
+
+      <pre class="docs-code">{{ markup() }}</pre>
+    </section>
+
+    <h2 class="docs-divider" id="examples">Examples</h2>
+
+    <section class="docs-case" id="pill">
+      <h3>Pill</h3>
+      <p class="docs-note">
+        The header's icon bar. Items that come and go fold the row open and shut, and a count
+        turning up takes the highlight along without a pour. The pinned item keeps the highlight
+        when the pointer leaves.
+      </p>
+
+      <div class="morph-stage">
+        <x-liquid-morph-menu pill>
+          <button type="button" aria-label="Search" liquidMorphItem>
+            <ng-icon name="ionSearchOutline" />
+          </button>
+          <button type="button" aria-label="Notifications" liquidMorphItem [liquidMorphActive]="pinned()">
+            <ng-icon name="ionNotificationsOutline" />
+            @if (unread()) {
+              <span class="liquid-morph-count" aria-hidden="true">{{ unread() > 9 ? '9+' : unread() }}</span>
+            }
+          </button>
+          @if (showSettings()) {
+            <button type="button" aria-label="Settings" liquidMorphItem>
+              <ng-icon name="ionSettingsOutline" />
+            </button>
+          }
+          <button type="button" aria-label="Languages" liquidMorphItem>
+            <ng-icon name="ionGlobeOutline" />
+          </button>
+          <button type="button" aria-label="Sign out" liquidMorphItem>
+            <ng-icon name="ionLogOutOutline" />
+          </button>
+        </x-liquid-morph-menu>
+      </div>
+
+      <div class="docs-actions">
+        <button class="docs-ghost" type="button" liquidPress (click)="unread.set(unread() + 1)">
+          Add unread
+        </button>
+        <button class="docs-ghost" type="button" liquidPress (click)="unread.set(0)">
+          Clear unread
+        </button>
+        <button class="docs-ghost" type="button" liquidPress (click)="showSettings.set(!showSettings())">
+          {{ showSettings() ? 'Remove' : 'Add' }} an item
+        </button>
+        <button class="docs-ghost" type="button" liquidPress (click)="pinned.set(!pinned())">
+          {{ pinned() ? 'Unpin' : 'Pin' }} notifications
+        </button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="popup">
+      <h3>Pinned by a popup</h3>
+      <p class="docs-note">
+        Bind <code>liquidMorphActive</code> to the popup's <code>isOpen()</code> and the highlight
+        stays on the item that opened it while the pointer moves off to use the panel.
+      </p>
+      <div class="morph-stage">
+        <x-liquid-morph-menu pill>
+          <button
+            type="button"
+            aria-label="Search"
+            liquidMorphItem
+            [liquidMorphActive]="searchMenu.isOpen()"
+            [liquidMenuTriggerFor]="searchMenu"
+          >
+            <ng-icon name="ionSearchOutline" />
+          </button>
+          <button
+            type="button"
+            aria-label="Languages"
+            liquidMorphItem
+            [liquidMorphActive]="languageMenu.isOpen()"
+            [liquidMenuTriggerFor]="languageMenu"
+          >
+            <ng-icon name="ionGlobeOutline" />
+          </button>
+        </x-liquid-morph-menu>
+        <x-liquid-menu-popup #searchMenu="liquidMenu" title="Search">
+          <button type="button" liquidMenuItem>Passport</button>
+          <button type="button" liquidMenuItem>National ID</button>
+          <button type="button" liquidMenuItem>Birth certificate</button>
+        </x-liquid-menu-popup>
+        <x-liquid-menu-popup #languageMenu="liquidMenu" title="Language">
+          <button type="button" liquidMenuItem>ខ្មែរ</button>
+          <button type="button" liquidMenuItem>English</button>
+        </x-liquid-menu-popup>
+      </div>
+      <pre class="docs-code">{{ code.popup }}</pre>
+    </section>
+
+    <section class="docs-case" id="selection">
+      <h3>Selection</h3>
+      <p class="docs-note">
+        With <code>disabledHover</code> the highlight ignores the pointer and stays on the pinned
+        item, so it marks a selection and pours only when the selection changes. Keyboard focus
+        still moves it.
+      </p>
+      <div class="morph-stage">
+        <x-liquid-morph-menu pill disabledHover>
+          @for (item of demoItems; track item.id) {
+            <button
+              type="button"
+              [attr.aria-label]="item.label"
+              [attr.aria-pressed]="selected() === item.id"
+              liquidMorphItem
+              [liquidMorphActive]="selected() === item.id"
+              (click)="selected.set(item.id)"
+            >
+              <ng-icon [name]="item.icon" />
+            </button>
+          }
+        </x-liquid-morph-menu>
+      </div>
+      <pre class="docs-code">{{ code.selection }}</pre>
+    </section>
+
+    <section class="docs-case" id="disabled">
+      <h3>Disabled</h3>
+      <p class="docs-note">
+        <code>liquidMorphDisabled</code> keeps the highlight off one item and dims it; crossing it
+        lets the highlight go. <code>disabledHighlight</code> on the menu keeps the highlight away from
+        every item.
+      </p>
+      <div class="morph-stage">
+        <x-liquid-morph-menu pill [disabledHighlight]="highlightOff()">
+          <button type="button" aria-label="Search" liquidMorphItem>
+            <ng-icon name="ionSearchOutline" />
+          </button>
+          <button type="button" aria-label="Notifications" liquidMorphItem>
+            <ng-icon name="ionNotificationsOutline" />
+          </button>
+          <button
+            type="button"
+            aria-label="Sign out"
+            liquidMorphItem
+            [liquidMorphDisabled]="signOutDisabled()"
+            [disabled]="signOutDisabled()"
+          >
+            <ng-icon name="ionLogOutOutline" />
+          </button>
+          <button type="button" aria-label="Languages" liquidMorphItem>
+            <ng-icon name="ionGlobeOutline" />
+          </button>
+        </x-liquid-morph-menu>
+      </div>
+      <div class="docs-actions">
+        <button class="docs-ghost" type="button" liquidPress (click)="signOutDisabled.set(!signOutDisabled())">
+          {{ signOutDisabled() ? 'Enable' : 'Disable' }} sign out
+        </button>
+        <button class="docs-ghost" type="button" liquidPress (click)="highlightOff.set(!highlightOff())">
+          {{ highlightOff() ? 'Enable' : 'Disable' }} the highlight
+        </button>
+      </div>
+      <pre class="docs-code">{{ code.disabled }}</pre>
+    </section>
+
+    <section class="docs-case" id="vertical">
+      <h3>Vertical</h3>
+      <p class="docs-note">
+        The same menu as the row, stacked: the items, the pill and the pour are unchanged, only the
+        axis turns. Without <code>pill</code> the menu draws only the highlight; the page styles
+        the items, and sets <code>align-items: stretch</code> for full-width rows.
+      </p>
+      <div class="morph-stage">
+        <x-liquid-morph-menu pill orientation="vertical">
+          <button type="button" aria-label="Search" liquidMorphItem>
+            <ng-icon name="ionSearchOutline" />
+          </button>
+          <button type="button" aria-label="Notifications" liquidMorphItem>
+            <ng-icon name="ionNotificationsOutline" />
+          </button>
+          <button type="button" aria-label="Settings" liquidMorphItem liquidMorphDisabled>
+            <ng-icon name="ionSettingsOutline" />
+          </button>
+          <button type="button" aria-label="Languages" liquidMorphItem>
+            <ng-icon name="ionGlobeOutline" />
+          </button>
+        </x-liquid-morph-menu>
+
+        <x-liquid-morph-menu class="morph-vertical" orientation="vertical">
+          @for (item of demoItems; track item.id) {
+            <button type="button" liquidMorphItem>
+              <ng-icon [name]="item.icon" />
+              <span>{{ item.label }}</span>
+            </button>
+          }
+        </x-liquid-morph-menu>
+      </div>
+    </section>
+
+    <section class="docs-case" id="custom">
+      <h3>Custom look</h3>
+      <p class="docs-note">
+        Every tunable is a <code>--liquid-morph-*</code> custom property read with a fallback, so
+        it can be set on the menu or any ancestor. This one is a light text menu with a tinted
+        highlight, a wider reach and a slower pour.
+      </p>
+      <div class="morph-stage is-light">
+        <x-liquid-morph-menu class="morph-custom">
+          <a href="#custom" liquidMorphItem>Overview</a>
+          <a href="#custom" liquidMorphItem>Services</a>
+          <a href="#custom" liquidMorphItem>Applications</a>
+          <a href="#custom" liquidMorphItem>Help</a>
+        </x-liquid-morph-menu>
+      </div>
+      <pre class="docs-code">{{ code.custom }}</pre>
+    </section>
+
+    <section class="docs-case" id="api-menu">
+      <h2>&lt;x-liquid-morph-menu&gt;</h2>
+      <p class="docs-note">Inputs</p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Input</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of menuApi; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td><code>{{ row.value }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note">Members, through <code>#menu="liquidMorphMenu"</code></p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Type</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of menuMembers; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-item">
+      <h2>[liquidMorphItem]</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of itemApi; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td><code>{{ row.value ?? '—' }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-classes">
+      <h2>Classes</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Where</th>
+              <th>Means</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of classes; track row.name + row.type) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td>{{ row.type }}</td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-css">
+      <h2>CSS custom properties</h2>
+      <p class="docs-note">
+        All read with a fallback, so a <code>--liquid-morph-*</code> set on any ancestor reaches the
+        menu. The durations and the pull are read in TypeScript, where the motion is driven.
+      </p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of cssApi; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="motion">
+      <h2>Motion</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>What</th>
+              <th>Duration</th>
+              <th>Curve</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of motion; track row.what) {
+              <tr>
+                <td>{{ row.what }}</td>
+                <td>{{ row.duration }}</td>
+                <td>{{ row.curve }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Measured</h3>
+      <div class="docs-figures">
+        @for (figure of figures; track figure.note) {
+          <div class="docs-figure">
+            <b>{{ figure.value }}</b>
+            <span>{{ figure.note }}</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="docs-case" id="behaviour">
+      <h2>Behaviour &amp; accessibility</h2>
+      <ul class="docs-notes">
+        @for (note of behaviour; track note) {
+          <li>{{ note }}</li>
+        }
+      </ul>
+
+      <h3>Known gaps</h3>
+      <ul class="docs-notes">
+        @for (gap of gaps; track gap) {
+          <li>{{ gap }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="docs-case" id="files">
+      <h2>Files</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Kind</th>
+              <th>What it is</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (file of files; track file.name) {
+              <tr>
+                <td><code>{{ file.name }}</code></td>
+                <td>{{ file.type }}</td>
+                <td>{{ file.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li [class.is-nested]="section.nested">
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>

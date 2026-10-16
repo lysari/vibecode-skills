@@ -1,0 +1,184 @@
+@use 'variables'as var;
+
+// Not encapsulated: the items are the consumer's own elements, projected in, and
+// encapsulated rules would never reach them. Every selector hangs off a class the
+// component or its directive puts on its own host instead.
+//
+// Tunables are read with a fallback rather than declared here, so a
+// `--liquid-morph-*` set on any ancestor reaches the menu too.
+
+.liquid-morph-menu {
+    position   : relative;
+    // Keeps the highlight-under-items stacking to the menu.
+    isolation  : isolate;
+    display    : inline-flex;
+    align-items: center;
+
+    // The same row turned on its side: everything else about it stays as the
+    // horizontal one has it, so a vertical pill is the header's pill, stacked.
+    &.is-vertical {
+        flex-direction: column;
+    }
+}
+
+// Placed and sized by the component off the active item's box. The move between
+// items is a Web Animation from the component — a CSS transition on the same
+// properties would outrank it in the cascade — so only the arrival and the
+// departure are transitioned here.
+.liquid-morph-indicator {
+    position                                : absolute;
+    top                                     : 0;
+    left                                    : 0;
+    z-index                                 : 0;
+    width                                   : var(--liquid-morph-width, 0px);
+    height                                  : var(--liquid-morph-height, 0px);
+    translate                               : var(--liquid-morph-x, 0px) var(--liquid-morph-y, 0px);
+    border-radius                           : var(--liquid-morph-radius, 999px);
+    // A faint white rather than a solid one: the menus this rides in are dark
+    // glass, and an opaque highlight swallows the white glyphs it passes under.
+    background-color                        : var(--liquid-morph-color, rgba(255, 255, 255, 0.16));
+    box-shadow                              : var(--liquid-morph-shadow, inset 0 0 0 0.5px rgba(255, 255, 255, 0.18));
+    // Shrunk and gone: what it grows out of, and what it drains back into.
+    scale                                   : var(--liquid-morph-idle-scale, 0.72);
+    opacity                                 : 0;
+    pointer-events                          : none;
+    transition                              : opacity var(--liquid-morph-leave-duration, 220ms) ease,
+        scale var(--liquid-morph-leave-duration, 220ms) ease;
+    aspect-ratio: 1;
+
+    .is-active>& {
+        scale  : 1;
+        opacity: 1;
+        // Overshoots a little, so it lands with some weight instead of easing flat.
+        transition: opacity var(--liquid-morph-enter-duration, 240ms) ease-out,
+            scale var(--liquid-morph-enter-duration, 240ms) var(--liquid-morph-spring, cubic-bezier(0.34, 1.42, 0.5, 1));
+    }
+}
+
+.liquid-morph-item {
+    position: relative;
+    // Above the highlight, which sits behind the whole row.
+    z-index : 1;
+}
+
+// While an item folds in or out, the box closes around what it holds instead of
+// slicing across it: the content stays centred in what is left and keeps its own
+// size, and the item has faded out from under it before the fold gets tight.
+.liquid-morph-item.is-folding {
+
+    >* {
+        flex: none;
+    }
+
+    .liquid-morph-menu:not(.is-vertical)>& {
+        justify-content: center;
+    }
+
+    .liquid-morph-menu.is-vertical>& {
+        align-items: center;
+    }
+
+    // On its way out of the DOM: it should not answer a pointer crossing it.
+    &.is-leaving {
+        pointer-events: none;
+    }
+}
+
+// The item box is the whole row height, so the highlight hugs it with no pad.
+.liquid-morph-menu.is-pill {
+    padding            : 1px 2px;
+    border-radius      : var(--liquid-morph-radius, 999px);
+
+    &.is-vertical {
+        padding: 2px 1px;
+    }
+    // background      : var(--liquid-morph-pill-background,
+    //         radial-gradient(circle at 97% 3.3%, rgba(#000, 0.35) 0, rgba(#000, 0.6) 164%));
+    // background      : var(--liquid-morph-pill-background,
+    //         radial-gradient(circle at 97% 3.3%, rgba(#fff, 0.15) 0, rgba(#fff, 0.3) 164%));
+    background         :
+        radial-gradient(120% 130% at 0% 0%, rgba(#fff, 0.22), rgba(#fff, 0) 58%),
+        linear-gradient(135deg, rgba(#fff, 0.1) 62%),
+        rgba(#707070, .12);
+    backdrop-filter: blur(24px);
+    color          : var(--liquid-morph-pill-color, rgba(255, 255, 255, 0.8));
+
+    &::after {
+        content       : '';
+        position      : absolute;
+        inset         : 0;
+        z-index       : 2;
+        padding       : 1px;
+        border-radius : inherit;
+        pointer-events: none;
+        background    : linear-gradient(135deg,
+                rgba(#fff, 0.6) 0%,
+                rgba(#fff, 0.12) 28%,
+                rgba(#fff, 0.06) 50%,
+                rgba(#fff, 0.08) 72%,
+                rgba(#fff, 0.22) 100%);
+        -webkit-mask          : linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask                  : linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite        : exclude;
+    }
+
+    .liquid-morph-item {
+        width      : var(--liquid-morph-icon-size, 24px);
+        height     : var(--liquid-morph-icon-size, 24px);
+        padding    : 7px 6px;
+        box-sizing : content-box;
+        display    : flex;
+        place-items: center;
+        background : none;
+        border     : none;
+        color      : inherit;
+        font       : inherit;
+        cursor     : pointer;
+
+        ng-icon {
+            font-size: var(--liquid-morph-icon-size, 24px);
+        }
+
+        img {
+            width: var(--liquid-morph-icon-size, 24px);
+        }
+    }
+
+    .liquid-morph-count {
+        position       : absolute;
+        top            : 4px;
+        right          : 1px;
+        min-width      : 16px;
+        height         : 16px;
+        padding        : 0 4px;
+        box-sizing     : border-box;
+        display        : flex;
+        align-items    : center;
+        justify-content: center;
+        border-radius  : 8px;
+        background     : var(--danger);
+        box-shadow     : 0 0 0 2px rgba(255, 255, 255, 0.9);
+        color          : var(--text-inverse);
+        font-family    : var.$appFont;
+        font-size      : 10px;
+        font-weight    : 600;
+        line-height    : 1;
+        pointer-events : none;
+    }
+}
+
+// The highlight never comes here, so nothing should invite the pointer to try.
+// After the pill, and as specific as its item rule, so its pointer cursor yields.
+.liquid-morph-menu .liquid-morph-item.is-disabled {
+    opacity: 0.4;
+    cursor : default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .liquid-morph-indicator,
+    .liquid-morph-menu.is-active>.liquid-morph-indicator {
+        transition: none;
+    }
+}

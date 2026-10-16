@@ -1,0 +1,178 @@
+@use 'liquid-field' as field;
+
+$spring: field.$spring;
+
+:host {
+    @include field.tokens('liquid-toggle');
+    --_height: var(--liquid-toggle-height, 32px);
+    --_width: var(--liquid-toggle-width, calc(var(--_height) * 1.75));
+    --_radius: var(--liquid-toggle-radius, calc(var(--_height) / 2));
+    --_inset: calc(var(--_height) * 0.125);
+    --_thumb: calc(var(--_height) - 2 * var(--_inset));
+    --_font: var(--liquid-toggle-font-size, clamp(12px, calc(var(--_height) * 0.44), 16px));
+    --_i-w: calc(var(--_height) * 0.0625);
+    --_i-h: calc(var(--_height) * 0.34);
+    --_o: calc(var(--_height) * 0.32);
+    --_o-stroke: calc(var(--_height) * 0.045);
+}
+
+:host(.is-disabled) {
+    opacity: 0.5;
+}
+
+@include field.below;
+@include field.said-motion;
+
+.liquid-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--_height) * 0.5);
+}
+
+.liquid-toggle-label {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--_font);
+    line-height: 1.3;
+    color: var(--liquid-toggle-label-color, var(--muted));
+    cursor: pointer;
+}
+
+.liquid-toggle-switch {
+    position: relative;
+    flex: none;
+    width: var(--_width);
+    height: var(--_height);
+    border-radius: var(--_radius);
+}
+
+.liquid-toggle-press,
+.liquid-toggle-track {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+}
+
+.liquid-toggle-track {
+    position: relative;
+    overflow: hidden;
+    background: var(--liquid-toggle-track, #e1e1e6);
+    transition: box-shadow var(--_settle) $spring;
+
+    :host(.is-focused) & {
+        box-shadow: 0 0 0 2px var(--_tint), 0 0 0 5px oklch(48% 0.16 var(--_h) / 0.18);
+    }
+
+    :host(.is-invalid) & {
+        box-shadow: 0 0 0 2px var(--invalid);
+    }
+
+    :host(.is-invalid.is-focused) & {
+        box-shadow: 0 0 0 2px var(--invalid), 0 0 0 5px color-mix(in srgb, var(--invalid) 18%, transparent);
+    }
+}
+
+.liquid-toggle-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--liquid-toggle-fill, #4cc417);
+
+    :host(.is-on) & {
+        width: 100%;
+    }
+
+    :host(.is-fill-thumb) & {
+        --bias: 20%;
+        width: calc(var(--_thumb) - var(--bias));
+        height: calc(var(--_thumb) - var(--bias));
+        translate: calc(var(--_inset) + var(--bias)) calc(var(--_inset) + var(--bias));
+    }
+
+    :host(.is-fill-thumb.is-on) & {
+        width: 100%;
+        height: 100%;
+        translate: 0 0;
+    }
+}
+
+.liquid-toggle-thumb {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    width: var(--_thumb);
+    height: var(--_thumb);
+    border-radius: calc(var(--_thumb) / 2);
+    background: var(--liquid-toggle-thumb, #fff);
+    box-shadow: 0 calc(var(--_height) * 0.04) calc(var(--_height) * 0.12) rgba(29, 29, 31, 0.18);
+    translate: var(--_inset) var(--_inset);
+    pointer-events: none;
+
+    :host(.is-on) & {
+        translate: calc(var(--_width) - var(--_inset) - var(--_thumb)) var(--_inset);
+    }
+}
+
+.liquid-toggle-i,
+.liquid-toggle-o {
+    position: absolute;
+    top: calc((var(--_height) - var(--_i-h)) / 2);
+    pointer-events: none;
+}
+
+// Each mark sits in a thumb rest, so the thumb covers the one that is not the state.
+.liquid-toggle-i {
+    left: calc(var(--_inset) + (var(--_thumb) - var(--_i-w)) / 2);
+    width: var(--_i-w);
+    height: var(--_i-h);
+    border-radius: calc(var(--_i-w) / 2);
+    background: var(--liquid-toggle-thumb, #fff);
+}
+
+.liquid-toggle-o {
+    top: calc((var(--_height) - var(--_o)) / 2);
+    left: calc(var(--_width) - var(--_inset) - var(--_thumb) + (var(--_thumb) - var(--_o)) / 2);
+    box-sizing: border-box;
+    width: var(--_o);
+    height: var(--_o);
+    border: var(--_o-stroke) solid #b0b0b0;
+    border-radius: 50%;
+}
+
+.liquid-toggle-control {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    appearance: none;
+
+    :host(.is-disabled) & {
+        cursor: default;
+    }
+}
+
+.liquid-toggle-press,
+.liquid-toggle-thumb,
+.liquid-toggle-fill,
+.liquid-toggle-i,
+.liquid-toggle-o {
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .liquid-toggle-track {
+        transition: none;
+    }
+
+    .liquid-input-said-in,
+    .liquid-input-said-out {
+        animation: none;
+    }
+}

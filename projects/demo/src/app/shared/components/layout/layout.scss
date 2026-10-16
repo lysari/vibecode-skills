@@ -40,9 +40,42 @@
     gap: 12px;
     overflow: hidden;
 
+    &.has-secondary-sidebar {
+      grid-template-columns: var(--sidebar-width) var(--secondary-sidebar-width, 250px) 1fr;
+
+      @media (max-width: 1240px) {
+        grid-template-columns: 240px 220px 1fr;
+      }
+
+      @media (max-width: v.$compact) {
+        grid-template-columns: 1fr;
+        overflow: visible;
+      }
+    }
+
     @media (max-width: v.$compact) {
       grid-template-columns: 1fr;
       overflow: visible;
+    }
+
+    .secondary-sidebar {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      border: var(--border-width) solid var(--color-window-border);
+      border-radius: var(--panel-radius);
+      background: var(--color-sidebar-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      min-width: 0;
+
+      @media (max-width: v.$compact) {
+        height: auto;
+        max-height: 320px;
+        overflow: visible;
+      }
     }
 
     .content-panel {

@@ -1,0 +1,133 @@
+// Styles for the `[numberSlot]` directive — a slot-machine reel per digit.
+//
+// A directive has no view encapsulation, so these rules live globally, same as
+// `_number-pop-in.scss`. Every knob is a custom property the directive's inputs
+// write onto the host.
+
+:root {
+  --slot-dur: 820ms;
+  --slot-stagger: 80ms;
+  // Scales with the digit. A px blur that looks right at 16px disappears at 64.
+  --slot-blur: 0em;
+  --slot-overshoot: 0.16em;
+  // The line is one em, which is what the comma beside a digit sits on. The
+  // cell is taller: a digit's ink hangs outside the em, and a window of exactly
+  // one em clips it. The extra is empty padding, so the line itself stays put.
+  --slot-line: 1em;
+  --slot-pad: 0.12em;
+}
+
+@keyframes t-slot-spin {
+  0% {
+    transform: translate3d(0, var(--slot-from-y), 0);
+    // Written here, not via a custom property: a var() in this property is
+    // dropped, and the reel then cruises at the animation's linear timing
+    // until it hits the stop.
+    animation-timing-function: cubic-bezier(0.12, 0.75, 0.2, 1);
+  }
+
+  86% {
+    transform: translate3d(0, var(--slot-over-y), 0);
+    animation-timing-function: cubic-bezier(0.22, 0.7, 0.28, 1);
+  }
+
+  100% {
+    transform: translate3d(0, var(--slot-end-y), 0);
+  }
+}
+
+@keyframes t-slot-blur {
+  0% {
+    filter: blur(0);
+  }
+
+  14% {
+    filter: blur(var(--slot-blur));
+  }
+
+  55% {
+    filter: blur(var(--slot-blur));
+  }
+
+  78%,
+  100% {
+    filter: blur(0);
+  }
+}
+
+// Derived here rather than on `:root`: a custom property resolves its var()s
+// where it is declared, so one set on `:root` would keep the root's pad and
+// ignore a `--slot-pad` set on the number.
+.t-slot-group {
+  --slot-cell: calc(var(--slot-line) + 2 * var(--slot-pad));
+
+  display: inline-flex;
+  align-items: baseline;
+  position: relative;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+
+  * {
+    font-size: inherit !important;
+  }
+}
+
+// Overflow stays visible. A hidden overflow would move this box's baseline to
+// its bottom edge, and the digit would sit above the separators beside it.
+// The window inside is what clips the strip.
+.t-slot-reel {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: baseline;
+}
+
+.t-slot-sizer {
+  display: block;
+  height: var(--slot-line);
+  line-height: var(--slot-line);
+  visibility: hidden;
+}
+
+.t-slot-window {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(var(--slot-pad) * -1);
+  height: var(--slot-cell);
+  overflow: hidden;
+}
+
+.t-slot-cell {
+  display: block;
+  box-sizing: border-box;
+  height: var(--slot-cell);
+  padding-top: var(--slot-pad);
+  line-height: var(--slot-line);
+  text-align: center;
+}
+
+// A strip left as an inline box loses its block cells: they get pulled out of
+// it, the transform stays on an empty inline, and the window keeps showing the
+// first digit. It has to be a block so the travel moves the digits.
+.t-slot-strip {
+  display: block;
+}
+
+.t-slot-static {
+  line-height: 1;
+  white-space: pre;
+}
+
+.t-slot-reel.is-spinning .t-slot-strip {
+  animation:
+    t-slot-spin var(--slot-dur) linear var(--slot-delay, 0ms) both,
+    t-slot-blur var(--slot-dur) linear var(--slot-delay, 0ms) both;
+  will-change: transform, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-slot-reel .t-slot-strip {
+    animation: none !important;
+  }
+}

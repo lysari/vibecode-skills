@@ -1,0 +1,80 @@
+<!-- The press squashes the field; the stretch past either end is on this wrapper,
+     so the two never animate the same `scale`. -->
+<div #press class="liquid-input-press">
+  <div
+    #field
+    class="liquid-input-field liquid-slider-field"
+    (pointerdown)="onPointerDown($event)"
+    (pointermove)="onPointerMove($event)"
+    (pointerup)="letGo(false)"
+    (pointercancel)="letGo(true)"
+    (lostpointercapture)="letGo(false)"
+  >
+    <span #track class="liquid-slider-track" aria-hidden="true">
+      @for (tick of tickList(); track tick.at) {
+        <i class="liquid-slider-tick" [class.is-hidden]="tick.hidden" [style.--_at]="tick.at"></i>
+      }
+    </span>
+    <span class="liquid-slider-fill" aria-hidden="true">
+      <span class="liquid-slider-handle"></span>
+    </span>
+
+    <label #labelText class="liquid-slider-label" [for]="inputId()">{{ label() }}</label>
+    <span
+      #output
+      class="liquid-slider-value"
+      aria-hidden="true"
+      [numberSlot]="text()"
+      [slotSpins]="0"
+      [slotAnimateOnInit]="false"
+      [slotDisabled]="isDisabled()"
+    ></span>
+
+    <input
+      #control
+      class="liquid-slider-control"
+      type="range"
+      [id]="inputId()"
+      [min]="min()"
+      [max]="max()"
+      [step]="step()"
+      [value]="current()"
+      [disabled]="isDisabled()"
+      [attr.name]="name()"
+      [attr.aria-valuetext]="text()"
+      [attr.aria-invalid]="hasError() ? 'true' : null"
+      [attr.aria-describedby]="describedBy()"
+      (input)="onKey(control)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    />
+  </div>
+</div>
+
+@if (error() || hint()) {
+  <div class="liquid-input-below">
+    <div class="liquid-input-said">
+      @if (error(); as message) {
+        <p
+          class="liquid-input-error"
+          role="alert"
+          animate.enter="liquid-input-said-in"
+          animate.leave="liquid-input-said-out"
+          [id]="errorId()"
+        >
+          <ng-icon name="ionAlertCircleOutline" aria-hidden="true"></ng-icon>
+          <span>{{ message }}</span>
+        </p>
+      } @else if (hint(); as message) {
+        <p
+          class="liquid-input-hint"
+          animate.enter="liquid-input-said-in"
+          animate.leave="liquid-input-said-out"
+          [id]="hintId()"
+        >
+          {{ message }}
+        </p>
+      }
+    </div>
+  </div>
+}

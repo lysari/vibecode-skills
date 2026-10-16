@@ -1,0 +1,389 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid slider</h1>
+      <p class="docs-lede">
+        A number picked by dragging across the field, with its label and value written inside it.
+        The fill follows the finger on a spring, settles onto the nearest step when it lets go, and
+        stretches the field a little when dragged past either end. Click to jump, or focus it and use
+        the arrow keys, Page Up, Page Down, Home and End.
+      </p>
+      <div class="slider-panel">
+        <p class="slider-panel-title">Path</p>
+        <x-liquid-slider label="Width" [min]="0" [max]="10" ticks [(value)]="width" />
+        <x-liquid-slider label="Radius" [max]="1000" [(value)]="radius" />
+        <x-liquid-slider label="Opacity" [max]="1" [step]="0.05" [(value)]="opacity" />
+        <pre class="docs-log">width: {{ width() }} · radius: {{ radius() }} · opacity: {{ opacity() }}</pre>
+        <div class="docs-actions">
+          <button class="docs-ghost" type="button" liquidPress (click)="radius.set(40)">
+            radius = 40
+          </button>
+          <button class="docs-ghost" type="button" liquidPress (click)="radius.set(900)">
+            radius = 900
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section class="docs-case" id="playground">
+      <h2>Playground</h2>
+      <p class="docs-note">
+        Every input, the <code>valueChange</code> output and every custom property on one slider.
+      </p>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          label
+          <input type="text" [value]="play.label()" (input)="setText('label', $event)" />
+        </label>
+        <label class="docs-control">
+          min
+          <input type="number" [value]="play.min()" (input)="setNumber('min', $event)" />
+        </label>
+        <label class="docs-control">
+          max
+          <input type="number" [value]="play.max()" (input)="setNumber('max', $event)" />
+        </label>
+        <label class="docs-control">
+          step
+          <input type="number" min="0.01" step="any" [value]="play.step()" (input)="setNumber('step', $event)" />
+        </label>
+        <label class="docs-control">
+          handle
+          <select (change)="setHandle($event)">
+            <option value="auto" [selected]="play.handle() === 'auto'">auto</option>
+            <option value="on" [selected]="play.handle() === 'on'">on</option>
+            <option value="off" [selected]="play.handle() === 'off'">off</option>
+          </select>
+        </label>
+        <label class="docs-control">
+          hint
+          <input type="text" [value]="play.hint()" (input)="setText('hint', $event)" />
+        </label>
+        <label class="docs-control">
+          error
+          <input type="text" [value]="play.error()" (input)="setText('error', $event)" />
+        </label>
+      </div>
+
+      <div class="docs-flags">
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.ticks()" (change)="setFlag('ticks', $event)" />
+          ticks
+        </label>
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.disabled()" (change)="setFlag('disabled', $event)" />
+          disabled
+        </label>
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.invalid()" (change)="setFlag('invalid', $event)" />
+          invalid
+        </label>
+      </div>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          <span>--liquid-slider-hue · {{ play.style()['--liquid-slider-hue'] ?? 'default' }}</span>
+          <input type="range" min="0" max="360" value="262" (input)="setStyle('--liquid-slider-hue', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-height · {{ play.style()['--liquid-slider-height'] ?? 'default' }}</span>
+          <input type="range" min="32" max="64" value="48" (input)="setStyle('--liquid-slider-height', 'px', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-radius · {{ play.style()['--liquid-slider-radius'] ?? 'default' }}</span>
+          <input type="range" min="0" max="32" value="12" (input)="setStyle('--liquid-slider-radius', 'px', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-gap · {{ play.style()['--liquid-slider-gap'] ?? 'default' }}</span>
+          <input type="range" min="0" max="12" value="0" (input)="setStyle('--liquid-slider-gap', 'px', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-font-size · {{ play.style()['--liquid-slider-font-size'] ?? 'default' }}</span>
+          <input type="range" min="11" max="20" value="16" (input)="setStyle('--liquid-slider-font-size', 'px', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-settle-duration · {{ play.style()['--liquid-slider-settle-duration'] ?? 'default' }}</span>
+          <input type="range" min="120" max="1000" step="10" value="340" (input)="setStyle('--liquid-slider-settle-duration', 'ms', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-press-depth · {{ play.style()['--liquid-slider-press-depth'] ?? 'default' }}</span>
+          <input type="range" min="0" max="1" step="0.05" value="0.2" (input)="setStyle('--liquid-slider-press-depth', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-press-duration · {{ play.style()['--liquid-slider-press-duration'] ?? 'default' }}</span>
+          <input type="range" min="40" max="300" step="10" value="110" (input)="setStyle('--liquid-slider-press-duration', 'ms', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-tint · {{ play.style()['--liquid-slider-tint'] ?? 'default' }}</span>
+          <input type="color" value="#3d5bd9" (input)="setStyle('--liquid-slider-tint', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-background · {{ play.style()['--liquid-slider-background'] ?? 'default' }}</span>
+          <input type="color" value="#f5f5f7" (input)="setStyle('--liquid-slider-background', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-background-hover · {{ play.style()['--liquid-slider-background-hover'] ?? 'default' }}</span>
+          <input type="color" value="#ededf0" (input)="setStyle('--liquid-slider-background-hover', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-background-focus · {{ play.style()['--liquid-slider-background-focus'] ?? 'default' }}</span>
+          <input type="color" value="#ffffff" (input)="setStyle('--liquid-slider-background-focus', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-fill · {{ play.style()['--liquid-slider-fill'] ?? 'default' }}</span>
+          <input type="color" value="#e1e1e6" (input)="setStyle('--liquid-slider-fill', '', $event)" />
+        </label>
+        <label class="docs-control is-wide">
+          <span>--liquid-slider-fill-shadow</span>
+          <input
+            type="text"
+            placeholder="0 1px 3px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06)"
+            (input)="setStyle('--liquid-slider-fill-shadow', '', $event)"
+          />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-handle-color · {{ play.style()['--liquid-slider-handle-color'] ?? 'default' }}</span>
+          <input type="color" value="#8a8a8b" (input)="setStyle('--liquid-slider-handle-color', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-tick-color · {{ play.style()['--liquid-slider-tick-color'] ?? 'default' }}</span>
+          <input type="color" value="#b9b9ba" (input)="setStyle('--liquid-slider-tick-color', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-label-color · {{ play.style()['--liquid-slider-label-color'] ?? 'default' }}</span>
+          <input type="color" value="#8e8e8f" (input)="setStyle('--liquid-slider-label-color', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-value-color · {{ play.style()['--liquid-slider-value-color'] ?? 'default' }}</span>
+          <input type="color" value="#3e3e40" (input)="setStyle('--liquid-slider-value-color', '', $event)" />
+        </label>
+        <label class="docs-control">
+          <span>--liquid-slider-rim-color · {{ play.style()['--liquid-slider-rim-color'] ?? 'default' }}</span>
+          <input type="color" value="#ececee" (input)="setStyle('--liquid-slider-rim-color', '', $event)" />
+        </label>
+      </div>
+
+      <div class="docs-stage">
+        <x-liquid-slider
+          [style]="play.style()"
+          [label]="play.label()"
+          [min]="play.min()"
+          [max]="play.max()"
+          [step]="play.step()"
+          [ticks]="play.ticks()"
+          [handle]="play.handle()"
+          [disabled]="play.disabled()"
+          [invalid]="play.invalid()"
+          [hint]="play.hint() || null"
+          [error]="play.error() || null"
+          [value]="playValue()"
+          (valueChange)="onPlayChange($event)"
+        />
+      </div>
+      <pre class="docs-log" role="status">value: {{ playValue() ?? 'null' }} · valueChange fired {{ playChanges() }}×</pre>
+      <div class="docs-actions">
+        <button class="docs-ghost" type="button" liquidPress (click)="resetStyle()">Reset styles</button>
+      </div>
+      <pre class="docs-code">{{ playMarkup() }}</pre>
+    </section>
+
+    <section class="docs-case" id="sizes">
+      <h2>Sizes</h2>
+      <p class="docs-note">
+        Everything inside the field is sized off <code>--liquid-slider-height</code>: the padding,
+        the handle, the dots, the gap and the default font. A rounder
+        <code>--liquid-slider-radius</code> gives the fill a rounder end, up to a circle for a pill.
+        <code>--liquid-slider-gap</code> insets the fill on every side, with corners that stay
+        concentric with the field's.
+      </p>
+      <div class="slider-sizes">
+        <div>
+          <p class="docs-note">Compact · <code>--liquid-slider-height: 36px</code></p>
+          <x-liquid-slider class="size-compact" label="Width" [max]="10" ticks [value]="2" />
+        </div>
+        <div>
+          <p class="docs-note">Default · 48px</p>
+          <x-liquid-slider label="Width" [max]="10" ticks [value]="2" />
+        </div>
+        <div>
+          <p class="docs-note">Large · <code>--liquid-slider-height: 60px</code></p>
+          <x-liquid-slider class="size-large" label="Width" [max]="10" ticks [value]="2" />
+        </div>
+        <div>
+          <p class="docs-note">Pill · <code>--liquid-slider-radius: 999px</code></p>
+          <x-liquid-slider class="size-pill" label="Width" [max]="10" ticks [value]="2" />
+        </div>
+        <div>
+          <p class="docs-note">Raised · <code>--liquid-slider-gap: 6px</code>, a white fill and a shadow</p>
+          <x-liquid-slider class="size-raised" label="Scale" [max]="2" [step]="0.001" [value]="1.36" />
+        </div>
+        <div class="slider-narrow">
+          <p class="docs-note">Narrow · 220px</p>
+          <x-liquid-slider label="Brightness" [max]="10" ticks [value]="2" />
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="handle">
+      <h2>Handle</h2>
+      <p class="docs-note">
+        Near either end the handle passes under the label or the number. <code>handle</code> says
+        what it does there.
+      </p>
+      <div class="docs-grid">
+        <div>
+          <p class="docs-note"><code>auto</code> · hides under text</p>
+          <x-liquid-slider label="Width" [max]="10" [value]="1" />
+        </div>
+        <div>
+          <p class="docs-note"><code>on</code> · always shown</p>
+          <x-liquid-slider label="Width" [max]="10" [value]="1" handle="on" />
+        </div>
+        <div>
+          <p class="docs-note"><code>off</code> · never shown</p>
+          <x-liquid-slider label="Width" [max]="10" [value]="6" handle="off" />
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="states">
+      <h2>States</h2>
+      <div class="docs-grid">
+        <div>
+          <p class="docs-note"><code>hint</code></p>
+          <x-liquid-slider label="Volume" [value]="40" hint="Drag, click, or use the arrow keys" />
+        </div>
+        <div>
+          <p class="docs-note"><code>error</code></p>
+          <x-liquid-slider label="Copies" [max]="5" ticks [value]="0" error="Choose at least one copy" />
+        </div>
+        <div>
+          <p class="docs-note"><code>disabled</code></p>
+          <x-liquid-slider label="Locked" [value]="60" disabled />
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="forms">
+      <h2>Forms</h2>
+      <p class="docs-note">
+        It is a form control: <code>[formControl]</code>, <code>formControlName</code> and
+        <code>ngModel</code> all work. The control is marked touched when a drag ends or the field
+        loses focus. The error message is yours to bind, through <code>error</code>.
+      </p>
+      <div class="docs-grid">
+        <div>
+          <p class="docs-note">Reactive · <code>Validators.min(1)</code></p>
+          <x-liquid-slider
+            label="Copies"
+            [max]="5"
+            ticks
+            [formControl]="copies"
+            [error]="copies.touched && copies.invalid ? 'Choose at least one copy' : null"
+          />
+          <pre class="docs-log">{{ copies.touched ? 'touched' : 'untouched' }} · {{ copies.status }} · {{ copies.value }}</pre>
+        </div>
+        <div>
+          <p class="docs-note">Template-driven · <code>ngModel</code></p>
+          <x-liquid-slider #model="ngModel" label="Volume" name="volume" [(ngModel)]="volume" />
+          <pre class="docs-log">{{ model.touched ? 'touched' : 'untouched' }} · {{ model.status }} · {{ volume }}</pre>
+        </div>
+      </div>
+      <div class="docs-actions">
+        <button class="docs-submit" type="button" liquidPress (click)="copies.markAsTouched()">Submit</button>
+        <button class="docs-ghost" type="button" liquidPress (click)="copies.setValue(4)">setValue(4)</button>
+        <button
+          class="docs-ghost"
+          type="button"
+          liquidPress
+          (click)="copies.disabled ? copies.enable() : copies.disable()"
+        >
+          {{ copies.disabled ? 'enable()' : 'disable()' }}
+        </button>
+      </div>
+      <pre class="docs-code">{{ formsSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <pre class="docs-code">{{ setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API</h2>
+
+      <p class="docs-note"><code>&lt;x-liquid-slider&gt;</code> · exportAs <code>liquidSlider</code></p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: api }" />
+
+      <p class="docs-note">Outputs and members</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: members, head: 'Type' }" />
+
+      <p class="docs-note">CSS custom properties</p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: cssApi }" />
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<ng-template #inputs let-rows>
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td><code>{{ row.value }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #calls let-rows let-head="head">
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>{{ head }}</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>

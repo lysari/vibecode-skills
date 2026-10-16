@@ -1,0 +1,103 @@
+.slot-figure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 36px 48px;
+  margin-top: 16px;
+  padding: 28px 32px;
+  border-radius: 22px;
+  background: #fff;
+}
+
+.slot-readout {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.slot-readout.is-hero {
+  font-size: 72px;
+}
+
+.slot-readout.is-price {
+  font-size: 40px;
+}
+
+.slot-caption {
+  margin: 8px 0 0;
+}
+
+.slot-sizes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.slot-size {
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.slot-size-value {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.slot-size-value.is-compact {
+  font-size: 14px;
+}
+
+.slot-size-value.is-body {
+  font-size: 32px;
+}
+
+.slot-size-value.is-large {
+  font-size: 64px;
+}
+
+.slot-size-value.is-narrow {
+  width: 140px;
+  font-size: 28px;
+}
+
+.slot-motion {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.slot-motion-card {
+  padding: 18px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.slot-motion-value {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.slot-compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.slot-compare-value {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.docs-actions {
+  flex-wrap: wrap;
+}

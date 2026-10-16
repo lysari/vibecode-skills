@@ -1,0 +1,172 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid menu popup</h1>
+      <p class="docs-lede">
+        A panel that grows out of the element that opened it and shrinks back into it. It places
+        itself under its trigger, flips above when only that side fits, and stacks on top of
+        another popup when opened from inside one.
+      </p>
+      <div class="popup-stage">
+        <button class="docs-ghost" type="button" liquidPress [liquidMenuTriggerFor]="actions">
+          Actions
+        </button>
+        <x-liquid-menu-popup #actions="liquidMenu" title="Actions">
+          <button type="button" liquidMenuItem>Rename</button>
+          <button type="button" liquidMenuItem>Duplicate</button>
+          <button type="button" liquidMenuItem>Delete</button>
+        </x-liquid-menu-popup>
+      </div>
+    </header>
+
+    <section class="docs-case" id="closing">
+      <h2>Closing</h2>
+      <p class="docs-note">
+        By default an invisible overlay covers the page while the popup is up, so the click
+        outside closes it and goes no further. Turn <code>overlay</code> off and the page stays
+        live: the click outside still closes the popup, and also lands on whatever it hit. Turn
+        <code>closeOnOutsideClick</code> off and a click outside leaves it up — Escape, the trigger,
+        <code>close()</code> or focus moving out of the panel still put it away.
+      </p>
+
+      <div class="docs-flags">
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="overlay()" (change)="toggle('overlay', $event)" />
+          overlay
+        </label>
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="closeOnOutsideClick()"
+            (change)="toggle('closeOnOutsideClick', $event)"
+          />
+          closeOnOutsideClick
+        </label>
+      </div>
+
+      <div class="popup-stage">
+        <button class="docs-ghost" type="button" liquidPress [liquidMenuTriggerFor]="closing">
+          Open
+        </button>
+        <button class="docs-ghost" type="button" liquidPress (click)="pageClicks.set(pageClicks() + 1)">
+          Page button · {{ pageClicks() }}
+        </button>
+        <x-liquid-menu-popup
+          #closing="liquidMenu"
+          role="dialog"
+          title="Close me"
+          [overlay]="overlay()"
+          [closeOnOutsideClick]="closeOnOutsideClick()"
+          (opened)="lastReason.set(null)"
+          (closed)="lastReason.set($event)"
+        >
+          <p class="popup-copy">Click outside, press Escape, or use the button.</p>
+          <button class="docs-ghost" type="button" liquidPress (click)="closing.close()">
+            Close
+          </button>
+        </x-liquid-menu-popup>
+      </div>
+
+      <p class="docs-note">
+        Last closed by: <code>{{ lastReason() ?? '—' }}</code>
+      </p>
+      <pre class="docs-code">{{ closingSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">
+        Put <code>liquidMenuTriggerFor</code> on whatever opens it; the popup takes its position
+        from that element.
+      </p>
+      <pre class="docs-code">{{ setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API</h2>
+
+      <p class="docs-note"><code>&lt;x-liquid-menu-popup&gt;</code></p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Input</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of api; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td><code>{{ row.value }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note">Outputs</p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Output</th>
+              <th>Payload</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of outputs; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note">Close reasons</p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Reason</th>
+              <th>When</th>
+              <th>Means</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of reasons; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td>{{ row.type }}</td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>

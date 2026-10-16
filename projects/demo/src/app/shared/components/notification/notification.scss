@@ -1,0 +1,273 @@
+@use 'variables'as var;
+
+// A fixed height keeps the popup's measured size honest: switching tabs changes
+// the list, and the popup pins its box once per open.
+:host {
+    display       : flex;
+    flex-direction: column;
+    width         : 360px;
+    max-width     : calc(100vw - 32px);
+    height        : 460px;
+    font-family   : var.$appFont;
+    color         : #1d1d1f;
+}
+
+.notification-toolbar {
+    display        : flex;
+    align-items    : center;
+    justify-content: space-between;
+    gap            : 8px;
+    padding        : 10px 10px 6px;
+}
+
+// Sits inside a `liquidTab`, whose own styles come from `x-liquid-tabs`.
+.notification-tab-count {
+    display      : inline-grid;
+    place-items  : center;
+    min-width    : 18px;
+    height       : 18px;
+    padding      : 0 5px;
+    box-sizing   : border-box;
+    border-radius: 9px;
+    background   : var(--color-primary);
+    color        : var(--text-inverse);
+    font-size    : 11px;
+    font-weight  : 600;
+    line-height  : 1;
+}
+
+.notification-mark-all {
+    display      : grid;
+    place-items  : center;
+    flex         : none;
+    width        : 32px;
+    height       : 32px;
+    padding      : 0;
+    border       : none;
+    border-radius: 50%;
+    background   : none;
+    color        : var(--color-secondary);
+    cursor       : pointer;
+    transition   : background-color 0.15s ease-in-out, opacity 0.15s ease-in-out;
+
+    ng-icon {
+        font-size: 20px;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:disabled {
+        opacity: 0.35;
+        cursor : default;
+    }
+}
+
+.notification-list {
+    flex               : 1 1 auto;
+    min-height         : 0;
+    padding            : 0 6px 6px;
+    overflow-y         : auto;
+    overscroll-behavior: contain;
+    scrollbar-width    : thin;
+}
+
+.notification-group+.notification-group {
+    margin-top: 4px;
+}
+
+.notification-group-title {
+    position        : sticky;
+    top             : 0;
+    z-index         : 1;
+    margin          : 0;
+    padding         : 8px 10px 4px;
+    background-color: rgba(#fff, 0.92);
+    backdrop-filter : blur(8px);
+    color           : rgba(29, 29, 31, 0.5);
+    font-size       : 12px;
+    font-weight     : 600;
+    letter-spacing  : 0.02em;
+}
+
+.notification-item {
+    --kind: var(--dockIconColor);
+
+    position             : relative;
+    display              : grid;
+    grid-template-columns: 36px 1fr;
+    align-items          : start;
+    gap                  : 12px;
+    width                : 100%;
+    padding              : 10px;
+    padding-inline-end   : 28px;
+    border               : none;
+    border-radius        : 16px;
+    background           : none;
+    color                : inherit;
+    font                 : inherit;
+    text-align           : start;
+    cursor               : pointer;
+    transition           : background-color 0.15s ease-in-out;
+
+    &[data-kind='device'] {
+        --kind: var(--color-primary);
+    }
+
+    &[data-kind='security'] {
+        --kind: var(--bgColorFinal);
+    }
+
+    &[data-kind='identity'] {
+        --kind: var(--success);
+    }
+
+    &[data-kind='document'] {
+        --kind: var(--color-secondary);
+    }
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:focus-visible {
+        outline       : 2px solid var(--color-primary);
+        outline-offset: -2px;
+    }
+}
+
+.notification-icon {
+    display         : grid;
+    place-items     : center;
+    width           : 36px;
+    height          : 36px;
+    border-radius   : 50%;
+    background-color: color-mix(in srgb, var(--kind) 14%, transparent);
+    color           : var(--kind);
+
+    ng-icon {
+        font-size: 19px;
+    }
+}
+
+.notification-text {
+    display       : flex;
+    flex-direction: column;
+    gap           : 2px;
+    min-width     : 0;
+}
+
+.notification-heading {
+    display        : flex;
+    align-items    : baseline;
+    justify-content: space-between;
+    gap            : 8px;
+}
+
+.notification-title {
+    overflow     : hidden;
+    font-size    : 14px;
+    font-weight  : 500;
+    line-height  : 1.4;
+    text-overflow: ellipsis;
+    white-space  : nowrap;
+
+    .is-unread & {
+        font-weight: 600;
+    }
+}
+
+.notification-time {
+    flex                : none;
+    color               : rgba(29, 29, 31, 0.45);
+    font-size           : 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.notification-body {
+    display           : -webkit-box;
+    overflow          : hidden;
+    color             : rgba(29, 29, 31, 0.6);
+    font-size         : 13px;
+    // Khmer stacks subscripts below the line; the extra leading keeps them clear.
+    line-height       : 1.55;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp        : 2;
+}
+
+// Always rendered, so reading an item shrinks the dot away rather than cutting it.
+.notification-dot {
+    position        : absolute;
+    top             : 50%;
+    inset-inline-end: 11px;
+    width           : 8px;
+    height          : 8px;
+    border-radius   : 50%;
+    background-color: var(--color-primary);
+    box-shadow      : 0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+    translate       : 0 -50%;
+    scale           : 0;
+    opacity         : 0;
+    transition      : scale 220ms var(--menu-spring, ease), opacity 160ms ease-out;
+
+    .is-unread & {
+        scale  : 1;
+        opacity: 1;
+    }
+}
+
+.notification-sr {
+    position   : absolute;
+    width      : 1px;
+    height     : 1px;
+    overflow   : hidden;
+    clip-path  : inset(50%);
+    white-space: nowrap;
+}
+
+.notification-empty {
+    display        : flex;
+    flex-direction : column;
+    align-items    : center;
+    justify-content: center;
+    gap            : 6px;
+    height         : 100%;
+    padding        : 24px;
+    box-sizing     : border-box;
+    text-align     : center;
+}
+
+.notification-empty-icon {
+    display         : grid;
+    place-items     : center;
+    width           : 56px;
+    height          : 56px;
+    margin-bottom   : 6px;
+    border-radius   : 50%;
+    background-color: rgba(0, 0, 0, 0.05);
+    color           : rgba(29, 29, 31, 0.45);
+
+    ng-icon {
+        font-size: 26px;
+    }
+}
+
+.notification-empty-title {
+    font-size  : 15px;
+    font-weight: 600;
+}
+
+.notification-empty-text {
+    color    : rgba(29, 29, 31, 0.55);
+    font-size: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .notification-dot {
+        transition: none;
+    }
+}

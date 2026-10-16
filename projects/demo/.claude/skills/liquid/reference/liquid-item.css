@@ -1,0 +1,106 @@
+/* ── Liquid item ────────────────────────────────────────────────────────────
+   The surface a press and a fold happen on. Both archetypes are script-driven —
+   `liquid-press.js` and `liquid-fold.js` — so this file holds only the resting
+   state and the two classes the fold sets while it runs.
+*/
+.liquid-item {
+  --liquid-press-duration: 110ms;
+
+  display      : flex;
+  align-items  : center;
+  gap          : 12px;
+  width        : 100%;
+  padding      : 12px 14px;
+  border       : 0;
+  border-radius: 14px;
+  background   : #fff;
+  color        : #1d1d1f;
+  font         : inherit;
+  text-align   : start;
+  cursor       : pointer;
+  appearance   : none;
+  box-shadow   : 0 1px 3px rgb(0 0 0 / 0.07);
+  transition   : background 200ms ease;
+}
+.liquid-item:hover { background: #f5f5f7; }
+.liquid-item:focus-visible {
+  outline   : none;
+  box-shadow: 0 0 0 3px rgb(26 115 232 / 0.35);
+}
+
+/* What the press squashes and what the fold beads up: the item's children, never
+   the item. The box stays free to be sized and highlighted by whatever owns it.
+   `will-change` because these are the elements every archetype animates. */
+.liquid-item > * { will-change: scale, opacity; }
+
+/* ── What folds ─────────────────────────────────────────────────────────────
+   The wrapper a fold is given, not the item inside it. It has to be the element
+   that carries the spacing between rows, because **a fold collapses the margin
+   it owns and cannot touch a `gap` on the list**. A flex or grid `gap` belongs
+   to the container, survives the whole fold at full size, and then vanishes in
+   one frame when the element is finally removed — measured here at an 8px step
+   landing 323ms into a 320ms fold, after everything else had settled.
+
+   So the list sets no `gap`, and each foldable row carries its own margin. */
+.liquid-fold {
+  /* Read by `liquid-fold.js` off this element, so it has to be declared here and
+     not on the item inside: a custom property inherits downward, never up. */
+  --liquid-fold-duration: 320ms;
+  margin-bottom         : var(--liquid-fold-gap, 8px);
+}
+
+/* There is deliberately no `:last-child { margin-bottom: 0 }` here, and adding
+   one puts the 8px snap straight back. The row being folded out is the one that
+   is exempt, so it has no margin to collapse; its neighbour inherits the
+   exemption only *after* the removal, in a single frame, once the fold has
+   already finished and settled. Measured both ways: an 8px step at 324ms of a
+   320ms fold, identical to the `gap` it was supposed to fix.
+
+   Every row carries the same margin, and the list swallows the trailing one. */
+.liquid-fold-list {
+  /* Declared on the list, not the row, so one edit retunes the spacing and the
+     negative margin that swallows the trailing one together. */
+  --liquid-fold-gap: 8px;
+
+  display       : flex;
+  flex-direction: column;
+  /* No `gap` — see above. */
+  gap           : 0;
+  margin        : 0 0 calc(-1 * var(--liquid-fold-gap));
+  padding       : 0;
+  list-style    : none;
+}
+
+/* Set for the length of a fold. The contents have to stay centred and keep
+   their own size while the box closes around them — without this the fold
+   squashes the content instead of folding over it, and the two read as one
+   thing being crushed rather than a row closing. */
+.liquid-fold.is-folding {
+  white-space: nowrap;
+  overflow   : hidden;
+}
+.liquid-fold.is-folding > * { flex: none; }
+
+/* A leaving row is still in the DOM until its fold resolves — it has to be, or
+   the row snaps shut in a frame — so it is taken out of the pointer's way for
+   the time it is still visible. */
+.liquid-fold.is-leaving {
+  pointer-events: none;
+}
+
+.liquid-item-glyph {
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  flex           : none;
+  width          : 34px;
+  height         : 34px;
+  border-radius  : 11px;
+  background     : rgb(26 115 232 / 0.1);
+  color          : #1a73e8;
+}
+.liquid-item-label { flex: 1 1 auto; min-width: 0; font-weight: 500; }
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-item { transition: none; }
+}

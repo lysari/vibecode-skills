@@ -1,0 +1,169 @@
+/* ── Liquid grow from origin ────────────────────────────────────────────────
+   The resting state and the two keyframe runs; `liquid-popup.js` measures, pins
+   and places. Copy both; retune the variables at the top.
+*/
+.liquid-popup {
+  --menu-open-duration : 340ms;
+  --menu-close-duration: 200ms;
+  /* Overshoots and settles, so the panel lands with a little weight. */
+  --menu-spring        : cubic-bezier(0.34, 1.32, 0.4, 1);
+  --menu-collapse      : cubic-bezier(0.4, 0, 0.9, 0.5);
+  --menu-radius        : 22px;
+  /* Read by the script; here so a page can see what it is being asked for. */
+  --menu-width         : auto;
+  --menu-height        : auto;
+  --menu-content-width : auto;
+  --menu-content-height: auto;
+  --menu-origin-x      : 0px;
+  --menu-origin-y      : 0px;
+  --menu-origin-width  : 0px;
+  --menu-origin-height : 0px;
+
+  position     : fixed;
+  /* Measured here, before the script places it. */
+  left         : 0;
+  top          : 0;
+  max-width    : calc(100vw - 16px);
+  z-index      : 99999;
+  box-sizing   : border-box;
+  width        : fit-content;
+  height       : fit-content;
+  padding      : 8px;
+  border-radius: var(--menu-radius);
+  background   : rgb(255 255 255 / 0.86);
+  backdrop-filter: saturate(180%) blur(20px);
+  box-shadow   : 0 11px 34px rgb(0 0 0 / 0.28);
+  outline      : none;
+  /* Invisible until opened, so a panel sitting in the markup does not flash. */
+  opacity      : 0;
+  overflow     : hidden;
+}
+
+/* The measuring pass: laid out at its natural size, off-screen and inert, for
+   the one frame the script needs to read `fit-content` off it. */
+.liquid-popup.is-measuring {
+  opacity  : 0;
+  translate: -9999px -9999px;
+}
+
+.liquid-popup.is-open,
+.liquid-popup.is-closing {
+  opacity: 1;
+  /* Pinned to the measured size — `fit-content` cannot be animated to. */
+  width  : var(--menu-width);
+  height : var(--menu-height);
+}
+
+.liquid-popup.is-open .liquid-popup-wrapper,
+.liquid-popup.is-closing .liquid-popup-wrapper {
+  /* Frozen at its final layout, or the text re-wraps as the box grows and the
+     whole panel boils on its way open. */
+  width : var(--menu-content-width);
+  height: var(--menu-content-height);
+}
+
+.liquid-popup.is-open {
+  animation: menu-grow var(--menu-open-duration) var(--menu-spring) both;
+}
+/* Offset in phase, never in duration: the box leads on the way in by one lag,
+   so it reveals the content rather than racing it, and both land together. */
+.liquid-popup.is-open .liquid-popup-wrapper {
+  animation: menu-content-in calc(var(--menu-open-duration) - 40ms) 40ms ease-out both;
+}
+
+.liquid-popup.is-closing {
+  animation: menu-shrink var(--menu-close-duration) var(--menu-collapse) both;
+}
+/* …and the content leads on the way out, which is the same rule seen from the
+   other end: whatever is leaving goes first. */
+.liquid-popup.is-closing .liquid-popup-wrapper {
+  animation: menu-content-out calc(var(--menu-close-duration) - 60ms) ease-in both;
+}
+
+/* Only once the grow has played out. A transition on these properties any
+   earlier fights the keyframes and turns every open into a fade-in. */
+.liquid-popup.is-settled {
+  transition: opacity 260ms ease, scale 320ms var(--menu-spring);
+}
+
+/* Both keyframe runs leave the open state implicit and describe only the trigger
+   end: a trigger-sized box sitting exactly where the trigger is. That way the
+   panel always lands on whatever the layout actually gave it.
+   Moved by `margin`, never `translate`: Safari runs `translate` on the compositor
+   and `width`/`height` on the main thread, so a main-thread hitch slid the panel
+   out from under the trigger instead of growing it out of it. */
+@keyframes menu-grow {
+  from {
+    width     : var(--menu-origin-width);
+    height    : var(--menu-origin-height);
+    margin-left: var(--menu-origin-x);
+    margin-top : var(--menu-origin-y);
+    box-shadow: 0 1px 6px rgb(0 0 0 / 0.06);
+  }
+}
+
+@keyframes menu-shrink {
+  to {
+    width     : var(--menu-origin-width);
+    height    : var(--menu-origin-height);
+    margin-left: var(--menu-origin-x);
+    margin-top : var(--menu-origin-y);
+    box-shadow: 0 1px 6px rgb(0 0 0 / 0.06);
+    opacity   : 0;
+  }
+}
+
+@keyframes menu-content-in {
+  from { opacity: 0; filter: blur(12px); scale: 0.96; }
+  60%  { opacity: 1; }
+  to   { opacity: 1; filter: blur(0);    scale: 1; }
+}
+
+@keyframes menu-content-out {
+  to { opacity: 0; filter: blur(8px); scale: 0.96; }
+}
+
+.liquid-popup-overlay {
+  position: fixed;
+  inset   : 0;
+  z-index : 99998;
+}
+
+.liquid-popup-content {
+  display       : flex;
+  flex-direction: column;
+  height        : 100%;
+  min-width     : 200px;
+}
+.liquid-popup-title {
+  display    : flex;
+  align-items: center;
+  gap        : 8px;
+  padding    : 4px 8px 10px;
+  font-size  : 15px;
+  font-weight: 600;
+  color      : #1d1d1f;
+}
+.liquid-popup-body {
+  flex         : 1 1 auto;
+  min-height   : 0;
+  padding      : 6px;
+  border-radius: 18px;
+  overflow-y   : auto;
+  background   : rgb(255 255 255 / 0.9);
+  box-shadow   : 2px 4px 24px rgb(0 0 0 / 0.1);
+}
+
+/* Same shape, no motion. Kept at 1ms rather than `none` so `animationend` still
+   fires — the close waits on it before the panel leaves the DOM, and `none`
+   would strand it there forever. */
+@media (prefers-reduced-motion: reduce) {
+  .liquid-popup.is-open,
+  .liquid-popup.is-closing,
+  .liquid-popup.is-open .liquid-popup-wrapper,
+  .liquid-popup.is-closing .liquid-popup-wrapper {
+    animation-duration: 1ms;
+    animation-delay   : 0s;
+  }
+  .liquid-popup { transition: none; }
+}

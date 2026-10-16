@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Liquid UI — runnable reference</title>
+<!-- The four archetypes `demo.html` does not cover: press, fold, grow from
+     origin, slide. Open this file directly in a browser; everything here is
+     classic scripts and plain CSS, so `file://` is enough to watch it and to
+     sample geometry. Serve it (`python3 -m http.server`) only when you need to
+     read the CSSOM — a `file://` stylesheet is an opaque origin and `cssRules`
+     throws. -->
+<link rel="icon" href="data:," />
+<link rel="stylesheet" href="liquid-item.css" />
+<link rel="stylesheet" href="liquid-popup.css" />
+<link rel="stylesheet" href="liquid-slide.css" />
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f5f7; margin: 0; padding: 40px 16px 120px; color: #1d1d1f; }
+  .demo { max-width: 620px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+  section { display: flex; flex-direction: column; gap: 12px; }
+  h2 { margin: 0; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; color: #6e6e73; }
+  p.note { margin: 0; font-size: 14px; line-height: 1.6; color: #6e6e73; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .plain { border: 0; border-radius: 10px; padding: 8px 14px; background: #1d1d1f; color: #fff; font: inherit; cursor: pointer; }
+  .plain.ghost { background: #fff; color: #1d1d1f; box-shadow: 0 1px 3px rgb(0 0 0 / 0.1); }
+  .plain[aria-pressed="true"] { background: #1a73e8; color: #fff; }
+  ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+  .liquid-slide-panel h3 { margin: 0 0 8px; font-size: 17px; }
+  .liquid-slide-panel p { margin: 0; line-height: 1.7; color: #6e6e73; }
+</style>
+</head>
+<body>
+<div class="demo">
+
+  <!-- ── Press ──────────────────────────────────────────────────────────── -->
+  <section>
+    <h2>Press</h2>
+    <p class="note">
+      Hold one down. It flattens <em>and widens</em> to <code>1.08 0.9</code> in 110ms
+      and stays there; let go and it springs back through <code>0.95 1.07</code> over
+      3.4&times; as long. Keyboard too — tab to one and hold Enter.
+    </p>
+    <ul class="list">
+      <li><button class="liquid-item" type="button" data-press>
+        <span class="liquid-item-glyph" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
+        <span class="liquid-item-label">Hold me down</span>
+      </button></li>
+      <li><button class="liquid-item" type="button" data-press>
+        <span class="liquid-item-glyph" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/></svg>
+        </span>
+        <span class="liquid-item-label">Then let go quickly</span>
+      </button></li>
+    </ul>
+  </section>
+
+  <!-- ── Fold ───────────────────────────────────────────────────────────── -->
+  <section>
+    <h2>Fold</h2>
+    <p class="note">
+      An item entering or leaving a row. Size, padding and margin fold together,
+      so the row closes the gap as it goes — and the content beads up on the same
+      clock, swelling to <code>1.14</code> as it gathers. Add a few, then remove
+      them mid-fold.
+    </p>
+    <div class="row">
+      <button class="plain" type="button" id="fold-add">Add an item</button>
+      <button class="plain ghost" type="button" id="fold-remove">Remove the last</button>
+    </div>
+    <ul class="liquid-fold-list" id="fold-list">
+      <li class="liquid-fold"><button class="liquid-item" type="button" data-press>
+        <span class="liquid-item-glyph" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
+        </span>
+        <span class="liquid-item-label">Was here from the start</span>
+      </button></li>
+    </ul>
+  </section>
+
+  <!-- ── Grow from origin ───────────────────────────────────────────────── -->
+  <section>
+    <h2>Grow from origin</h2>
+    <p class="note">
+      The panel comes out of the button, not over it: 340ms open on a spring that
+      overshoots, 200ms tighter close, and the content one 40ms lag behind the box
+      out of <code>blur(12px)</code>. Escape or a click outside closes it.
+    </p>
+    <div class="row">
+      <button class="plain" type="button" id="popup-trigger">Open the panel</button>
+    </div>
+
+    <div class="liquid-popup" id="popup" role="dialog" aria-label="Example panel" hidden>
+      <div class="liquid-popup-wrapper">
+        <div class="liquid-popup-content">
+          <div class="liquid-popup-title">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+            Panel
+          </div>
+          <div class="liquid-popup-body">
+            <ul class="list">
+              <li><button class="liquid-item" type="button" data-press>
+                <span class="liquid-item-label">Grows out of its trigger</span>
+              </button></li>
+              <li><button class="liquid-item" type="button" data-press>
+                <span class="liquid-item-label">Content arrives a beat later</span>
+              </button></li>
+              <li><button class="liquid-item" type="button" data-press>
+                <span class="liquid-item-label">Both land together</span>
+              </button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Slide ──────────────────────────────────────────────────────────── -->
+  <section>
+    <h2>Slide — travelling</h2>
+    <p class="note">
+      One surface moving past a window. The panels either side stay on screen at
+      <code>scale(0.94)</code>, half dimmed and 3px blurred; the frame's height
+      follows on its own shorter clock. Click through fast — the travel picks up
+      the live position rather than restarting.
+    </p>
+    <div class="row" id="slide-bar"></div>
+    <div class="liquid-slide" id="slide">
+      <div class="liquid-slide-track">
+        <div class="liquid-slide-panel"><h3>First</h3><p>The track travels and the neighbours stay visible, so the switch reads as a place you are moving through.</p></div>
+        <div class="liquid-slide-panel"><h3>Second</h3><p>Deliberately a taller panel, so the frame has a height change to follow. The resize is 280ms against the travel's 420ms — it has stopped before the content lands, rather than still growing under it. If both ran on one clock the frame would look like it was being dragged along by the content.</p></div>
+        <div class="liquid-slide-panel"><h3>Third</h3><p>Short again, so the frame has to come back down.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Slide — swapping</h2>
+    <p class="note">
+      The same content change in one spot: one curve and one duration both ways,
+      so the two panels always cover the frame between them. Drift is 6px and the
+      blur 3px — both are paid twice, once by each half.
+    </p>
+    <div class="row" id="swap-bar"></div>
+    <div class="liquid-slide" id="swap">
+      <div class="liquid-slide-track">
+        <div class="liquid-slide-panel"><h3>Overview</h3><p>Crossing over in place. Watch the middle of the cross: the frame is never allowed to show through.</p></div>
+        <div class="liquid-slide-panel"><h3>Detail</h3><p>Fading the old one out over a shorter window than the new one fades in would let the page through in the middle, and across a whole section that dip reads as a flash rather than as a change of content.</p></div>
+        <div class="liquid-slide-panel"><h3>Settings</h3><p>Same shape in both directions, so going back looks like going forward reversed.</p></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="liquid-util.js"></script>
+<script src="liquid-press.js"></script>
+<script src="liquid-fold.js"></script>
+<script src="liquid-popup.js"></script>
+<script src="liquid-slide.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* Press: anything marked up for it, including the items inside the popup. */
+  var pressable = function (root) {
+    root.querySelectorAll('[data-press]').forEach(function (el) {
+      if (el.dataset.pressed) return;
+      el.dataset.pressed = '1';
+      Liquid.pressable(el, '--liquid-press-duration');
+    });
+  };
+  pressable(document);
+
+  /* Fold. An item that was there from the start does not fold itself open —
+     only the ones that arrive afterwards do. */
+  var list = document.getElementById('fold-list');
+  var labels = ['Folded itself in', 'Arrived after the row', 'Pushed the others down', 'Another one'];
+  var count = 0;
+
+  document.getElementById('fold-add').addEventListener('click', function () {
+    var item = document.createElement('li');
+    item.className = 'liquid-fold';
+    item.innerHTML =
+      '<button class="liquid-item" type="button" data-press>' +
+      '<span class="liquid-item-glyph" aria-hidden="true">' +
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>' +
+      '</span><span class="liquid-item-label">' + labels[count++ % labels.length] + '</span></button>';
+    list.appendChild(item);
+    pressable(item);
+    Liquid.foldIn(item);
+  });
+
+  document.getElementById('fold-remove').addEventListener('click', function () {
+    var items = list.querySelectorAll('li:not(.is-going)');
+    var last = items[items.length - 1];
+    if (!last) return;
+    /* Marked so a second click takes the one before it rather than folding the
+       same item out twice — a second fold cancels the first, and a cancelled
+       animation reverts its value in a single frame. */
+    last.classList.add('is-going');
+    Liquid.foldOut(last);
+  });
+
+  /* Grow from origin. The panel is `hidden` in the markup so it does not sit in
+     the layout; the script takes the attribute off as it appends it. */
+  var panel = document.getElementById('popup');
+  panel.removeAttribute('hidden');
+  panel.remove();
+  Liquid.popupTrigger(document.getElementById('popup-trigger'), panel);
+  var wirePopupItems = new MutationObserver(function () { pressable(document); });
+  wirePopupItems.observe(document.body, { childList: true });
+
+  /* Slide, in both arrangements. */
+  var bars = [
+    { frame: 'slide', bar: 'slide-bar', mode: 'slide', names: ['First', 'Second', 'Third'] },
+    { frame: 'swap', bar: 'swap-bar', mode: 'swap', names: ['Overview', 'Detail', 'Settings'] },
+  ];
+
+  bars.forEach(function (spec) {
+    var slider = new Liquid.Slider(document.getElementById(spec.frame), { mode: spec.mode });
+    var bar = document.getElementById(spec.bar);
+
+    spec.names.forEach(function (name, i) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'plain ghost';
+      button.textContent = name;
+      button.setAttribute('aria-pressed', String(i === 0));
+      button.addEventListener('click', function () {
+        slider.show(i);
+        bar.querySelectorAll('button').forEach(function (other, j) {
+          other.setAttribute('aria-pressed', String(i === j));
+        });
+      });
+      bar.appendChild(button);
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+@use 'variables'as var;
+
+// A form field like the others: the page tone set into the card, no border, the
+// service's hue for focus — the same box `x-liquid-autocomplete` and the form's
+// text inputs draw. Tunables are read with a fallback, so a `--liquid-upload-*`
+// set on any ancestor reaches the field.
+
+$ease  : cubic-bezier(0, 0, 0.5, 1);
+$ok    : oklch(55% 0.15 150);
+$danger: #c62828;
+$muted : rgba(29, 29, 31, 0.5);
+
+:host {
+    --_h     : var(--liquid-upload-hue, var(--svc-accent, 262));
+    --_tint  : oklch(48% 0.16 var(--_h));
+    --_soft  : oklch(96% 0.035 var(--_h));
+    --_height: var(--liquid-upload-height, 46px);
+
+    display              : grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap           : 12px;
+    min-width            : 0;
+    font-family          : var.$appFont;
+    color                : #1d1d1f;
+}
+
+:host(.is-photo) {
+    grid-template-columns: auto minmax(0, 1fr);
+}
+
+:host(.is-disabled) {
+    opacity: 0.55;
+}
+
+.liquid-upload-picker {
+    position      : absolute;
+    width         : 1px;
+    height        : 1px;
+    opacity       : 0;
+    pointer-events: none;
+}
+
+.sr-only {
+    position   : absolute;
+    width      : 1px;
+    height     : 1px;
+    overflow   : hidden;
+    clip-path  : inset(50%);
+    white-space: nowrap;
+}
+
+// ── Avatar ───────────────────────────────────────────────────────────────────
+
+.liquid-upload-avatar {
+    position     : relative;
+    display      : grid;
+    place-items  : center;
+    width        : var(--_height);
+    height       : var(--_height);
+    border-radius: 50%;
+    background   : var(--liquid-upload-background, var(--background));
+    color        : rgba(29, 29, 31, 0.4);
+    font-size    : 22px;
+    cursor       : pointer;
+    transition   : box-shadow 0.3s $ease;
+
+    // Pinned to the circle. As a grid item its `height: 100%` resolves against
+    // an auto row, which is the image's own height — a portrait spills out below.
+    img {
+        position       : absolute;
+        inset          : 0;
+        width          : 100%;
+        height         : 100%;
+        border-radius  : 50%;
+        // A passport photo is portrait: keep the face, lose the shoulders.
+        object-fit     : cover;
+        object-position: 50% 30%;
+    }
+
+    :host(.has-file) & {
+        box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px oklch(48% 0.16 var(--_h) / 0.35);
+    }
+
+    :host(.is-disabled) & {
+        cursor: default;
+    }
+}
+
+.liquid-upload-badge {
+    position     : absolute;
+    right        : -3px;
+    bottom       : -3px;
+    display      : grid;
+    place-items  : center;
+    width        : 17px;
+    height       : 17px;
+    border-radius: 50%;
+    background   : #fff;
+    color        : $ok;
+    font-size    : 17px;
+    box-shadow   : 0 1px 3px rgba(#000, 0.2);
+}
+
+// ── The field ────────────────────────────────────────────────────────────────
+
+.liquid-upload-field {
+    display      : flex;
+    align-items  : center;
+    gap          : 10px;
+    min-width    : 0;
+    height       : var(--_height);
+    padding      : 0 6px 0 14px;
+    border-radius: var(--liquid-upload-radius, 14px);
+    background   : var(--liquid-upload-background, var(--background));
+    cursor       : pointer;
+    transition   : box-shadow 0.3s $ease, background-color 0.3s $ease;
+
+    &:hover {
+        background: var(--liquid-upload-background-hover, #ededf0);
+    }
+
+    &:focus-within {
+        background: #fff;
+        box-shadow: 0 0 0 2px var(--_tint), 0 0 0 5px oklch(48% 0.16 var(--_h) / 0.18);
+    }
+
+    :host(.is-document) & {
+        padding-left: 8px;
+    }
+
+    :host(.is-invalid) & {
+        box-shadow: 0 0 0 2px $danger;
+    }
+
+    // A file held over the field: the focus ring, in the wash of the hue.
+    :host(.is-dragging) & {
+        background: var(--_soft);
+        box-shadow: 0 0 0 2px var(--_tint), 0 0 0 5px oklch(48% 0.16 var(--_h) / 0.18);
+    }
+
+    :host(.is-disabled) & {
+        background: var(--liquid-upload-background, var(--background));
+        cursor    : default;
+    }
+}
+
+.liquid-upload-thumb {
+    // The image is pinned to it, as in the avatar.
+    position     : relative;
+    flex         : none;
+    display      : grid;
+    place-items  : center;
+    width        : 32px;
+    height       : 32px;
+    border-radius: 9px;
+    color        : rgba(29, 29, 31, 0.4);
+    font-size    : 19px;
+
+    &.has-file,
+    :host(.is-dragging) & {
+        background: #fff;
+        color     : var(--_tint);
+        box-shadow: 1px 2px 6px rgba(#000, 0.08);
+    }
+
+    img {
+        position     : absolute;
+        inset        : 0;
+        width        : 100%;
+        height       : 100%;
+        border-radius: inherit;
+        object-fit   : cover;
+    }
+}
+
+.liquid-upload-pdf {
+    padding       : 2px 4px;
+    border-radius : 4px;
+    background    : oklch(55% 0.19 27);
+    font-family   : var.$appFontStrong;
+    font-size     : 9.5px;
+    font-weight   : 700;
+    letter-spacing: 0.03em;
+    color         : #fff;
+}
+
+.liquid-upload-text {
+    flex       : 1;
+    min-width  : 0;
+    display    : flex;
+    align-items: baseline;
+    gap        : 8px;
+    font-size  : 14px;
+    // Khmer stacks subscripts below the line; the leading keeps them unclipped.
+    line-height: 1.7;
+    white-space: nowrap;
+}
+
+.liquid-upload-name,
+.liquid-upload-placeholder {
+    min-width    : 0;
+    overflow     : hidden;
+    text-overflow: ellipsis;
+}
+
+.liquid-upload-placeholder {
+    color: rgba(29, 29, 31, 0.45);
+}
+
+.liquid-upload-size {
+    flex     : none;
+    font-size: 12px;
+    color    : $muted;
+}
+
+.liquid-upload-cue {
+    font-weight: 600;
+    color      : var(--_tint);
+}
+
+.liquid-upload-clear {
+    flex         : none;
+    display      : grid;
+    place-items  : center;
+    width        : 26px;
+    height       : 26px;
+    padding      : 0;
+    border       : 0;
+    border-radius: 50%;
+    background   : none;
+    color        : rgba(29, 29, 31, 0.35);
+    font-size    : 18px;
+    cursor       : pointer;
+    transition   : color 0.15s ease-in-out;
+
+    &:hover,
+    &:focus-visible {
+        color: rgba(29, 29, 31, 0.65);
+    }
+}
+
+// The liquid button, at the height the field leaves it.
+.liquid-upload-browse {
+    --liquid-button-radius   : 10px;
+    --liquid-button-padding  : 0 14px;
+    --liquid-button-font-size: 13px;
+
+    flex       : none;
+    height     : 34px;
+    font-weight: 600;
+}
+
+.liquid-upload-spinner {
+    flex            : none;
+    width           : 18px;
+    height          : 18px;
+    border          : 2px solid oklch(48% 0.16 var(--_h) / 0.2);
+    border-top-color: var(--_tint);
+    border-radius   : 50%;
+    animation       : liquid-upload-spin 0.8s linear infinite;
+}
+
+// ── Under the field ──────────────────────────────────────────────────────────
+
+// Lined up under the field, past the avatar where there is one.
+.liquid-upload-below {
+    grid-column: -2;
+    min-width  : 0;
+}
+
+.liquid-upload-hint {
+    margin-top : 6px;
+    font-size  : 12px;
+    line-height: 1.5;
+    color      : $muted;
+}
+
+.liquid-upload-error {
+    display    : flex;
+    align-items: flex-start;
+    gap        : 5px;
+    margin-top : 6px;
+    font-size  : 12px;
+    line-height: 1.5;
+    color      : $danger;
+
+    ng-icon {
+        flex      : none;
+        display   : flex;
+        margin-top: 2px;
+        font-size : 15px;
+    }
+}
+
+@keyframes liquid-upload-spin {
+    to {
+        rotate: 1turn;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .liquid-upload-field,
+    .liquid-upload-avatar {
+        transition: none;
+    }
+
+    .liquid-upload-spinner {
+        animation-duration: 2.4s;
+    }
+}

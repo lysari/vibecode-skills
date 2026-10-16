@@ -1,0 +1,191 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid button</h1>
+      <p class="docs-lede">
+        The portal's button. Its fill and its label squash together under the finger and spring
+        back through the other shape — the same press every liquid surface answers with. Three
+        variants, all drawn from one hue, so a button inside a service's section takes that
+        service's accent without being told.
+      </p>
+      <div class="button-row">
+        <button type="button" liquidButton>Filled</button>
+        <button type="button" liquidButton variant="tinted">Tinted</button>
+        <button type="button" liquidButton variant="plain">Plain</button>
+      </div>
+    </header>
+
+    <section class="docs-case" id="playground">
+      <h2>Playground</h2>
+      <p class="docs-note">Every input, and the hue it is painted from.</p>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          <span>variant</span>
+          <select [value]="variant()" (change)="pick($event)">
+            @for (item of variants; track item) {
+              <option [value]="item">{{ item }}</option>
+            }
+          </select>
+        </label>
+        <label class="docs-control">
+          <span>--liquid-button-hue · {{ hue() }}</span>
+          <input type="range" min="0" max="360" [value]="hue()" (input)="setHue($event)" />
+        </label>
+      </div>
+
+      <div class="docs-flags">
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="block()" (change)="toggle('block', $event)" />
+          block
+        </label>
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="disabled()" (change)="toggle('disabled', $event)" />
+          disabled
+        </label>
+      </div>
+
+      <div class="docs-stage">
+        <button
+          type="button"
+          liquidButton
+          [variant]="variant()"
+          [block]="block()"
+          [disabled]="disabled()"
+          [style.--liquid-button-hue]="hue()"
+          (click)="clicks.set(clicks() + 1)"
+        >
+          Continue
+          <ng-icon name="ionArrowForwardOutline" aria-hidden="true" />
+        </button>
+      </div>
+
+      <pre class="docs-code">{{ markup() }}</pre>
+      <pre class="docs-log">clicks: {{ clicks() }}</pre>
+    </section>
+
+    <section class="docs-case" id="elements">
+      <h2>Buttons and links</h2>
+      <p class="docs-note">
+        It goes on the element it is. A <code>&lt;button&gt;</code> stays a button and an
+        <code>&lt;a&gt;</code> stays a link — no role is added either way, so a link that navigates
+        is still announced as one. Give a <code>&lt;button&gt;</code> inside a form its
+        <code>type</code>, since a bare one submits. A disabled link leaves the tab order and
+        swallows its clicks, because an anchor has no <code>disabled</code> of its own.
+      </p>
+      <div class="button-row">
+        <button type="button" liquidButton>
+          <ng-icon name="ionCheckmarkOutline" aria-hidden="true" />
+          Button
+        </button>
+        <a liquidButton variant="tinted" routerLink="../liquid-tabs">Link to tabs</a>
+        <a liquidButton variant="plain" routerLink="../liquid-tabs" disabled>Disabled link</a>
+        <button type="button" liquidButton disabled>Disabled button</button>
+      </div>
+      <div class="button-block">
+        <button type="button" liquidButton block>Block — fills its container</button>
+      </div>
+      <pre class="docs-code">{{ elements }}</pre>
+    </section>
+
+    <section class="docs-case" id="colour">
+      <h2>Colour</h2>
+      <p class="docs-note">
+        <code>--liquid-button-hue</code> is an OKLCH hue, read from the button or any ancestor, and
+        it falls back to the section's <code>--svc-accent</code>. A surface that has to match
+        something already on the page can pin <code>--liquid-button-fill</code> or
+        <code>--liquid-button-shadow</code> and keep the rest of its variant.
+      </p>
+      @for (h of hues; track h) {
+        <div class="button-row" [style.--liquid-button-hue]="h">
+          @for (item of variants; track item) {
+            <button type="button" liquidButton [variant]="item">Hue {{ h }}</button>
+          }
+        </div>
+      }
+      <div class="button-row">
+        <button type="button" liquidButton class="button-dark">Pinned fill</button>
+        <button type="button" liquidButton variant="plain" class="button-outline">
+          Bordered
+        </button>
+      </div>
+      <pre class="docs-code">{{ colour }}</pre>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">
+        Something that already has a look and only needs to answer a tap wants
+        <code>liquidPress</code> instead — the press on its own, with no paint.
+      </p>
+      <pre class="docs-code">{{ setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API</h2>
+
+      <p class="docs-note"><code>button[liquidButton], a[liquidButton]</code></p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Input</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of api; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td><code>{{ row.value }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note">CSS custom properties</p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Takes</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of cssApi; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td>{{ row.type }}</td>
+                <td><code>{{ row.value }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>

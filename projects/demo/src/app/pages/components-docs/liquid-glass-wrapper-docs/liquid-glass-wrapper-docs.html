@@ -1,0 +1,317 @@
+<div class="docs-page">
+  <article>
+    <div class="docs-page-header">
+      <div class="docs-breadcrumb">Components / Primitives</div>
+      <h1 class="docs-title">Liquid Glass</h1>
+      <p class="docs-lead">
+        Apple WWDC-inspired physical glass material featuring ray-traced Snell's law refraction,
+        specular rim highlights, pointer-reactive shimmer, and graceful fallback modes.
+      </p>
+    </div>
+
+  <section id="overview" class="docs-section">
+    <h2 class="docs-section-title">Overview</h2>
+    <p class="docs-text">
+      Liquid Glass renders realistic translucent surfaces using generated SVG displacement and specular maps.
+      It refracts underlying images or text with chromatic aberration and adapts dynamically to element resizing.
+      Available both as a container component (<code>&lt;app-liquid-glass-wrapper&gt;</code>) and an attribute directive (<code>[appLiquidGlass]</code>).
+    </p>
+
+    <div class="docs-preview-card docs-backdrop-pattern">
+      <div class="docs-glass-center">
+        <app-liquid-glass-wrapper [radius]="24" [bezel]="32" [tintOpacity]="0.15">
+          <div class="glass-demo-content">
+            <h4>Refractive Crystal</h4>
+            <p>Content beneath the bezel curves inward physically.</p>
+          </div>
+        </app-liquid-glass-wrapper>
+      </div>
+    </div>
+  </section>
+
+  <section id="playground" class="docs-section">
+    <h2 class="docs-section-title">Playground</h2>
+    <p class="docs-text">
+      Tune dome profile curves, refraction bezel widths, tint washes, and fallback switches.
+    </p>
+
+    <div class="docs-playground-card">
+      <div class="docs-playground-controls">
+        <div class="docs-control-group">
+          <label class="docs-control-label">Dome Profile</label>
+          <div class="docs-btn-group">
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="profile() === 'convex-squircle'"
+              (click)="setProfile('convex-squircle')"
+            >
+              Squircle
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="profile() === 'convex-circle'"
+              (click)="setProfile('convex-circle')"
+            >
+              Circle
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="profile() === 'concave'"
+              (click)="setProfile('concave')"
+            >
+              Concave
+            </button>
+          </div>
+        </div>
+
+        <div class="docs-control-group">
+          <label class="docs-control-label">Corner Radius ({{ radius() }}px)</label>
+          <div class="docs-btn-group">
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="radius() === 16"
+              (click)="setRadius(16)"
+            >
+              16px
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="radius() === 28"
+              (click)="setRadius(28)"
+            >
+              28px
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="radius() === 42"
+              (click)="setRadius(42)"
+            >
+              42px Pill
+            </button>
+          </div>
+        </div>
+
+        <div class="docs-control-group">
+          <label class="docs-control-label">Bezel Rim ({{ bezel() }}px)</label>
+          <div class="docs-btn-group">
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="bezel() === 20"
+              (click)="setBezel(20)"
+            >
+              Narrow (20px)
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="bezel() === 36"
+              (click)="setBezel(36)"
+            >
+              Standard (36px)
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="bezel() === 54"
+              (click)="setBezel(54)"
+            >
+              Deep (54px)
+            </button>
+          </div>
+        </div>
+
+        <div class="docs-control-group docs-checkbox-group">
+          <label class="docs-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="interactive()"
+              (change)="toggleInteractive()"
+            />
+            Interactive Sheen
+          </label>
+          <label class="docs-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="elevation()"
+              (change)="toggleElevation()"
+            />
+            Drop Elevation
+          </label>
+          <label class="docs-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="disabled()"
+              (change)="toggleDisabled()"
+            />
+            Bypass Material
+          </label>
+        </div>
+      </div>
+
+      <div class="docs-stage-box docs-backdrop-pattern">
+        <div class="docs-glass-center">
+          <app-liquid-glass-wrapper
+            [radius]="radius()"
+            [bezel]="bezel()"
+            [profile]="profile()"
+            [thickness]="thickness()"
+            [tint]="tint()"
+            [tintOpacity]="tintOpacity()"
+            [interactive]="interactive()"
+            [elevation]="elevation()"
+            [disabled]="disabled()"
+            [renderAs]="renderAs()"
+          >
+            <div class="glass-demo-content">
+              <h4>Refractive Specimen</h4>
+              <p>Move mouse over this surface to inspect specular light sheen.</p>
+            </div>
+          </app-liquid-glass-wrapper>
+        </div>
+
+        <div class="docs-stage-actions">
+          <button
+            type="button"
+            liquidButton
+            variant="filled"
+            (click)="setProfile('convex-squircle')"
+          >
+            Select Squircle Dome
+          </button>
+          <button
+            type="button"
+            liquidButton
+            variant="tinted"
+            (click)="resetSettings()"
+          >
+            Reset Settings to Default
+          </button>
+        </div>
+      </div>
+
+      <div class="docs-code-container">
+        <div class="docs-code-header">
+          <span class="docs-code-title">Live Template Preview</span>
+        </div>
+        <pre class="docs-code">{{ playMarkup() }}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="sizes" class="docs-section">
+    <h2 class="docs-section-title">Sizes & Profiles</h2>
+    <p class="docs-text">
+      From compact utility badges to full-screen navigation toolbars and host directive overlays.
+    </p>
+
+    <div class="docs-sizes-grid docs-backdrop-pattern">
+      <div class="docs-size-card">
+        <div class="docs-size-header">
+          <span class="docs-size-badge">Compact Badge</span>
+          <span class="docs-size-desc">Radius 16px, bezel 18px</span>
+        </div>
+        <div class="docs-size-preview">
+          <app-liquid-glass-wrapper [radius]="16" [bezel]="18">
+            <div class="glass-pill-demo">Status: Encrypted</div>
+          </app-liquid-glass-wrapper>
+        </div>
+      </div>
+
+      <div class="docs-size-card">
+        <div class="docs-size-header">
+          <span class="docs-size-badge">Directive Applied Directly</span>
+          <span class="docs-size-desc">Using [appLiquidGlass] on existing layout card</span>
+        </div>
+        <div class="docs-size-preview">
+          <div
+            class="directive-demo-card"
+            appLiquidGlass
+            [lgRadius]="24"
+            [lgBezel]="30"
+          >
+            <h5>Native Host Injected</h5>
+            <p>Zero layout disruption in flex rows or CSS grid cells.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="setup" class="docs-section">
+    <h2 class="docs-section-title">Setup & Usage</h2>
+    <div class="docs-setup-block">
+      <pre class="docs-code">import &#123; LiquidGlassWrapperComponent &#125; from '@app/shared/components/liquid-glass-wrapper/liquid-glass-wrapper.component';
+import &#123; LiquidGlassDirective &#125; from '@app/shared/components/liquid-glass-wrapper/liquid-glass.directive';
+
+&#64;Component(&#123;
+  imports: [LiquidGlassWrapperComponent, LiquidGlassDirective],
+  template: `
+    &lt;!-- Wrapper component mode --&gt;
+    &lt;app-liquid-glass-wrapper [radius]="28" [bezel]="36"&gt;
+      &lt;div class="card-body"&gt;Interactive surface&lt;/div&gt;
+    &lt;/app-liquid-glass-wrapper&gt;
+
+    &lt;!-- Host directive mode --&gt;
+    &lt;div class="my-card" appLiquidGlass [lgRadius]="24"&gt;
+      &lt;span&gt;Direct glass injection&lt;/span&gt;
+    &lt;/div&gt;
+  `,
+&#125;)
+export class GlassShowcase &#123;&#125;</pre>
+    </div>
+  </section>
+
+  <section id="api" class="docs-section">
+    <h2 class="docs-section-title">API Reference</h2>
+    <div class="docs-table-wrapper">
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of apiRows; track row.name) {
+            <tr>
+              <td><code>{{ row.name }}</code></td>
+              <td><code>{{ row.type }}</code></td>
+              <td><code>{{ row.default }}</code></td>
+              <td>{{ row.description }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <span class="docs-toc-title">On this page</span>
+      <ul>
+        @for (sec of sections; track sec.id) {
+          <li>
+            <a
+              class="docs-toc-link"
+              [href]="'#' + sec.id"
+              (click)="jumpTo($event, sec.id)"
+            >
+              {{ sec.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+

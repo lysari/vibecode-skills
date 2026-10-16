@@ -1,0 +1,142 @@
+// Not encapsulated: the host is the consumer's own `<button>` or `<a>`, and the
+// two layers inside it are the only elements this component owns. Every selector
+// hangs off a class the component puts on them.
+//
+// Tunables are read with a fallback rather than declared here, so a
+// `--liquid-button-*` set on any ancestor reaches the buttons under it.
+
+.liquid-button {
+    // Resolved once, for the rules below that derive from them. The hue falls
+    // through to whichever service section the button sits in, so a button picks
+    // up that section's accent without being told which one it is.
+    --_liquid-button-hue   : var(--liquid-button-hue, var(--svc-accent, 262));
+    --_liquid-button-radius: var(--liquid-button-radius, 999px);
+
+    position                   : relative;
+    // Keeps the fill-under-label stacking to the button.
+    isolation                  : isolate;
+    display                    : inline-flex;
+    align-items                : center;
+    justify-content            : center;
+    box-sizing                 : border-box;
+    max-width                  : 100%;
+    padding                    : var(--liquid-button-padding, 9px 18px);
+    border                     : none;
+    border-radius              : var(--_liquid-button-radius);
+    background                 : none;
+    font                       : inherit;
+    font-size                  : var(--liquid-button-font-size, 14px);
+    font-weight                : 500;
+    line-height                : 1.2;
+    white-space                : nowrap;
+    text-decoration            : none;
+    cursor                     : pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    &.is-block {
+        display: flex;
+        width  : 100%;
+    }
+
+    &.is-disabled {
+        opacity       : 0.45;
+        cursor        : default;
+        // Also what stops a disabled anchor navigating; the click handler covers
+        // the case where a page overrides this.
+        pointer-events: none;
+    }
+
+    // A ring rather than an outline: `styles.scss` carries a global
+    // `* { outline: none !important }`, so an outline here would never paint and
+    // the button would have no focus indicator at all. It sits on the host,
+    // which does not squash, so focus stays put while the button is pressed.
+    &:focus-visible {
+        box-shadow: 0 0 0 3px oklch(48% 0.16 var(--_liquid-button-hue) / 0.35);
+    }
+}
+
+// The button's whole appearance, on its own layer so the press can squash it
+// while the host's box stays the size the layout gave it.
+//
+// It paints from the two properties each variant resolves below rather than
+// from a colour of its own, which is what lets a consumer reach the surface at
+// all: this element belongs to the component, so it carries no `_ngcontent`
+// attribute, and a rule in an encapsulated stylesheet that named it would be
+// rewritten to match nothing. A custom property set on the host inherits down
+// to it instead.
+.liquid-button-fill {
+    position        : absolute;
+    inset           : 0;
+    z-index         : 0;
+    border-radius   : inherit;
+    // Here and not on the host: the host does not squash, so a border there
+    // stays rigid while the fill spreads past it.
+    border          : var(--liquid-button-border, none);
+    background-color: var(--_liquid-button-fill, transparent);
+    box-shadow      : var(--_liquid-button-shadow, none);
+    pointer-events  : none;
+
+    // Colour and shadow only. `scale` belongs to the press, which is a Web
+    // Animation — a CSS transition on the same property would outrank it.
+    transition      : background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.liquid-button-content {
+    position       : relative;
+    z-index        : 1;
+    display        : inline-flex;
+    align-items    : center;
+    justify-content: center;
+    gap            : var(--liquid-button-gap, 8px);
+    min-width      : 0;
+}
+
+// Lightness and chroma are pinned here and only the hue varies, the same way the
+// sidebar, the header and the service cards paint themselves — so no accent can
+// ship a fill that fails contrast against its own label.
+//
+// Each variant resolves its surface through `--liquid-button-fill`,
+// `--liquid-button-fill-hover`, `--liquid-button-shadow` and
+// `--liquid-button-shadow-hover` rather than declaring one, so a page that has
+// to match a button to something already on it can pin any of the four and keep
+// the rest.
+.liquid-button.is-filled {
+    --_liquid-button-fill        : var(--liquid-button-fill, oklch(48% 0.16 var(--_liquid-button-hue)));
+    --_liquid-button-fill-hover  : var(--liquid-button-fill-hover, var(--liquid-button-fill, oklch(43% 0.16 var(--_liquid-button-hue))));
+    --_liquid-button-shadow      : var(--liquid-button-shadow, 0 5px 12px -5px oklch(48% 0.16 var(--_liquid-button-hue) / 0.6));
+    --_liquid-button-shadow-hover: var(--liquid-button-shadow-hover, var(--liquid-button-shadow, 0 7px 16px -6px oklch(48% 0.16 var(--_liquid-button-hue) / 0.7)));
+
+    color: var(--liquid-button-color, #fff);
+}
+
+.liquid-button.is-tinted {
+    --_liquid-button-fill        : var(--liquid-button-fill, oklch(96% 0.035 var(--_liquid-button-hue)));
+    --_liquid-button-fill-hover  : var(--liquid-button-fill-hover, var(--liquid-button-fill, oklch(93% 0.05 var(--_liquid-button-hue))));
+    --_liquid-button-shadow      : var(--liquid-button-shadow, none);
+    --_liquid-button-shadow-hover: var(--liquid-button-shadow-hover, var(--liquid-button-shadow, none));
+
+    color: var(--liquid-button-color, oklch(38% 0.13 var(--_liquid-button-hue)));
+}
+
+// Nothing until it is reached for, then the tinted button's own wash.
+.liquid-button.is-plain {
+    --_liquid-button-fill        : var(--liquid-button-fill, transparent);
+    --_liquid-button-fill-hover  : var(--liquid-button-fill-hover, oklch(96% 0.035 var(--_liquid-button-hue)));
+    --_liquid-button-shadow      : var(--liquid-button-shadow, none);
+    --_liquid-button-shadow-hover: var(--liquid-button-shadow-hover, var(--liquid-button-shadow, none));
+
+    color: var(--liquid-button-color, oklch(38% 0.13 var(--_liquid-button-hue)));
+}
+
+// One rule for all three: the variant decides what it reaches for.
+.liquid-button:hover:not(.is-disabled) {
+    --_liquid-button-fill  : var(--_liquid-button-fill-hover);
+    --_liquid-button-shadow: var(--_liquid-button-shadow-hover);
+}
+
+// The press checks this for itself in script; this is the rest of the travel.
+@media (prefers-reduced-motion: reduce) {
+    .liquid-button-fill {
+        transition: none;
+    }
+}

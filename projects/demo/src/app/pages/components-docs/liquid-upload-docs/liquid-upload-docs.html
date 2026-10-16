@@ -1,0 +1,239 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid upload</h1>
+      <p class="docs-lede">
+        A single-file field, drawn like the form's other inputs: the file's name inside a field of
+        the same height, and a Browse button at its end. A file can also be dropped onto it. The
+        value is an <code>IFile</code> carrying a small preview; putting the original somewhere is
+        the caller's job, through <code>picked</code>.
+      </p>
+      <div class="docs-hero-field">
+        <x-liquid-upload
+          label="Birth certificate"
+          [(value)]="certificate"
+          (picked)="onPicked($event)"
+          (rejected)="onRejected($event)"
+        />
+        <pre class="docs-log">value: {{ describe(certificate()) }}</pre>
+      </div>
+    </header>
+
+    <section class="docs-case" id="photo">
+      <h2>Photo</h2>
+      <p class="docs-note">
+        <code>variant="photo"</code> shows the photo itself in a round avatar beside the field.
+        <code>minWidth</code> and <code>minHeight</code> are checked against an image before it is
+        taken. Anything projected inside sits under the field — the rules the photo has to meet.
+      </p>
+      <div class="docs-stage">
+        <x-liquid-upload
+          variant="photo"
+          label="Passport photo"
+          accept="image/jpeg,image/png"
+          acceptLabel="JPG or PNG"
+          [minWidth]="400"
+          [minHeight]="500"
+          [(value)]="photo"
+          (picked)="onPicked($event)"
+          (rejected)="onRejected($event)"
+        >
+          <ul class="upload-rules">
+            <li>At least 400 × 500 pixels</li>
+            <li>Plain white background, face centred</li>
+          </ul>
+        </x-liquid-upload>
+      </div>
+      <pre class="docs-code">{{ photoSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="rules">
+      <h2>Rules</h2>
+      <p class="docs-note">
+        A file is checked against <code>accept</code>, <code>maxSize</code> and, for an image, its
+        minimum size — however it arrived, picked or dropped. One that fails leaves the value as it
+        was, says why under the field, and is reported through <code>rejected</code>. Try an image
+        here, or a PDF over 200 KB.
+      </p>
+      <div class="docs-stage">
+        <x-liquid-upload
+          label="Signed form"
+          accept="application/pdf"
+          acceptLabel="PDF"
+          [maxSize]="smallLimit"
+          (picked)="onPicked($event)"
+          (rejected)="onRejected($event)"
+        />
+      </div>
+      <pre class="docs-log">{{ events().length ? events().join('\n') : 'Events from every field on this page land here.' }}</pre>
+      <pre class="docs-code">{{ rulesSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="states">
+      <h2>States</h2>
+      <div class="docs-grid">
+        <div>
+          <p class="docs-note">Holding a file</p>
+          <x-liquid-upload label="Birth certificate" [value]="uploaded" />
+        </div>
+        <div>
+          <p class="docs-note"><code>[hint]="false"</code></p>
+          <x-liquid-upload label="No hint" [hint]="false" />
+        </div>
+        <div>
+          <p class="docs-note"><code>invalid</code></p>
+          <x-liquid-upload label="Invalid" invalid />
+        </div>
+        <div>
+          <p class="docs-note"><code>disabled</code></p>
+          <x-liquid-upload label="Disabled" disabled />
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="forms">
+      <h2>Forms</h2>
+      <p class="docs-note">
+        It is a form control: <code>[formControl]</code>, <code>formControlName</code> and
+        <code>ngModel</code> all work, and the control is marked touched once a file is taken or
+        removed. The error state is still yours to bind, through <code>invalid</code>.
+      </p>
+      <div class="docs-grid">
+        <div>
+          <p class="docs-note">Reactive · <code>Validators.required</code></p>
+          <x-liquid-upload
+            label="Birth certificate"
+            [formControl]="certificateControl"
+            [invalid]="certificateControl.touched && certificateControl.invalid"
+          />
+          <pre class="docs-log">{{ certificateControl.touched ? 'touched' : 'untouched' }} · {{ certificateControl.status }} · {{ describe(certificateControl.value) }}</pre>
+        </div>
+        <div>
+          <p class="docs-note">Template-driven · <code>ngModel</code></p>
+          <x-liquid-upload
+            #model="ngModel"
+            label="Family book"
+            name="familyBook"
+            required
+            [(ngModel)]="familyBook"
+            [invalid]="!!model.touched && !!model.invalid"
+          />
+          <pre class="docs-log">{{ model.touched ? 'touched' : 'untouched' }} · {{ model.status }} · {{ describe(familyBook) }}</pre>
+        </div>
+      </div>
+      <div class="docs-actions">
+        <button
+          class="docs-submit"
+          type="button"
+          liquidPress
+          (click)="certificateControl.markAsTouched(); model.control.markAsTouched()"
+        >
+          Submit
+        </button>
+        <button class="docs-ghost" type="button" liquidPress (click)="certificateControl.setValue(uploaded)">
+          setValue(file)
+        </button>
+        <button
+          class="docs-ghost"
+          type="button"
+          liquidPress
+          (click)="certificateControl.disabled ? certificateControl.enable() : certificateControl.disable()"
+        >
+          {{ certificateControl.disabled ? 'enable()' : 'disable()' }}
+        </button>
+      </div>
+      <pre class="docs-code">{{ formsSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">
+        While one of these is on the page, a file dropped anywhere else is swallowed rather than
+        navigating away from a half-filled form.
+      </p>
+      <pre class="docs-code">{{ setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API</h2>
+
+      <p class="docs-note"><code>&lt;x-liquid-upload&gt;</code> · exportAs <code>liquidUpload</code></p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: api }" />
+
+      <p class="docs-note">Outputs</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: outputs, head: 'Payload' }" />
+
+      <p class="docs-note">Members</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: members, head: 'Returns' }" />
+
+      <p class="docs-note">Rejection reasons</p>
+      <ng-container *ngTemplateOutlet="calls; context: { $implicit: rejections, head: 'Checked by' }" />
+
+      <p class="docs-note">CSS custom properties</p>
+      <ng-container *ngTemplateOutlet="inputs; context: { $implicit: cssApi }" />
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<ng-template #inputs let-rows>
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td><code>{{ row.value }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #calls let-rows let-head="head">
+  <div class="docs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>{{ head }}</th>
+          <th>Does</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.name) {
+          <tr>
+            <td><code>{{ row.name }}</code></td>
+            <td><code>{{ row.type }}</code></td>
+            <td>{{ row.does }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>

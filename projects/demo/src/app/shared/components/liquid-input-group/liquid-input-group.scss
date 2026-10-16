@@ -1,0 +1,76 @@
+@use 'liquid-field'as field;
+
+// The chrome is the one every liquid field draws — see
+// `src/styles/_liquid-field.scss`. What is this component's own is the row the
+// segments stand in, and the rule between them.
+
+:host {
+    @include field.tokens('liquid-input-group');
+}
+
+:host(.is-disabled) {
+    opacity: 0.5;
+}
+
+@include field.field('liquid-input-group');
+
+// The segments sit in the row the box already draws, so the row gives up its
+// own padding to them: a segment's own padding is what separates it from the
+// rule beside it, and from the edge.
+.liquid-input-group-row {
+    padding: 0;
+}
+
+// A segment draws no box of its own, and is sized either by what it asked for
+// or by what is left over. Addressed by the class every segment carries rather
+// than by what it is: a picker and a masked field are laid out the same way.
+::ng-deep .liquid-input-group-row > .liquid-segment {
+    flex     : 1;
+    min-width: 0;
+    // Its own room, and the row's edge: two of these side by side leave 28px
+    // between them.
+    padding  : 0 14px;
+
+    // A hairline down the middle of that gap, so a segmented field says where
+    // one part ends rather than leaving it to be guessed at. Inset, and well
+    // short of the field's own height: this separates two halves of one control,
+    // which is not the outline around a card that the page does without.
+    &+.liquid-segment {
+        position: relative;
+
+        &::before {
+            content   : '';
+            position  : absolute;
+            left      : 0;
+            top       : 50%;
+            translate : 0 -50%;
+            width     : 1px;
+            height    : var(--liquid-input-group-separator-height, 22px);
+            background: var(--liquid-input-group-separator, rgba(29, 29, 31, 0.12));
+        }
+    }
+
+    // A segment that asked for a width keeps it rather than sharing the row —
+    // and the width is the control's, not the box's: the box is border-box, so
+    // a width put on it would be eaten by the padding beside it.
+    &[style*='--_width'] {
+        flex : none;
+        width: auto;
+
+        .liquid-input-control {
+            width: var(--_width);
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .liquid-input-field {
+        transition: none;
+    }
+
+    .liquid-input-said-in,
+    .liquid-input-said-out {
+        animation: none;
+    }
+}

@@ -1,0 +1,82 @@
+.morph-stage {
+    display        : flex;
+    flex-wrap      : wrap;
+    align-items    : center;
+    justify-content: center;
+    gap            : 24px;
+    min-height     : 120px;
+    margin-top     : 12px;
+    padding        : 24px;
+    border-radius  : 22px;
+    background     : linear-gradient(135deg, #1e6fd9 0%, #0b3a8a 100%);
+
+    &.is-light {
+        background: #f2f4f7;
+    }
+}
+
+.morph-plain {
+    --liquid-morph-color : rgba(0, 0, 0, 0.07);
+    --liquid-morph-shadow: none;
+
+    padding      : 4px;
+    border-radius: 999px;
+    background   : #fff;
+
+    .liquid-morph-item {
+        display    : flex;
+        place-items: center;
+        padding    : 8px;
+        border     : none;
+        background : none;
+        color      : #1c2b3a;
+        font-size  : 22px;
+        cursor     : pointer;
+    }
+}
+
+.morph-vertical {
+    --liquid-morph-color : rgba(0, 0, 0, 0.06);
+    --liquid-morph-radius: 12px;
+
+    align-items  : stretch;
+    width        : 220px;
+    padding      : 6px;
+    border-radius: 18px;
+    background   : #fff;
+
+    .liquid-morph-item {
+        display    : flex;
+        align-items: center;
+        gap        : 10px;
+        padding    : 10px 12px;
+        border     : none;
+        background : none;
+        color      : #1c2b3a;
+        font       : inherit;
+        text-align : left;
+        cursor     : pointer;
+    }
+}
+
+.morph-custom {
+    --liquid-morph-color   : rgba(30, 111, 217, 0.12);
+    --liquid-morph-shadow  : none;
+    --liquid-morph-radius  : 10px;
+    --liquid-morph-pad-x   : 4px;
+    --liquid-morph-duration: 420ms;
+    --liquid-morph-pull    : 16px;
+
+    gap: 8px;
+
+    .liquid-morph-item {
+        padding        : 8px 10px;
+        color          : #0b3a8a;
+        font-weight    : 500;
+        text-decoration: none;
+    }
+}
+
+.docs-table + .docs-note {
+    margin-top: 24px;
+}

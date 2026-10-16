@@ -1,0 +1,120 @@
+<!-- Out of sight and out of the tab order: the Browse button opens it. -->
+<input
+  #picker
+  class="liquid-upload-picker"
+  type="file"
+  tabindex="-1"
+  aria-hidden="true"
+  [accept]="accept()"
+  [disabled]="isDisabled()"
+  (change)="onPicked(picker)"
+/>
+
+<!-- The photo's own face, beside the field. A second way in for the pointer only;
+     the Browse button is the one a keyboard or a screen reader uses. -->
+@if (variant() === 'photo') {
+  <span class="liquid-upload-avatar" aria-hidden="true" (click)="pick()">
+    @if (preview(); as url) {
+      <img [src]="url" alt="" (error)="onPreviewError(url)" />
+    } @else if (value()) {
+      <ng-icon name="ionImageOutline"></ng-icon>
+    } @else {
+      <ng-icon name="ionPersonOutline"></ng-icon>
+    }
+    @if (value()) {
+      <span class="liquid-upload-badge">
+        <ng-icon name="ionCheckmarkCircle"></ng-icon>
+      </span>
+    }
+  </span>
+}
+
+<div class="liquid-upload-field" (click)="onFieldClick($event)">
+  @if (variant() === 'document') {
+    <span class="liquid-upload-thumb" [class.has-file]="value()" aria-hidden="true">
+      @if (busy()) {
+        <span class="liquid-upload-spinner"></span>
+      } @else if (dragging()) {
+        <ng-icon name="ionCloudUploadOutline"></ng-icon>
+      } @else {
+        @switch (kind()) {
+          @case ('image') {
+            @if (preview(); as url) {
+              <img [src]="url" alt="" (error)="onPreviewError(url)" />
+            } @else {
+              <ng-icon name="ionImageOutline"></ng-icon>
+            }
+          }
+          @case ('pdf') {
+            <span class="liquid-upload-pdf">PDF</span>
+          }
+          @case ('file') {
+            <ng-icon name="ionDocumentTextOutline"></ng-icon>
+          }
+          @default {
+            <ng-icon name="ionAttachOutline"></ng-icon>
+          }
+        }
+      }
+    </span>
+  } @else if (busy()) {
+    <span class="liquid-upload-spinner"></span>
+  }
+
+  <span class="liquid-upload-text" [id]="valueId()">
+    @if (dragging()) {
+      <span class="liquid-upload-cue" i18n="@@upload.dropHere">Drop to add</span>
+    } @else if (value(); as file) {
+      <span class="liquid-upload-name">{{ file.name }}</span>
+      @if (meta(); as meta) {
+        <span class="liquid-upload-size">{{ meta }}</span>
+      }
+    } @else {
+      <span class="liquid-upload-placeholder">{{ placeholder() }}</span>
+    }
+  </span>
+
+  @if (value() && !isDisabled() && !busy()) {
+    <button
+      class="liquid-upload-clear"
+      type="button"
+      i18n-aria-label="@@form.file.remove"
+      aria-label="Remove file"
+      (click)="remove()"
+    >
+      <ng-icon name="ionCloseCircle"></ng-icon>
+    </button>
+  }
+
+  <button
+    class="liquid-upload-browse"
+    type="button"
+    liquidButton
+    variant="tinted"
+    [id]="inputId()"
+    [disabled]="isDisabled() || busy()"
+    [attr.aria-label]="label() + ', ' + actionLabel()"
+    [attr.aria-describedby]="describedByIds()"
+    [attr.aria-invalid]="invalid() || rejection() !== null ? 'true' : null"
+    (click)="pick()"
+  >
+    {{ actionLabel() }}
+  </button>
+
+  @if (busy()) {
+    <span class="sr-only" role="status" i18n="@@upload.processing">Preparing the file…</span>
+  }
+</div>
+
+<div class="liquid-upload-below">
+  @if (hint()) {
+    <p class="liquid-upload-hint" [id]="hintId()">{{ limitLabel() }}</p>
+  }
+  <ng-content />
+  @if (rejection(); as message) {
+    <p class="liquid-upload-error" role="alert" [id]="errorId()">
+      <ng-icon name="ionAlertCircleOutline" aria-hidden="true"></ng-icon>
+      <span>{{ message }}</span>
+    </p>
+  }
+</div>

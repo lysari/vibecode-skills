@@ -1,12 +1,17 @@
 <div class="window">
   <app-header />
 
-  <div class="window-body">
+  <div class="window-body" [class.has-secondary-sidebar]="isDocs()">
     <app-sidebar />
+
+    @if (isDocs()) {
+      <aside class="secondary-sidebar" aria-label="Component directory">
+        <app-docs-sidebar />
+      </aside>
+    }
 
     <main class="content-panel">
       <ng-content />
     </main>
   </div>
 </div>
-

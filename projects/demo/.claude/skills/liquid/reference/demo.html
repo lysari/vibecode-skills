@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Liquid disclosure — runnable reference</title>
+<!-- Open this file directly in a browser. It is the page the numbers in
+     SKILL.md were measured from; liquid.css and liquid.js are the two files
+     you copy into a project. -->
+<!-- Stops the browser asking for a favicon, which is the only thing that
+     logs an error when this page is opened straight off disk. -->
+<link rel="icon" href="data:," />
+<link rel="stylesheet" href="liquid.css" />
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f5f7; margin: 0; padding: 40px 16px; }
+  .demo { max-width: 620px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+</style>
+</head>
+<body>
+<div class="demo" data-liquid-group>
+  <div class="liquid">
+    <h3 style="margin:0;font-size:inherit;font-weight:inherit">
+      <button class="liquid-trigger" type="button" aria-expanded="false" aria-controls="p1" id="t1">
+        <span class="liquid-glyph" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10h4M7 14h10"/></svg>
+        </span>
+        <span class="liquid-label">What is this component?</span>
+        <span class="liquid-chevron" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+      </button>
+    </h3>
+    <div class="liquid-panel" id="p1" role="region" aria-labelledby="t1" inert>
+      <div class="liquid-clip">
+        <p class="liquid-content">A disclosure row that opens with weight. The box grows, the copy arrives a beat later unblurring as it settles, and the row itself opens a little past its resting height before coming back.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="liquid">
+    <h3 style="margin:0;font-size:inherit;font-weight:inherit">
+      <button class="liquid-trigger" type="button" aria-expanded="false" aria-controls="p2" id="t2">
+        <span class="liquid-glyph" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/></svg>
+        </span>
+        <span class="liquid-label">Why does the close feel different?</span>
+        <span class="liquid-chevron" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+      </button>
+    </h3>
+    <div class="liquid-panel" id="p2" role="region" aria-labelledby="t2" inert>
+      <div class="liquid-clip">
+        <p class="liquid-content">Because a close that accelerates into its stop reads as an impact. This one peaks about a third of the way through and decelerates into the landing, then the header gives by five pixels and recovers. Longer copy so the two rows differ in height, which is the case that catches max-height hacks.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="liquid">
+    <h3 style="margin:0;font-size:inherit;font-weight:inherit">
+      <button class="liquid-trigger" type="button" aria-expanded="false" aria-controls="p3" id="t3">
+        <span class="liquid-glyph" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 7v6c0 5 3.5 7.5 8 8 4.5-.5 8-3 8-8V7z"/></svg>
+        </span>
+        <span class="liquid-label">Can I interrupt it?</span>
+        <span class="liquid-chevron" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+      </button>
+    </h3>
+    <div class="liquid-panel" id="p3" role="region" aria-labelledby="t3" inert>
+      <div class="liquid-clip">
+        <p class="liquid-content">Yes. Click again mid-flight and nothing jumps: a settle that is already running is allowed to finish rather than having its class pulled.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="liquid.js"></script>
+</body>
+</html>

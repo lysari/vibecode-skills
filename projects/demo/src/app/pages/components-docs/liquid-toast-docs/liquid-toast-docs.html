@@ -1,0 +1,562 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid toast</h1>
+      <p class="docs-lede">
+        Toasts with Sonner's API and the app's own motion. Call <code>toast()</code> from anywhere;
+        a card grows out of a drop at the screen edge — or out of the element it belongs to — and
+        gathers back into it when it goes.
+      </p>
+      <p class="docs-lede">
+        Every button below calls the real thing. The page carries its own toaster, so what you see
+        is what the app does.
+      </p>
+      <div class="docs-actions">
+        <button class="docs-submit" type="button" liquidPress (click)="say('success')">
+          Show a toast
+        </button>
+        <button class="docs-ghost" type="button" liquidPress (click)="dismissAll()">
+          Dismiss all
+        </button>
+      </div>
+    </header>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">
+        One <code>&lt;x-liquid-toaster&gt;</code> anywhere the app is always mounted; then call
+        <code>toast()</code> from anywhere at all, with no injection.
+      </p>
+      <pre class="docs-code">{{ code.setup }}</pre>
+    </section>
+
+    <section class="docs-case" id="playground">
+      <h2>Playground</h2>
+      <p class="docs-note">
+        The options a toast is fired with. The app mounts one
+        <code>&lt;x-liquid-toaster&gt;</code> for the whole page, so the two marked
+        <span class="docs-only">toaster</span> belong on that element rather than on a toast, and
+        are shown here for reference.
+      </p>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          position
+          <select (change)="set('position', $event)">
+            @for (edge of edges; track edge) {
+              <option [value]="edge" [selected]="edge === play.position()">{{ edge }}</option>
+            }
+          </select>
+        </label>
+        <label class="docs-control">
+          duration
+          <input
+            type="number"
+            min="500"
+            step="500"
+            [value]="play.duration()"
+            (input)="set('duration', $event)"
+          />
+        </label>
+        <label class="docs-control">
+          <span>visibleToasts<span class="docs-only">toaster</span></span>
+          <input
+            type="number"
+            min="1"
+            max="8"
+            [value]="play.visibleToasts()"
+            (input)="set('visibleToasts', $event)"
+          />
+        </label>
+        <label class="docs-control">
+          timer
+          <select (change)="set('timer', $event)">
+            <option value="off">off</option>
+            <option value="hover">hover</option>
+            <option value="always">always</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="docs-flags">
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.closeButton()"
+            (change)="set('closeButton', $event)"
+          />
+          closeButton
+        </label>
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.autoDismiss()"
+            (change)="set('autoDismiss', $event)"
+          />
+          autoDismiss
+        </label>
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.pauseOnHover()"
+            (change)="set('pauseOnHover', $event)"
+          />
+          pauseOnHover<span class="docs-only">toaster</span>
+        </label>
+      </div>
+
+      <div class="docs-actions">
+        <button class="docs-submit" type="button" liquidPress (click)="tryIt()">
+          Show a toast
+        </button>
+        <button class="docs-ghost" type="button" liquidPress (click)="dismissAll()">
+          Dismiss all
+        </button>
+        <span class="docs-note">Fires one with whatever the controls say.</span>
+      </div>
+
+      <pre class="docs-code">{{ markup() }}</pre>
+    </section>
+
+    <h2 class="docs-divider" id="examples">Examples</h2>
+
+    <section class="docs-case" id="types">
+      <h3>Types</h3>
+      <p class="docs-note">
+        Each type is only a hue: the plate and the icon derive from it with lightness and chroma
+        pinned. <code>default</code> has no icon; <code>loading</code> spins and stays until it is
+        updated.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="say('default')">default</button>
+        <button type="button" liquidPress (click)="say('success')">success</button>
+        <button type="button" liquidPress (click)="say('info')">info</button>
+        <button type="button" liquidPress (click)="say('warning')">warning</button>
+        <button type="button" liquidPress (click)="say('error')">error</button>
+        <button type="button" liquidPress (click)="say('loading')">loading</button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="description">
+      <h3>Description</h3>
+      <p class="docs-note">
+        A second, quieter line. Long text wraps, and the card is sized to it before it grows — so
+        nothing re-wraps mid-flight.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="described()">With a description</button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="buttons">
+      <h3>Action &amp; cancel</h3>
+      <p class="docs-note">
+        The main button and a quieter one beside it. The toast dismisses itself after a button's
+        <code>onClick</code> — unless that calls <code>event.preventDefault()</code>.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="withButtons()">Ask before deleting</button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="update">
+      <h3>Update in place</h3>
+      <p class="docs-note">
+        Pass an existing <code>id</code> and that toast changes where it stands: the card resizes to
+        its new content before the content swaps, and the countdown starts over. Press once to start
+        it, again to finish it.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="update()">Start / finish an upload</button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="promise">
+      <h3>Promise</h3>
+      <p class="docs-note">
+        One toast follows the work: loading, then success or error. Messages can be strings,
+        functions of the result, or <code>{{ '{' }} title, description {{ '}' }}</code
+        >. This one fails about a third of the time, on purpose.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="promise()">Submit an application</button>
+      </div>
+      <pre class="docs-code">{{ code.promise }}</pre>
+    </section>
+
+    <section class="docs-case" id="persistent">
+      <h3>No auto dismiss</h3>
+      <p class="docs-note">
+        <code>autoDismiss: false</code> keeps a toast until it is closed, and gives it a close
+        button unless <code>closeButton: false</code> or <code>dismissible: false</code> says
+        otherwise.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="persistent()">Warn about the session</button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="overflow">
+      <h3>Overflow ghost</h3>
+      <p class="docs-note">
+        Past <code>visibleToasts</code>, a ghost pill after the last card counts what is waiting.
+        Click it to show them all — the stack scrolls if it outgrows the screen — and “Show less” to
+        fold them back. A waiting toast does not count down until it shows.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="overflow()">Six at once</button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="countdown">
+      <h3>Countdown pill</h3>
+      <p class="docs-note">
+        Off by default. With <code>timer: 'hover'</code>, hovering a toast grows a pill out of its
+        side with the time left, its digits popping like <code>numberPopIn</code>. It faces into the
+        screen, and hovering holds the count where it is unless
+        <code>pauseOnHover: false</code> says otherwise.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="countdown('hover')">timer: 'hover'</button>
+        <button type="button" liquidPress (click)="countdown('always')">timer: 'always'</button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="positions">
+      <h3>Edge positions</h3>
+      <p class="docs-note">Six edges, each its own stack, with the newest nearest the edge.</p>
+      <div class="docs-buttons">
+        @for (edge of edges; track edge) {
+          <button type="button" liquidPress (click)="at(edge)">{{ edge }}</button>
+        }
+      </div>
+    </section>
+
+    <section class="docs-case" id="target">
+      <h3>From a target</h3>
+      <p class="docs-note">
+        A toast can grow out of an element rather than the screen edge, stack beside it, and gather
+        back into it — so a save answers from the thing that was saved. The element gives a small
+        squash as each one leaves it. While the target is missing or hidden, its toasts go to the
+        <code>fallback</code> edge instead.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidToastTarget="bell" (click)="fromTarget()">
+          Show from this target
+        </button>
+        <button type="button" liquidPress (click)="dismissAll()">Dismiss it</button>
+      </div>
+      <p class="docs-note">
+        It appears beside this button rather than at a screen edge, and stays until dismissed — a
+        toast that sees itself out in four seconds is hard to look at while reading about it.
+      </p>
+      <pre class="docs-code">{{ code.target }}</pre>
+    </section>
+
+    <section class="docs-case" id="custom">
+      <h3>Custom content</h3>
+      <p class="docs-note">
+        Your own template in the card, with the same motion around it. The context gives the toast
+        and a <code>dismiss</code>.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="custom()">Show a custom card</button>
+      </div>
+
+      <ng-template #customCard let-toast let-dismiss="dismiss">
+        <div class="docs-custom">
+          <strong>Ministry of Interior</strong>
+          <span>Your appointment is confirmed for 9:30 on Monday.</span>
+          <button type="button" liquidPress (click)="dismiss()">Got it</button>
+        </div>
+      </ng-template>
+    </section>
+
+    <section class="docs-case" id="callbacks">
+      <h3>Callbacks</h3>
+      <p class="docs-note">
+        <code>onAutoClose</code> when its time runs out; <code>onDismiss</code> for everything else.
+        Never both.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="callbacks()">Show one and wait</button>
+      </div>
+      <pre class="docs-log">{{ log() }}</pre>
+    </section>
+
+    <section class="docs-case" id="dismiss">
+      <h3>Dismissing</h3>
+      <p class="docs-note">
+        One by the id it was created with, or everything showing at once.
+        <code>important</code> announces assertively, interrupting what a screen reader is reading —
+        for something that cannot wait.
+      </p>
+      <div class="docs-buttons">
+        <button type="button" liquidPress (click)="dismissOne()">
+          Show one / dismiss it by id
+        </button>
+        <button type="button" liquidPress (click)="important()">
+          Announce something important
+        </button>
+        <button type="button" liquidPress (click)="dismissAll()">Dismiss all</button>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-toast">
+      <h2>toast()</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Call</th>
+              <th>Returns</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of calls; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-options">
+      <h2>Options</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of options; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>
+                  <code>{{ row.value }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-toaster">
+      <h2>&lt;x-liquid-toaster&gt;</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of toasterApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>
+                  <code>{{ row.value }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-target">
+      <h2>liquidToastTarget</h2>
+      <p class="docs-note">
+        The directive that names an element, and the shape a toast asks for it with.
+      </p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of targetApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>
+                  <code>{{ row.value }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-css">
+      <h2>CSS custom properties</h2>
+      <p class="docs-note">
+        All read with a fallback, so a <code>--liquid-toast-*</code> set on any ancestor reaches the
+        toasts under it. The four durations are read in TypeScript, where the motion is driven.
+      </p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of cssApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="motion">
+      <h2>Motion</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>What</th>
+              <th>Duration</th>
+              <th>Curve</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of motion; track row.what) {
+              <tr>
+                <td>{{ row.what }}</td>
+                <td>{{ row.duration }}</td>
+                <td>{{ row.curve }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Measured</h3>
+      <div class="docs-figures">
+        @for (figure of figures; track figure.note) {
+          <div class="docs-figure">
+            <b>{{ figure.value }}</b>
+            <span>{{ figure.note }}</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="docs-case" id="behaviour">
+      <h2>Behaviour &amp; accessibility</h2>
+      <ul class="docs-notes">
+        @for (note of behaviour; track note) {
+          <li>{{ note }}</li>
+        }
+      </ul>
+
+      <h3>Known gaps</h3>
+      <ul class="docs-notes">
+        @for (gap of gaps; track gap) {
+          <li>{{ gap }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="docs-case" id="files">
+      <h2>Files</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Kind</th>
+              <th>What it is</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (file of files; track file.name) {
+              <tr>
+                <td>
+                  <code>{{ file.name }}</code>
+                </td>
+                <td>{{ file.type }}</td>
+                <td>{{ file.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li [class.is-nested]="section.nested">
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<!--
+  No toaster here: the app mounts one in `app.html`, and a second would draw
+  every toast a second time. The playground below sets its options per toast
+  instead, which is what a page would do anyway — `position`, `duration`,
+  `timer`, `closeButton` and `autoDismiss` are all per-toast options.
+-->

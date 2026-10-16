@@ -1,0 +1,58 @@
+// The app's solid-surface vocabulary: cards, pills, ink.
+//
+// Lives in `src/styles` (on the Sass `includePaths`) rather than beside one
+// page, because the footer and the home page both build on it.
+//
+// Measured off apple.com/store rather than guessed at. The three things Apple
+// does that this page was not doing:
+//
+//   1. No borders. None, anywhere. A card is separated from the page by its
+//      fill and a soft shadow — a hairline outline on top of that is the thing
+//      that makes a layout read as "web" instead of "product".
+//   2. One page tone. The canvas is #f5f5f7 throughout and every card is white,
+//      so separation comes from whitespace rather than alternating bands.
+//   3. A shadow with a slight rightward bias — 2px 4px 12px at 8% — not the
+//      symmetrical `0 y blur` that most design systems reach for.
+//
+// Mixins rather than `%placeholders` because the home page's styles are split
+// across several sheets to stay inside the per-component style budget, and
+// `@extend` cannot group selectors that live in different files.
+
+// Apple's standard easing, lifted from their card transition.
+$ease: cubic-bezier(0, 0, 0.5, 1);
+
+/// A card: white fill, no border, soft offset shadow, 18px corner.
+@mixin card($radius: 18px) {
+    position       : relative;
+    display        : block;
+    border-radius  : $radius;
+    background     : var(--surface);
+    box-shadow     : 2px 4px 12px rgba(#000, 0.08);
+    text-decoration: none;
+    transition     : box-shadow 0.3s $ease;
+
+    // Apple's own cards do not move on hover — the shadow deepens and that is
+    // the whole affordance. Resisting a translate is what keeps a grid of them
+    // feeling like objects rather than buttons.
+    &:hover {
+        box-shadow: 2px 8px 24px rgba(#000, 0.13);
+    }
+
+    &:focus-visible {
+        outline   : none !important;
+        box-shadow: 0 0 0 4px rgba(#1a73e8, 0.35);
+    }
+}
+
+/// The small capsule used for eyebrows, link chips and seals. White on the
+/// page tone, so it needs the same shadow to separate — never a border.
+@mixin pill {
+    display      : inline-flex;
+    align-items  : center;
+    gap          : 8px;
+    width        : fit-content;
+    padding      : 6px 14px 6px 10px;
+    border-radius: 980px;
+    background   : var(--surface);
+    box-shadow   : 2px 4px 12px rgba(#000, 0.08);
+}

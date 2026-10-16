@@ -1,0 +1,534 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid input</h1>
+      <p class="docs-lede">
+        The portal's text field: Angular Material's <code>matInput</code> API gathered into one
+        element, with masks, per-character transforms, and a group that draws one box around several
+        fields. The label, the hint and the error belong to the field rather than to a wrapper
+        around it.
+      </p>
+      <p class="docs-lede">
+        Everything below is the component itself, imported the way a page imports it — so this
+        cannot drift from what the app ships. Every value is made up here; nothing is read or saved.
+      </p>
+      <div class="docs-hero-field">
+        <x-liquid-input
+          label="Full name"
+          placeholder="Sok Dara"
+          hint="As printed on your ID"
+          prefixIcon="ionPersonOutline"
+          clearable
+          [(value)]="name"
+        />
+      </div>
+    </header>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">Standalone, like everything else in <code>shared/components</code>.</p>
+      <pre class="docs-code">{{ code.setup }}</pre>
+      <pre class="docs-code">{{ code.template }}</pre>
+    </section>
+
+    <section class="docs-case" id="playground">
+      <h2>Playground</h2>
+      <p class="docs-note">Every input that changes what the field looks like or how it behaves.</p>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          type
+          <select (change)="set('type', $event)">
+            @for (type of types; track type) {
+              <option [value]="type" [selected]="type === play.type()">{{ type }}</option>
+            }
+          </select>
+        </label>
+        <label class="docs-control">
+          label
+          <input type="text" [value]="play.label()" (input)="set('label', $event)" />
+        </label>
+        <label class="docs-control">
+          placeholder
+          <input type="text" [value]="play.placeholder()" (input)="set('placeholder', $event)" />
+        </label>
+        <label class="docs-control">
+          hint
+          <input type="text" [value]="play.hint()" (input)="set('hint', $event)" />
+        </label>
+        <label class="docs-control">
+          mask
+          <input
+            type="text"
+            placeholder="000 000 000"
+            [value]="play.mask()"
+            (input)="set('mask', $event)"
+          />
+        </label>
+        <label class="docs-control">
+          prefixIcon
+          <select (change)="set('prefixIcon', $event)">
+            <option value="">none</option>
+            <option value="ionPersonOutline">ionPersonOutline</option>
+            <option value="ionMailOutline">ionMailOutline</option>
+            <option value="ionLockClosedOutline">ionLockClosedOutline</option>
+            <option value="ionSearchOutline">ionSearchOutline</option>
+            <option value="ionCallOutline">ionCallOutline</option>
+          </select>
+        </label>
+        <label class="docs-control">
+          maxlength
+          <input
+            type="number"
+            min="0"
+            step="5"
+            [value]="play.maxlength()"
+            (input)="set('maxlength', $event)"
+          />
+        </label>
+      </div>
+
+      <div class="docs-flags">
+        @for (flag of flags; track flag) {
+          <label class="docs-flag">
+            <input type="checkbox" [checked]="play[flag]()" (change)="set(flag, $event)" />
+            {{ flag }}
+          </label>
+        }
+      </div>
+
+      <div class="docs-stage">
+        <x-liquid-input
+          [type]="play.type()"
+          [label]="play.label()"
+          [placeholder]="play.placeholder()"
+          [hint]="play.hint()"
+          [mask]="play.mask() || null"
+          [maxlength]="play.maxlength() || null"
+          [prefixIcon]="play.prefixIcon() || null"
+          [clearable]="play.clearable()"
+          [revealable]="play.revealable()"
+          [showCount]="play.showCount()"
+          [optional]="play.optional()"
+          [required]="play.required()"
+          [uppercase]="play.uppercase()"
+          [disabled]="play.disabled()"
+          [readonly]="play.readonly()"
+          [invalid]="play.invalid()"
+          [(value)]="played"
+        />
+      </div>
+
+      <pre class="docs-code">{{ markup() }}</pre>
+      <pre class="docs-log">value: {{ played() === null ? 'null' : '"' + played() + '"' }}</pre>
+    </section>
+
+    <h2 class="docs-divider" id="examples">Examples</h2>
+
+    <section class="docs-case" id="basics">
+      <h3>Label, hint, placeholder</h3>
+      <p class="docs-note">
+        The label is a real <code>&lt;label for&gt;</code>. The hint sits under the field and is
+        named by <code>aria-describedby</code>; <code>optional</code> adds the quiet chip the
+        application form uses.
+      </p>
+      <div class="docs-grid">
+        <x-liquid-input label="Full name" placeholder="Sok Dara" hint="As printed on your ID" />
+        <x-liquid-input label="Nickname" optional placeholder="What people call you" />
+        <x-liquid-input label="Age" type="number" [(value)]="age" />
+      </div>
+    </section>
+
+    <section class="docs-case" id="masks">
+      <h3>Masks</h3>
+      <p class="docs-note">
+        <code>0</code> a digit, <code>A</code> a letter in any script, <code>*</code> either, and
+        every other character a literal that appears as the slots around it fill. The form is handed
+        what was typed, not the separators — <code>maskStores="formatted"</code> says otherwise.
+      </p>
+      <div class="docs-grid">
+        <x-liquid-input
+          label="Passport no."
+          mask="A0000000"
+          placeholder="N1234567"
+          [transformWith]="upper"
+          [(value)]="passport"
+        />
+        <x-liquid-input label="Card" mask="0000-0000-0000" showCount maskStores="formatted" />
+        <x-liquid-input
+          label="Search"
+          type="search"
+          prefixIcon="ionSearchOutline"
+          clearable
+          [(value)]="search"
+        />
+      </div>
+      <pre class="docs-code">{{ code.mask }}</pre>
+    </section>
+
+    <section class="docs-case" id="transforms">
+      <h3>Transforms</h3>
+      <p class="docs-note">
+        Each character is handed over as it arrives, and what comes back is what lands. Return
+        <code>null</code> to refuse it. It runs before the mask, so the slot is offered what the
+        transform returned.
+      </p>
+      <div class="docs-grid">
+        <x-liquid-input
+          label="Keypad"
+          placeholder="Type letters — get digits"
+          [transformWith]="keypad"
+        />
+        <x-liquid-input
+          label="Khmer number"
+          mask="000 000 000"
+          placeholder="០១២ ៣៤៥ ៦៧៨"
+          [transformWith]="toKhmer"
+          [(value)]="khmer"
+        />
+        <x-liquid-input
+          label="Anything"
+          placeholder="Type A1 b2-3"
+          [transformWith]="toKhmer"
+          [(value)]="anything"
+        />
+      </div>
+      <pre class="docs-code">{{ code.transform }}</pre>
+    </section>
+
+    <section class="docs-case" id="actions">
+      <h3>Clear, reveal, count</h3>
+      <p class="docs-note">
+        The buttons fold themselves into the row and press under the finger, and none of them takes
+        the focus off the field: clearing a field is not leaving it.
+      </p>
+      <div class="docs-grid">
+        <x-liquid-input
+          label="Password"
+          type="password"
+          prefixIcon="ionLockClosedOutline"
+          revealable
+          clearable
+          [(value)]="password"
+        />
+        <x-liquid-input
+          class="is-wide"
+          label="Reason for the request"
+          type="textarea"
+          hint="A sentence or two is enough"
+          showCount
+          [maxlength]="120"
+          [(value)]="note"
+        />
+      </div>
+    </section>
+
+    <section class="docs-case" id="states">
+      <h3>States</h3>
+      <div class="docs-grid">
+        <x-liquid-input label="eID number" [value]="'K-8842-1190'" readonly hint="From your eID" />
+        <x-liquid-input label="Issued by" [value]="'Ministry of Interior'" disabled />
+        <x-liquid-input
+          label="Passport no."
+          [value]="'n0012345'"
+          uppercase
+          invalid
+          error="This number is already on another application"
+        />
+      </div>
+    </section>
+
+    <section class="docs-case" id="groups" [formGroup]="form">
+      <h3>Groups, in a form</h3>
+      <p class="docs-note">
+        One box around several fields, each keeping its own mask or picker. A segment is whatever
+        registers itself as one, so an <code>x-liquid-autocomplete</code> is as welcome as a masked
+        field. The value is an object keyed by each segment's <code>name</code>.
+      </p>
+
+      <div class="docs-grid">
+        <x-liquid-input
+          label="Email"
+          type="email"
+          formControlName="email"
+          prefixIcon="ionMailOutline"
+          [errorMessages]="emailErrors"
+        />
+
+        <x-liquid-input-group label="Phone" formControlName="phone" [errorMessages]="phoneErrors">
+          <x-liquid-autocomplete
+            bare
+            name="code"
+            label="Dialling code"
+            width="9ch"
+            [options]="codes"
+            [displayWith]="codeName"
+            [captionWith]="codeCaption"
+            [compareWith]="sameKey"
+          />
+          <x-liquid-input
+            bare
+            name="number"
+            label="Number"
+            type="tel"
+            mask="000 000 000"
+            placeholder="012 345 678"
+          />
+        </x-liquid-input-group>
+
+        <x-liquid-input-group
+          label="Date of birth"
+          formControlName="date"
+          [errorMessages]="dateErrors"
+        >
+          <x-liquid-input bare name="day" label="Day" mask="00" width="4ch" placeholder="dd" />
+          <x-liquid-input bare name="month" label="Month" mask="00" width="4ch" placeholder="mm" />
+          <x-liquid-input bare name="year" label="Year" mask="0000" placeholder="yyyy" />
+        </x-liquid-input-group>
+      </div>
+
+      <div class="docs-actions">
+        <button class="docs-submit" type="button" liquidPress (click)="submit()">Submit</button>
+        <span class="docs-note">Marks everything touched, the way a submit does.</span>
+      </div>
+
+      <pre class="docs-log">{{ formValue() }}</pre>
+      <pre class="docs-code">{{ code.group }}</pre>
+    </section>
+
+    <section class="docs-case" id="api-input">
+      <h2>Inputs</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of inputApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>
+                  <code>{{ row.value }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-members">
+      <h2>Outputs &amp; methods</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of inputMembers; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="docs-note">
+        <code>exportAs: 'liquidInput'</code>, so a template can reach all of it:
+        <code>#name="liquidInput"</code>.
+      </p>
+    </section>
+
+    <section class="docs-case" id="api-group">
+      <h2>Group API</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of groupApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>
+                  <code>{{ row.value }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="api-types">
+      <h2>Types</h2>
+      <pre class="docs-code">{{ code.types }}</pre>
+    </section>
+
+    <section class="docs-case" id="api-css">
+      <h2>CSS custom properties</h2>
+      <p class="docs-note">
+        All read with a fallback, so a <code>--liquid-input-*</code> set on any ancestor reaches
+        every field under it — and with none set, a field answers in whatever
+        <code>--svc-accent</code> the section it stands in carries.
+      </p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of cssApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-case" id="motion">
+      <h2>Motion</h2>
+      <p class="docs-note">
+        A text field mostly holds still, so its motion is in what does move. Taking the focus is an
+        arrival, not a colour change: the ring grows out of the field's own edge and settles past
+        itself, and the box gives under the touch with the press every liquid surface uses.
+      </p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>What</th>
+              <th>Duration</th>
+              <th>Curve</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of motion; track row.what) {
+              <tr>
+                <td>{{ row.what }}</td>
+                <td>{{ row.duration }}</td>
+                <td>{{ row.curve }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Measured</h3>
+      <div class="docs-figures">
+        @for (figure of figures; track figure.note) {
+          <div class="docs-figure">
+            <b>{{ figure.value }}</b>
+            <span>{{ figure.note }}</span>
+          </div>
+        }
+      </div>
+      <p class="docs-note">
+        Sampled frame by frame in a browser, with the method in the <code>liquid</code> skill —
+        motion is the one thing a diff cannot show and a screenshot cannot either.
+      </p>
+    </section>
+
+    <section class="docs-case" id="behaviour">
+      <h2>Behaviour &amp; accessibility</h2>
+      <ul class="docs-notes">
+        @for (note of behaviour; track note) {
+          <li>{{ note }}</li>
+        }
+      </ul>
+
+      <h3>Known gaps</h3>
+      <ul class="docs-notes">
+        @for (gap of gaps; track gap) {
+          <li>{{ gap }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="docs-case" id="files">
+      <h2>Files</h2>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Kind</th>
+              <th>What it is</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (file of files; track file.name) {
+              <tr>
+                <td>
+                  <code>{{ file.name }}</code>
+                </td>
+                <td>{{ file.type }}</td>
+                <td>{{ file.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </article>
+
+  <!-- On this page. The rail on the left is which component; this is where in it. -->
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li [class.is-nested]="section.nested">
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>

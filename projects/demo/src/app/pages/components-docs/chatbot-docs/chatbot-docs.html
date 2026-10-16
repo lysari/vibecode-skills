@@ -1,0 +1,209 @@
+<div class="docs-page">
+  <article>
+    <div class="docs-page-header">
+      <div class="docs-breadcrumb">Components / Overlays & Menus</div>
+      <h1 class="docs-title">Chatbot Assistant</h1>
+      <p class="docs-lead">
+        Conversational support widget featuring natural query parsing, interactive FAQ suggestion chips,
+        simulated typing indicators, and seamless menu popup dialog docking.
+      </p>
+    </div>
+
+  <section id="overview" class="docs-section">
+    <h2 class="docs-section-title">Overview</h2>
+    <p class="docs-text">
+      The Chatbot assistant component offers instant contextual answers from structured knowledge base articles.
+      It features smooth chat arrival animations, reactive suggestion dismissal, auto-scrolling log containers,
+      and standalone or top-layer modal integration.
+    </p>
+
+    <div class="docs-preview-card">
+      <div class="docs-chat-frame">
+        <app-chatbot />
+      </div>
+    </div>
+  </section>
+
+  <section id="playground" class="docs-section">
+    <h2 class="docs-section-title">Playground</h2>
+    <p class="docs-text">
+      Interact with live suggestions, type questions, and test responsive container frame constraints.
+    </p>
+
+    <div class="docs-playground-card">
+      <div class="docs-playground-controls">
+        <div class="docs-control-group">
+          <label class="docs-control-label">Width ({{ containerWidth() }}px)</label>
+          <div class="docs-btn-group">
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="containerWidth() === 340"
+              (click)="setWidth(340)"
+            >
+              Compact (340px)
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="containerWidth() === 400"
+              (click)="setWidth(400)"
+            >
+              Default (400px)
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="containerWidth() === 460"
+              (click)="setWidth(460)"
+            >
+              Wide (460px)
+            </button>
+          </div>
+        </div>
+
+        <div class="docs-control-group">
+          <label class="docs-control-label">Height ({{ containerHeight() }}px)</label>
+          <div class="docs-btn-group">
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="containerHeight() === 420"
+              (click)="setHeight(420)"
+            >
+              Short (420px)
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="containerHeight() === 480"
+              (click)="setHeight(480)"
+            >
+              Standard (480px)
+            </button>
+            <button
+              type="button"
+              class="docs-mode-btn"
+              [class.is-active]="containerHeight() === 560"
+              (click)="setHeight(560)"
+            >
+              Tall (560px)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="docs-stage-box">
+        <div class="docs-chat-frame" [style.width.px]="containerWidth()" [style.height.px]="containerHeight()">
+          <app-chatbot />
+        </div>
+      </div>
+
+      <div class="docs-code-container">
+        <div class="docs-code-header">
+          <span class="docs-code-title">Live Template Preview</span>
+        </div>
+        <pre class="docs-code">{{ playMarkup() }}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="sizes" class="docs-section">
+    <h2 class="docs-section-title">Sizes & Popups</h2>
+    <p class="docs-text">
+      The assistant component is commonly anchored to header icons via native popovers, retaining conversation state across modal toggles.
+    </p>
+
+    <div class="docs-sizes-grid">
+      <div class="docs-size-card">
+        <div class="docs-size-header">
+          <span class="docs-size-badge">Floating Trigger Modal</span>
+          <span class="docs-size-desc">Anchored to trigger button with state preservation</span>
+        </div>
+        <div class="docs-size-preview">
+          <x-liquid-menu-popup #botPopup="liquidMenu" role="dialog" title="AI Support Assistant">
+            <app-chatbot />
+          </x-liquid-menu-popup>
+
+          <button
+            type="button"
+            liquidButton="filled"
+            [liquidMenuTriggerFor]="botPopup"
+          >
+            Open Help Assistant Dialog
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="setup" class="docs-section">
+    <h2 class="docs-section-title">Setup & Usage</h2>
+    <div class="docs-setup-block">
+      <pre class="docs-code">import &#123; Chatbot &#125; from '@app/shared/components/chatbot/chatbot';
+import &#123; LiquidMenuPopup &#125; from '@app/shared/components/liquid-menu-popup/liquid-menu-popup';
+import &#123; LiquidMenuTriggerFor &#125; from '@app/shared/components/liquid-menu-popup/liquid-menu-trigger-for.directive';
+
+&#64;Component(&#123;
+  imports: [Chatbot, LiquidMenuPopup, LiquidMenuTriggerFor],
+  template: `
+    &lt;x-liquid-menu-popup #botMenu="liquidMenu" role="dialog" title="Help Assistant"&gt;
+      &lt;app-chatbot /&gt;
+    &lt;/x-liquid-menu-popup&gt;
+
+    &lt;button type="button" liquidButton="filled" [liquidMenuTriggerFor]="botMenu"&gt;
+      Ask Assistant
+    &lt;/button&gt;
+  `,
+&#125;)
+export class HelpWidget &#123;&#125;</pre>
+    </div>
+  </section>
+
+  <section id="api" class="docs-section">
+    <h2 class="docs-section-title">API Reference</h2>
+    <div class="docs-table-wrapper">
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of apiRows; track row.name) {
+            <tr>
+              <td><code>{{ row.name }}</code></td>
+              <td><code>{{ row.type }}</code></td>
+              <td><code>{{ row.default }}</code></td>
+              <td>{{ row.description }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <span class="docs-toc-title">On this page</span>
+      <ul>
+        @for (sec of sections; track sec.id) {
+          <li>
+            <a
+              class="docs-toc-link"
+              [href]="'#' + sec.id"
+              (click)="jumpTo($event, sec.id)"
+            >
+              {{ sec.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+

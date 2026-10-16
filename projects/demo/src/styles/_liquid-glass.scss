@@ -1,0 +1,112 @@
+// Styles for the `[appLiquidGlass]` directive.
+//
+// A directive has no view encapsulation, so unlike the wrapper component's own
+// SCSS these rules have to live globally. They are namespaced `.lg-glass` — the
+// component uses `.lg-host`, and the two stacks are deliberately kept apart so
+// neither can bleed into the other.
+
+.lg-glass {
+  --lg-tint: #ffffff;
+  --lg-tint-opacity: 0.1;
+  --lg-mx: 50%;
+  --lg-my: 50%;
+
+  // Needed so the layers below have something to be absolute against. A host
+  // that is already positioned overrides this from its own rule.
+  position: relative;
+  // Keep the pointer glow's screen blend — and the negative-z layers — from
+  // reaching the page behind us.
+  isolation: isolate;
+}
+
+.lg-glass > .lg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  // A zero-sized host is fine; clipping it is what kills the filter region.
+  overflow: visible;
+  pointer-events: none;
+}
+
+.lg-glass > .lg-layer,
+.lg-glass > .lg-tint,
+.lg-glass > .lg-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+// The wrapper puts its projected content in `.lg-content` and stacks the layers
+// underneath it. Here the host's real children are what sits on top, and they
+// are ordinary in-flow content we must not touch — so the layers go negative
+// instead. Inside a stacking context the paint order is host background →
+// negative-z children → in-flow content, which lands the glass exactly between
+// the two. (The corollary: an opaque host background hides it.)
+.lg-glass > .lg-layer {
+  z-index: -3;
+
+  // Engines that reject an SVG reference in backdrop-filter still get frosted
+  // glass. Overridden inline once the directive knows which path it took.
+  @supports not (backdrop-filter: url('#lg-probe')) {
+    backdrop-filter: blur(4px) saturate(1.6);
+    -webkit-backdrop-filter: blur(4px) saturate(1.6);
+  }
+}
+
+.lg-glass > .lg-tint {
+  z-index: -2;
+  background: var(--lg-tint);
+  opacity: var(--lg-tint-opacity);
+}
+
+// Without refraction there is no specular map, so stand in a static rim so the
+// surface still reads as a raised piece of glass rather than a flat panel.
+.lg-glass--flat > .lg-tint {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    inset 0 0 0 1px rgb(255 255 255 / 0.18),
+    inset 0 -1px 0 rgb(0 0 0 / 0.06);
+}
+
+.lg-glass > .lg-glow {
+  z-index: -1;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 240ms ease;
+  background: radial-gradient(
+    circle at var(--lg-mx) var(--lg-my),
+    rgb(255 255 255 / 0.3),
+    rgb(255 255 255 / 0) 48%
+  );
+}
+
+.lg-glass--interactive.lg-glass--hover > .lg-glow {
+  opacity: 1;
+}
+
+// `lgDisabled` means bypass the material outright — no tint either. That is the
+// difference from `lgRenderAs="off"`, which keeps the tint wash.
+.lg-glass--bypassed {
+  > .lg-layer,
+  > .lg-tint,
+  > .lg-glow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lg-glass > .lg-tint {
+    opacity: 1;
+  }
+
+  .lg-glass > .lg-glow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-glass > .lg-glow {
+    transition: none;
+  }
+}

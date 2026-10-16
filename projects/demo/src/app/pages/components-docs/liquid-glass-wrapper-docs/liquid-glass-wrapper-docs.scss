@@ -1,0 +1,64 @@
+.docs-backdrop-pattern {
+  position: relative;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(15, 98, 254, 0.45), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(245, 158, 11, 0.4), transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(236, 72, 153, 0.4), transparent 40%),
+    linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+  padding: 32px;
+  border-radius: var(--radius-lg, 16px);
+  color: #ffffff;
+}
+
+.docs-glass-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.glass-demo-content {
+  padding: 24px 32px;
+  text-align: center;
+  min-width: 260px;
+
+  h4 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.85;
+  }
+}
+
+.glass-pill-demo {
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.directive-demo-card {
+  padding: 20px 24px;
+  border-radius: 24px;
+  color: #ffffff;
+
+  h5 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.85;
+  }
+}
+

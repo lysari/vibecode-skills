@@ -1,0 +1,14 @@
+<!--
+  Two layers, and both are direct children of the host on purpose: the press
+  squashes an element's children, so these two and nothing else are what puts
+  the button's colour and its label on one clock. The fill flattens and spreads
+  under the finger with the text sitting on it, rather than the two answering
+  the tap a frame apart.
+
+  Everything that paints the button lives on the fill instead of on the host,
+  because the host's box has to stay exactly the size the layout gave it while
+  the fill squashes past its edges — the same division the tab bar makes between
+  a tab and the pill under it.
+-->
+<span class="liquid-button-fill" aria-hidden="true"></span>
+<span class="liquid-button-content"><ng-content /></span>

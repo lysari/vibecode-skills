@@ -1,0 +1,69 @@
+.stepper-stage {
+  margin-top: 12px;
+  padding: 24px;
+  border-radius: 22px;
+  background: #fff;
+}
+
+.stepper-panel {
+  margin-top: 24px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.stepper-fields {
+  margin-top: 24px;
+}
+
+.stepper-vertical {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.stepper-themes {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.theme-green {
+  --liquid-stepper-color: #12805c;
+  --liquid-stepper-track-color: #{rgba(#12805c, 0.2)};
+}
+
+.theme-gradient {
+  --liquid-stepper-fill-color: linear-gradient(90deg, #1a73e8, #12805c);
+}
+
+.theme-square {
+  --liquid-stepper-color: #7c3aed;
+  --liquid-stepper-marker-radius: 10px;
+}
+
+.theme-dark {
+  --liquid-stepper-pill-background: #1c2b3a;
+  --liquid-stepper-indicator-color: #2f4358;
+  --liquid-stepper-marker-background: #{rgba(#fff, 0.14)};
+  --liquid-stepper-label-color: #{rgba(#fff, 0.6)};
+  --liquid-stepper-hover-label-color: #{rgba(#fff, 0.85)};
+  --liquid-stepper-selected-label-color: #fff;
+  --liquid-stepper-color: #4da3ff;
+}
+
+.docs-table + .docs-note {
+  margin-top: 24px;
+}
+
+.docs-control input[type='color'] {
+  width: 100%;
+  height: 38px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.docs-controls .is-wide {
+  grid-column: 1 / -1;
+}

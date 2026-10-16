@@ -1,0 +1,254 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-header">
+      <div class="docs-header-main">
+        <div class="docs-eyebrow">Form Controls</div>
+        <h1 class="docs-title">Liquid Input Group</h1>
+        <p class="docs-lead">
+          Combines multiple input segments into a cohesive, uninterrupted container with unified labels, focus rings, and validation feedback.
+        </p>
+      </div>
+    </header>
+
+  <section class="docs-section" id="overview">
+    <h2 class="docs-section-title">Overview</h2>
+    <p class="docs-prose">
+      The <code>LiquidInputGroup</code> component allows phone numbers, network endpoints, dates, and split keys to appear within a single pill container, separated by hairline dividers. Reaching capacity automatically advances focus to the next field.
+    </p>
+
+    <div class="docs-demo-card">
+      <div style="max-width: 480px; width: 100%;">
+        <x-liquid-input-group label="Customer Support Line" hint="Includes national trunk code">
+          <x-liquid-input bare name="code" width="8ch" [value]="'+855'" />
+          <x-liquid-input bare name="number" mask="000 000 000" [value]="'023888999'" />
+        </x-liquid-input-group>
+      </div>
+    </div>
+  </section>
+
+  <section class="docs-section" id="playground">
+    <h2 class="docs-section-title">Playground</h2>
+    <p class="docs-prose">
+      Experience multi-segment input formatting and focus propagation.
+    </p>
+
+    <div class="docs-playground">
+      <div class="docs-playground-stage">
+        <div style="max-width: 520px; width: 100%;">
+          <x-liquid-input-group
+            [label]="label()"
+            [hint]="hint()"
+            [disabled]="disabled()"
+            [error]="hasError() ? 'Route is unreachable or misconfigured' : null"
+            [style.--liquid-input-group-height]="height()"
+            [(value)]="groupValue"
+          >
+            <x-liquid-input
+              bare
+              name="protocol"
+              width="10ch"
+              [options]="protocolOptions"
+            />
+            <x-liquid-input
+              bare
+              name="domain"
+              placeholder="domain.internal"
+            />
+            <x-liquid-input
+              bare
+              name="port"
+              width="7ch"
+              placeholder="port"
+            />
+          </x-liquid-input-group>
+        </div>
+      </div>
+
+      <div class="docs-controls">
+        <div class="docs-control-group">
+          <label class="docs-control-label">Height</label>
+          <div class="docs-pill-group">
+            <button
+              type="button"
+              class="docs-pill"
+              [class.is-active]="height() === '36px'"
+              (click)="setHeight('36px')"
+            >
+              Select 36px height
+            </button>
+            <button
+              type="button"
+              class="docs-pill"
+              [class.is-active]="height() === '44px'"
+              (click)="setHeight('44px')"
+            >
+              Select 44px default
+            </button>
+            <button
+              type="button"
+              class="docs-pill"
+              [class.is-active]="height() === '52px'"
+              (click)="setHeight('52px')"
+            >
+              Select 52px height
+            </button>
+          </div>
+        </div>
+
+        <div class="docs-control-group">
+          <label class="docs-control-label">Options</label>
+          <div class="docs-toggle-stack">
+            <label class="docs-toggle-row">
+              <input
+                type="checkbox"
+                [checked]="disabled()"
+                (change)="toggleDisabled($event)"
+              />
+              <span>Disable entire group</span>
+            </label>
+            <label class="docs-toggle-row">
+              <input
+                type="checkbox"
+                [checked]="hasError()"
+                (change)="toggleError($event)"
+              />
+              <span>Simulate validation error</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="docs-markup-block">
+      <div class="docs-markup-bar">
+        <span class="docs-markup-title">Generated Markup</span>
+      </div>
+      <pre class="docs-code">{{ playMarkup() }}</pre>
+    </div>
+  </section>
+
+  <section class="docs-section" id="sizes">
+    <h2 class="docs-section-title">Sizes</h2>
+    <p class="docs-prose">
+      Uniform height controls ensure consistent alignment alongside other fields and action buttons.
+    </p>
+
+    <div class="docs-sizes-grid" style="display: flex; flex-direction: column; gap: 20px; max-width: 480px;">
+      <div>
+        <span class="docs-subhead" style="display: block; margin-bottom: 6px;">Compact (36px)</span>
+        <x-liquid-input-group
+          style="--liquid-input-group-height: 36px; --liquid-input-group-radius: 8px;"
+          label="Compact Phone"
+          [(value)]="compactVal"
+        >
+          <x-liquid-input bare name="code" width="6ch" />
+          <x-liquid-input bare name="num" mask="000-0000" />
+        </x-liquid-input-group>
+      </div>
+
+      <div>
+        <span class="docs-subhead" style="display: block; margin-bottom: 6px;">Default (44px)</span>
+        <x-liquid-input-group
+          label="Standard Phone"
+          [(value)]="defaultVal"
+        >
+          <x-liquid-input bare name="code" width="7ch" />
+          <x-liquid-input bare name="num" mask="000 000 000" />
+        </x-liquid-input-group>
+      </div>
+
+      <div>
+        <span class="docs-subhead" style="display: block; margin-bottom: 6px;">Large (52px)</span>
+        <x-liquid-input-group
+          style="--liquid-input-group-height: 52px; --liquid-input-group-radius: 14px;"
+          label="Prominent Phone"
+          [(value)]="largeVal"
+        >
+          <x-liquid-input bare name="code" width="7ch" />
+          <x-liquid-input bare name="num" mask="000 000 000" />
+        </x-liquid-input-group>
+      </div>
+    </div>
+  </section>
+
+  <section class="docs-section" id="setup">
+    <h2 class="docs-section-title">Setup</h2>
+    <p class="docs-prose">
+      Import <code>LiquidInputGroup</code> and <code>LiquidInput</code> together.
+    </p>
+    <pre class="docs-code">{{ setup }}</pre>
+  </section>
+
+  <section class="docs-section" id="api">
+    <h2 class="docs-section-title">API Reference</h2>
+    
+    <h3 class="docs-subhead">Inputs & Models</h3>
+    <div class="docs-table-wrap">
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of api; track row.name) {
+            <tr>
+              <td><code>{{ row.name }}</code></td>
+              <td><code>{{ row.type }}</code></td>
+              <td><code>{{ row.value }}</code></td>
+              <td>{{ row.does }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="docs-subhead" style="margin-top: 24px;">CSS Custom Properties</h3>
+    <div class="docs-table-wrap">
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of cssApi; track row.name) {
+            <tr>
+              <td><code>{{ row.name }}</code></td>
+              <td><code>{{ row.type }}</code></td>
+              <td><code>{{ row.value }}</code></td>
+              <td>{{ row.does }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <span class="docs-toc-title">On this page</span>
+      <ul>
+        @for (sec of sections; track sec.id) {
+          <li>
+            <a
+              class="docs-toc-link"
+              [href]="'#' + sec.id"
+              (click)="jumpTo($event, sec.id)"
+            >
+              {{ sec.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>
+

@@ -1,0 +1,228 @@
+// The chrome every liquid form field draws: the page tone set into the card, no
+// border, the service's hue for focus, and the line under it that says the hint
+// or the error.
+//
+// Lives here rather than beside one component because two of them draw it —
+// `x-liquid-input` and `x-liquid-input-group` — and a second copy of a ring and
+// its spring is a second thing to drift. Angular compiles each `@include` into
+// the component that asked for it, so `:host` still means that component.
+//
+// What is *inside* the box belongs to whoever draws it: the control, the icons
+// and the buttons at the end stay in `liquid-input.scss`.
+
+@use 'variables'as var;
+
+$ease                                                              : cubic-bezier(0, 0, 0.5, 1);
+// The popup's spring, because taking the focus is the same arrival: the ring
+// grows out of the field's own edge and settles past itself. `$arrive` is that
+// without the overshoot, for anything the overshoot would clamp, and `$leave`
+// is the way back out — quicker and tighter, and still landing.
+$spring                                                            : cubic-bezier(0.34, 1.32, 0.4, 1);
+$arrive                                                            : cubic-bezier(0.25, 1, 0.5, 1);
+$leave                                                             : cubic-bezier(0.32, 0.72, 0, 1);
+
+/// The tunables, read with a fallback so a `--liquid-input-*` set on any
+/// ancestor reaches every field under it. `$name` is the component's own
+/// prefix, so a group can be retuned on its own without touching its segments.
+@mixin tokens($name: 'liquid-input') {
+    --_h     : var(--#{$name}-hue, var(--svc-accent, 262));
+    --_tint  : var(--#{$name}-tint, oklch(48% 0.16 var(--_h)));
+    --_height: var(--#{$name}-height, 46px);
+    --_settle: var(--#{$name}-settle-duration, 340ms);
+
+    display    : block;
+    min-width  : 0;
+    font-family: var.$appFont;
+    color      : var(--ink);
+}
+
+/// The label above the field, and the two words that qualify it.
+@mixin label {
+    .liquid-input-label {
+        display      : flex;
+        align-items  : baseline;
+        gap          : 6px;
+        margin-bottom: 7px;
+        font-size    : var(--liquid-input-label-font-size, 13px);
+        font-weight  : 600;
+        line-height  : 1.5;
+        cursor       : pointer;
+
+        :host(.is-disabled) & {
+            cursor: default;
+        }
+    }
+
+    .liquid-input-optional {
+        font-size  : 12px;
+        font-weight: 400;
+        color      : var(--muted);
+    }
+
+    .liquid-input-required {
+        color: var(--invalid);
+    }
+}
+
+/// The box: the wrapper the press moves, the row that lays the field out, and
+/// the paint on it. `$radius-name` lets a group round itself differently.
+@mixin box($name: 'liquid-input') {
+
+    // The wrapper the press moves: no paint, no layout of its own, exactly one
+    // child, so the whole box gives as a single surface with everything on it.
+    .liquid-input-press {
+        display  : block;
+        min-width: 0;
+    }
+
+    .liquid-input-field {
+        display         : flex;
+        align-items     : center;
+        // No `gap`: a button folding out of this row has to take its own spacing
+        // with it, and a gap belongs to the row rather than to the button.
+        min-height      : var(--_height);
+        padding         : 0 14px;
+        border-radius   : var(--#{$name}-radius, 14px);
+        background      : var(--#{$name}-background, var(--background));
+        // Letting go is quicker and tighter than taking hold.
+        transition      : box-shadow 200ms $leave, background-color 200ms $leave;
+
+        &:hover {
+            background: var(--#{$name}-background-hover, #ededf0);
+        }
+
+        // A `box-shadow` spread interpolates, so the spring carries the ring
+        // past its 2px and back rather than fading it in at a fixed size. The
+        // fill arrives on the same clock but not on the same curve: a spring on
+        // a colour overshoots past white, which clamps into a flat spot.
+        :host(.is-focused) & {
+            background: var(--#{$name}-background-focus, #fff);
+            box-shadow: 0 0 0 2px var(--_tint), 0 0 0 5px oklch(48% 0.16 var(--_h) / 0.18);
+            transition: box-shadow var(--_settle) $spring, background-color var(--_settle) $arrive;
+        }
+
+        :host(.is-invalid) & {
+            box-shadow: 0 0 0 2px var(--invalid);
+        }
+
+        :host(.is-invalid.is-focused) & {
+            box-shadow: 0 0 0 2px var(--invalid), 0 0 0 5px color-mix(in srgb, var(--invalid) 18%, transparent);
+        }
+
+        :host(.is-disabled) &,
+        :host(.is-readonly) & {
+            background: var(--#{$name}-background, var(--background));
+        }
+    }
+}
+
+/// The line under the field: the hint, the error that takes its place, and the
+/// counter beside them.
+@mixin below {
+    .liquid-input-below {
+        display        : flex;
+        align-items    : flex-start;
+        justify-content: space-between;
+        gap            : 12px;
+        margin-top     : 6px;
+    }
+
+    // The hint and the error take the same place, so the one leaving has to be
+    // out of the flow while the one arriving takes it — otherwise the pair are
+    // briefly stacked and everything under them steps down a line and back.
+    .liquid-input-said {
+        position : relative;
+        flex     : 1;
+        min-width: 0;
+    }
+
+    .liquid-input-hint {
+        margin     : 0;
+        font-size  : 12px;
+        line-height: 1.5;
+        color      : var(--muted);
+    }
+
+    .liquid-input-error {
+        display    : flex;
+        align-items: flex-start;
+        gap        : 5px;
+        margin     : 0;
+        font-size  : 12px;
+        line-height: 1.5;
+        color      : var(--invalid);
+
+        ng-icon {
+            flex      : none;
+            display   : flex;
+            margin-top: 2px;
+            font-size : 15px;
+        }
+    }
+
+    .liquid-input-count {
+        flex                : none;
+        margin              : 0;
+        font-size           : 12px;
+        line-height         : 1.5;
+        color               : var(--muted);
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+/// The hint and the error arriving and leaving. The text shifts and never
+/// scales: type rendered between subpixels goes soft while it moves, and the
+/// easing is on the keyframes so the overshoot is not rushed past.
+@mixin said-motion {
+    .liquid-input-said-in {
+        // Behind the line on its way out, by the popup's own 40ms.
+        animation: liquid-input-said-in 260ms 40ms both;
+    }
+
+    .liquid-input-said-out {
+        position    : absolute;
+        inset-inline: 0;
+        top         : 0;
+        animation   : liquid-input-said-out 180ms both;
+    }
+
+    @keyframes liquid-input-said-in {
+        from {
+            opacity                  : 0;
+            translate                : 0 4px;
+            animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        62% {
+            opacity                  : 1;
+            translate                : 0 -1.5px;
+            animation-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
+        }
+
+        to {
+            opacity  : 1;
+            translate: 0 0;
+        }
+    }
+
+    @keyframes liquid-input-said-out {
+        from {
+            opacity                  : 1;
+            translate                : 0 0;
+            animation-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
+        }
+
+        to {
+            opacity  : 0;
+            translate: 0 -3px;
+        }
+    }
+}
+
+/// Everything above, for a field that wants the lot.
+@mixin field($name: 'liquid-input') {
+    @include label;
+    @include box($name);
+    @include below;
+    @include said-motion;
+}

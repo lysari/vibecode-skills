@@ -1,0 +1,17 @@
+.popup-stage {
+    display    : flex;
+    flex-wrap  : wrap;
+    align-items: center;
+    gap        : 12px;
+    margin-top : 12px;
+}
+
+.popup-copy {
+    margin   : 0 0 12px;
+    padding  : 0 8px;
+    font-size: 13px;
+}
+
+.docs-table + .docs-note {
+    margin-top: 24px;
+}

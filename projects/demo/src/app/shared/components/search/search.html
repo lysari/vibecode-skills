@@ -1,0 +1,120 @@
+<ng-template liquidMenuHeaderIcon>
+  <ng-icon name="ionSearchOutline"></ng-icon>
+</ng-template>
+<ng-template liquidMenuFooter>
+  <div class="search-hints" aria-hidden="true">
+    <span class="search-hint">
+      <kbd><ng-icon name="ionArrowUpOutline"></ng-icon></kbd>
+      <kbd><ng-icon name="ionArrowDownOutline"></ng-icon></kbd>
+      <span i18n="@@search.hintNavigate">navigate</span>
+    </span>
+    <span class="search-hint">
+      <kbd><ng-icon name="ionReturnDownBackOutline"></ng-icon></kbd>
+      <span i18n="@@search.hintOpen">open</span>
+    </span>
+    <span class="search-hint">
+      <kbd>esc</kbd>
+      <span i18n="@@search.hintClose">close</span>
+    </span>
+  </div>
+</ng-template>
+
+<div class="search-field">
+  <ng-icon class="search-field-icon" name="ionSearchOutline" aria-hidden="true"></ng-icon>
+  <input
+    #field
+    class="search-input"
+    type="search"
+    autofocus
+    autocomplete="off"
+    spellcheck="false"
+    enterkeyhint="go"
+    role="combobox"
+    aria-autocomplete="list"
+    aria-expanded="true"
+    i18n-aria-label="@@search"
+    aria-label="Search"
+    i18n-placeholder="@@search.placeholder"
+    placeholder="Search services and pages"
+    [attr.aria-controls]="listboxId"
+    [attr.aria-activedescendant]="activeOption() ? optionId(activeIndex()) : null"
+    [value]="query()"
+    (input)="onInput(field.value)"
+    (keydown)="onKeydown($event)"
+  />
+  @if (query()) {
+    <button
+      class="search-clear"
+      type="button"
+      i18n-aria-label="@@search.clear"
+      aria-label="Clear search"
+      (click)="clear(field)"
+    >
+      <ng-icon name="ionCloseCircle"></ng-icon>
+    </button>
+  }
+</div>
+
+<div
+  class="search-results"
+  role="listbox"
+  i18n-aria-label="@@search.results"
+  aria-label="Results"
+  [id]="listboxId"
+>
+  @for (group of groups(); track group.key) {
+    <div class="search-group" role="group" [attr.aria-labelledby]="listboxId + '-' + group.key">
+      <div class="search-group-title">
+        <span [id]="listboxId + '-' + group.key">{{ group.title }}</span>
+        @if (group.recent) {
+          <button
+            class="search-group-action"
+            type="button"
+            liquidButton
+            variant="plain"
+            i18n="@@search.clearRecent"
+            (mousedown)="$event.preventDefault()"
+            (click)="clearRecent()"
+          >
+            Clear
+          </button>
+        }
+      </div>
+      @for (result of group.results; track result.item.path) {
+        <div
+          class="search-option"
+          role="option"
+          [id]="optionId(result.index)"
+          [class.is-active]="result.index === activeIndex()"
+          [attr.aria-selected]="result.index === activeIndex()"
+          (mouseenter)="activeIndex.set(result.index)"
+          (mousedown)="$event.preventDefault()"
+          (click)="go(result.item)"
+        >
+          <span class="search-option-icon" aria-hidden="true">
+            <ng-icon [name]="group.recent ? 'ionTimeOutline' : result.item.icon"></ng-icon>
+          </span>
+          <span class="search-option-text">
+            <span class="search-option-title"
+              >{{ result.before }}@if (result.match) {<mark>{{ result.match }}</mark>}{{
+                result.after
+              }}</span
+            >
+            <span class="search-option-section">{{ result.item.section }}</span>
+          </span>
+          <ng-icon class="search-option-go" name="ionArrowForwardOutline" aria-hidden="true"></ng-icon>
+        </div>
+      }
+    </div>
+  } @empty {
+    <div class="search-empty">
+      <span class="search-empty-icon" aria-hidden="true">
+        <ng-icon name="ionSearchOutline"></ng-icon>
+      </span>
+      <span class="search-empty-title" i18n="@@search.noResults">No results found</span>
+      <span class="search-empty-text" i18n="@@search.noResultsHint"
+        >Try another word, like “ID” or “certificate”.</span
+      >
+    </div>
+  }
+</div>

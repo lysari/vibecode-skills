@@ -1,0 +1,63 @@
+@if (isRendered()) {
+  @if (overlay()) {
+    <div
+      #overlay
+      class="liquid-menu-popup-overlay"
+      [class.is-covered]="isCovered()"
+      (click)="onOverlayClick()"
+    ></div>
+  }
+  <div
+    #panel
+    class="liquid-menu-popup"
+    [id]="panelId"
+    [class.is-open]="isShown()"
+    [class.is-closing]="isClosing()"
+    [class.is-covered]="isCovered()"
+    [class.is-settled]="isSettled()"
+    (animationend)="onPanelAnimationEnd($event)"
+    (keydown)="onPanelKeydown($event)"
+    (focusout)="onPanelFocusout($event)"
+    [attr.role]="role()"
+    tabindex="-1"
+    [attr.aria-labelledby]="header() || title() ? titleId : null"
+  >
+    <div #content class="liquid-menu-popup-wrapper">
+      <div class="liquid-menu-popup-content">
+        @if (header(); as custom) {
+          <div class="liquid-menu-popup-header" [id]="titleId">
+            <ng-container
+              [ngTemplateOutlet]="custom.template"
+              [ngTemplateOutletContext]="slotContext()"
+            />
+          </div>
+        } @else if (title()) {
+          <h3 class="liquid-menu-popup-title" [id]="titleId">
+            @if (headerIcon(); as icon) {
+              <span class="liquid-menu-popup-title-icon" aria-hidden="true">
+                <ng-container [ngTemplateOutlet]="icon.template" />
+              </span>
+            }
+            <span class="liquid-menu-popup-title-text">{{ title() }}</span>
+          </h3>
+        }
+        <div class="liquid-menu-popup-body">
+          <div class="liquid-menu-popup-body-inner">
+            @if (lazyContent(); as lazy) {
+              <ng-container [ngTemplateOutlet]="lazy.template" />
+            }
+            <ng-content></ng-content>
+          </div>
+        </div>
+        @if (footer(); as custom) {
+          <div class="liquid-menu-popup-footer">
+            <ng-container
+              [ngTemplateOutlet]="custom.template"
+              [ngTemplateOutletContext]="slotContext()"
+            />
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

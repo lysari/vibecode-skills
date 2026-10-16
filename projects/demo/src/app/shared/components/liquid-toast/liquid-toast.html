@@ -1,0 +1,189 @@
+<!--
+  Ported from `.claude/demo/liquid-toast/liquid-toast.js` — the DOM its `create`,
+  `paint` and `ghost` build, in the same order, because the motion measures off
+  that order.
+
+  One list per stack: each screen edge in use, and each target in use. A list
+  stays once used, even empty, so its last toast can still fold away inside it.
+
+  Three layers per toast, and each moves on its own so nothing travels in
+  lockstep:
+
+  - the slot is the room the toast takes in the stack. It folds open and shut, so
+    the other toasts slide rather than jump.
+  - the card is the paint. It grows out of its origin — a small drop at the
+    screen edge, or the target's own box — and gathers back into it on the way out.
+  - the body is what the card holds, frozen at its final size while the card
+    grows around it, so the text never re-wraps mid-flight.
+-->
+@for (group of groups(); track group.key) {
+  <ol
+    class="liquid-toast-list"
+    tabindex="-1"
+    aria-live="polite"
+    i18n-aria-label="@@toast.region"
+    aria-label="Notifications"
+    [class.is-expanded]="group.expanded"
+    [attr.data-group]="group.key"
+    [class.is-anchored]="!!group.target"
+    [class.is-edge]="!!group.edge"
+    [class.is-top]="group.edge?.startsWith('top')"
+    [class.is-up]="group.edge?.startsWith('bottom')"
+    [class.is-left]="group.edge?.endsWith('left')"
+    [class.is-right]="group.edge?.endsWith('right')"
+    (pointerenter)="setHovered(true)"
+    (pointerleave)="setHovered(false)"
+    (focusin)="onFocusIn()"
+    (focusout)="onFocusOut($event)"
+  >
+    @for (item of group.toasts; track item.id) {
+      <li
+        class="liquid-toast-slot"
+        [attr.data-toast-id]="item.id"
+        (animate.enter)="onEnter($event)"
+        (animate.leave)="onLeave($event)"
+        (pointerenter)="hoveredToast.set(item.id)"
+        (pointerdown)="onCardPress($event)"
+        (pointerup)="onCardRelease($event)"
+        (pointerleave)="onToastPointerLeave($event, item)"
+        (pointercancel)="onCardRelease($event)"
+      >
+        <div
+          class="liquid-toast"
+          [class]="'is-' + item.type"
+          [attr.role]="item.important || item.type === 'error' ? 'alert' : null"
+        >
+          <div class="liquid-toast-body" [class.is-custom]="!!item.custom">
+            @if (item.custom; as custom) {
+              <ng-container *ngTemplateOutlet="custom; context: contextFor(item)" />
+            } @else {
+              <!--
+                No plate on a plain toast unless one is given, a plate on every
+                typed one, and `icon: null` takes it away outright.
+              -->
+              @if (item.icon) {
+                <span class="liquid-toast-plate" aria-hidden="true">
+                  <ng-container *ngTemplateOutlet="item.icon" />
+                </span>
+              } @else if (item.icon !== null && item.type === 'loading') {
+                <span class="liquid-toast-plate" aria-hidden="true">
+                  <span class="liquid-toast-spinner"></span>
+                </span>
+              } @else if (item.icon !== null && typeIcon(item.type); as icon) {
+                <span class="liquid-toast-plate" aria-hidden="true">
+                  <ng-icon [name]="icon" />
+                </span>
+              }
+
+              <div class="liquid-toast-copy">
+                <p class="liquid-toast-title">{{ item.title }}</p>
+                @if (item.description) {
+                  <p class="liquid-toast-description">{{ item.description }}</p>
+                }
+              </div>
+
+              <!-- Cancel before action, the way the twin appends them. -->
+              @if (item.cancel; as cancel) {
+                <button
+                  type="button"
+                  class="liquid-toast-button"
+                  liquidButton
+                  variant="plain"
+                  (click)="onButton($event, item, cancel)"
+                >
+                  {{ cancel.label }}
+                </button>
+              }
+
+              @if (item.action; as action) {
+                <button
+                  type="button"
+                  class="liquid-toast-button"
+                  liquidButton
+                  variant="tinted"
+                  (click)="onButton($event, item, action)"
+                >
+                  {{ action.label }}
+                </button>
+              }
+
+              @if (showClose(item)) {
+                <button
+                  type="button"
+                  class="liquid-toast-close"
+                  liquidPress
+                  i18n-aria-label="@@toast.dismiss"
+                  aria-label="Dismiss"
+                  (click)="toastDismiss(item.id)"
+                >
+                  <ng-icon name="ionClose" />
+                </button>
+              }
+            }
+          </div>
+        </div>
+
+        @if (hasTimer(item)) {
+          <!--
+            The countdown pill, after the card on purpose: the motion reads the
+            card as the slot's first child, and the twin appends the anchor after
+            it for the same reason. It stays while the toast counts down and
+            `data-shown` says whether it is out, so the gather has something to
+            play on when the hover ends — an `@if` removed it in that same frame
+            and the gather had nothing left. The anchor spans the slot's height so
+            the pill centres on the card; which side it sits on is the stack's
+            `data-timer-side`.
+          -->
+          <span
+            class="liquid-toast-timer-anchor"
+            aria-hidden="true"
+            [attr.data-shown]="showTimer(item) ? '' : null"
+          >
+            <span class="liquid-toast-timer">
+              <span class="liquid-toast-timer-content">
+                @if (timerContent(item)) {
+                  <span [numberPopIn]="timerValue(item)"></span>
+                  <span class="liquid-toast-timer-unit">{{ timerUnit(item) }}</span>
+                }
+              </span>
+            </span>
+          </span>
+        }
+      </li>
+    }
+
+    @if (group.hidden || group.expanded) {
+      <!--
+        The ghost: what is waiting behind the visible toasts. It is a slot like
+        any toast, so it grows in, folds away and moves with the stack.
+      -->
+      <li
+        class="liquid-toast-slot is-ghost"
+        (animate.enter)="onEnter($event)"
+        (animate.leave)="onLeave($event)"
+      >
+        <button
+          type="button"
+          class="liquid-toast liquid-toast-ghost"
+          liquidPress
+          [attr.aria-expanded]="group.expanded"
+          (click)="toggleExpanded(group.key)"
+        >
+          <span class="liquid-toast-body">
+            <!--
+              One label element, not loose text around the count: the body is a
+              flex row, and bare text either side of the number would each become
+              a flex item — "+ 2 more" with space around the digits.
+            -->
+            @if (group.expanded) {
+              <span class="liquid-toast-ghost-label" i18n="@@toast.showLess">Show less</span>
+            } @else {
+              <!-- The count pops like any other number that changes. -->
+              <span class="liquid-toast-ghost-label" i18n="@@toast.more">+<span class="liquid-toast-ghost-count" [numberPopIn]="group.hidden"></span> more</span>
+            }
+          </span>
+        </button>
+      </li>
+    }
+  </ol>
+}

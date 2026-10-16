@@ -1,0 +1,54 @@
+@if (label(); as text) {
+  <label class="liquid-input-label" [attr.for]="labelFor()">
+    <span>{{ text }}</span>
+    @if (optional()) {
+      <span class="liquid-input-optional" i18n="@@form.optional">Optional</span>
+    } @else if (isRequired()) {
+      <span class="liquid-input-required" aria-hidden="true">*</span>
+    }
+  </label>
+}
+
+<!--
+  The same two layers a single field has: a wrapper the press moves, holding one
+  row. The segments are projected straight into the row, so the box is drawn once
+  around all of them and there is nothing between them but a rule.
+-->
+<div #press class="liquid-input-press">
+  <div
+    class="liquid-input-field liquid-input-group-row"
+    role="group"
+    [attr.aria-label]="label()"
+    [attr.aria-describedby]="describedByIds()"
+  >
+    <ng-content />
+  </div>
+</div>
+
+@if (hint() || errorText()) {
+  <div class="liquid-input-below">
+    <div class="liquid-input-said">
+      @if (errorText(); as message) {
+        <p
+          class="liquid-input-error"
+          role="alert"
+          animate.enter="liquid-input-said-in"
+          animate.leave="liquid-input-said-out"
+          [id]="errorId()"
+        >
+          <ng-icon name="ionAlertCircleOutline" aria-hidden="true"></ng-icon>
+          <span>{{ message }}</span>
+        </p>
+      } @else if (hint(); as message) {
+        <p
+          class="liquid-input-hint"
+          animate.enter="liquid-input-said-in"
+          animate.leave="liquid-input-said-out"
+          [id]="hintId()"
+        >
+          {{ message }}
+        </p>
+      }
+    </div>
+  </div>
+}

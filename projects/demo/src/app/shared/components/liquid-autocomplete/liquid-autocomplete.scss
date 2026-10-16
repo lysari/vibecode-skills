@@ -1,0 +1,415 @@
+@use 'variables'as var;
+
+// Tunables are read with a fallback rather than declared, so a
+// `--liquid-autocomplete-*` set on any ancestor reaches the field. The popup is
+// in the top layer but still a DOM child of this host, so they reach it too.
+
+:host {
+    --_h   : var(--liquid-autocomplete-hue, var(--svc-accent, 262));
+    --_tint: oklch(48% 0.16 var(--_h));
+
+    display    : block;
+    min-width  : 0;
+    font-family: var.$appFont;
+    color      : #1d1d1f;
+}
+
+// ── The field ────────────────────────────────────────────────────────────────
+
+.liquid-autocomplete-field {
+    position     : relative;
+    display      : flex;
+    align-items  : center;
+    height       : var(--liquid-autocomplete-height, 46px);
+    border-radius: var(--liquid-autocomplete-radius, 14px);
+    background   : var(--liquid-autocomplete-background, var(--background));
+    transition   : box-shadow 0.3s cubic-bezier(0, 0, 0.5, 1), background-color 0.3s cubic-bezier(0, 0, 0.5, 1);
+
+    &:hover {
+        background: var(--liquid-autocomplete-background-hover, #ededf0);
+    }
+
+    // Open counts as focused: the focus is in the popup, but this is still the
+    // field being edited.
+    &:focus-within,
+    :host(.is-open) & {
+        background: #fff;
+        box-shadow: 0 0 0 2px var(--_tint), 0 0 0 5px oklch(48% 0.16 var(--_h) / 0.18);
+    }
+
+    :host(.is-invalid) & {
+        box-shadow: 0 0 0 2px #c62828;
+    }
+
+    :host(.is-disabled) & {
+        opacity   : 0.5;
+        background: var(--liquid-autocomplete-background, var(--background));
+    }
+}
+
+// The whole field is the button; the clear button and chevron sit over its
+// right-hand padding.
+.liquid-autocomplete-trigger {
+    flex         : 1;
+    min-width    : 0;
+    height       : 100%;
+    padding      : 0 40px 0 14px;
+    border       : 0;
+    border-radius: inherit;
+    background   : none;
+    font         : inherit;
+    font-size    : var(--liquid-autocomplete-font-size, 14px);
+    text-align   : start;
+    color        : inherit;
+    cursor       : pointer;
+
+    &:disabled {
+        cursor: default;
+    }
+
+    :host(.has-value) & {
+        padding-right: 68px;
+    }
+}
+
+.liquid-autocomplete-value {
+    display      : block;
+    overflow     : hidden;
+    // Khmer stacks subscripts below the line; the leading keeps them unclipped.
+    line-height  : 1.7;
+    text-overflow: ellipsis;
+    white-space  : nowrap;
+
+    &.is-placeholder {
+        color: rgba(29, 29, 31, 0.45);
+    }
+
+    // The swap's text span is inline-block, which an ellipsis cannot cut into:
+    // it has to clip itself.
+    ::ng-deep .t-text-swap {
+        max-width     : 100%;
+        overflow      : hidden;
+        text-overflow : ellipsis;
+        vertical-align: top;
+    }
+}
+
+.liquid-autocomplete-chevron {
+    position      : absolute;
+    right         : 14px;
+    display       : flex;
+    font-size     : 16px;
+    color         : rgba(29, 29, 31, 0.5);
+    pointer-events: none;
+    // The popup's own spring, so the chevron and the panel land together.
+    transition    : rotate 340ms cubic-bezier(0.34, 1.32, 0.4, 1), color 0.2s ease;
+
+    :host(.is-open) & {
+        rotate: 180deg;
+        color : var(--_tint);
+    }
+}
+
+.liquid-autocomplete-clear {
+    display      : grid;
+    place-items  : center;
+    flex         : none;
+    width        : 26px;
+    height       : 26px;
+    padding      : 0;
+    border       : 0;
+    border-radius: 50%;
+    background   : none;
+    color        : rgba(29, 29, 31, 0.35);
+    font-size    : 18px;
+    cursor       : pointer;
+    transition   : color 0.15s ease-in-out;
+
+    &:hover,
+    &:focus-visible {
+        color: rgba(29, 29, 31, 0.65);
+    }
+
+    .liquid-autocomplete-field>& {
+        position: absolute;
+        right   : 36px;
+    }
+}
+
+// ── The popup ────────────────────────────────────────────────────────────────
+// The header search's anatomy. With a search field the height is fixed — the
+// list changes with every keystroke, and the popup pins its box once per open —
+// but sized to the options, so five of them do not open a 380px panel.
+
+.liquid-autocomplete-panel {
+    --_row: 46px;
+
+    display       : flex;
+    flex-direction: column;
+    width         : max(var(--liquid-autocomplete-panel-width, 300px), var(--_trigger-width, 0px));
+    max-width     : calc(100vw - 32px);
+    max-height    : 400px;
+
+    // Two-line rows are taller, and the panel is sized in rows.
+    &.has-captions {
+        --_row: 54px;
+    }
+
+    &.has-search {
+        height: clamp(196px, 66px + var(--_rows) * var(--_row), 400px);
+    }
+}
+
+.liquid-autocomplete-search {
+    flex            : none;
+    display         : flex;
+    align-items     : center;
+    gap             : 8px;
+    height          : 42px;
+    margin          : 10px 10px 4px;
+    padding         : 0 8px 0 12px;
+    border-radius   : 14px;
+    background-color: rgba(0, 0, 0, 0.05);
+    transition      : background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    &:focus-within {
+        background-color: #fff;
+        box-shadow      : 0 0 0 2px oklch(48% 0.16 var(--_h) / 0.55), 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    >ng-icon {
+        flex     : none;
+        display  : flex;
+        font-size: 18px;
+        color    : rgba(29, 29, 31, 0.45);
+    }
+
+    input {
+        flex      : 1 1 auto;
+        min-width : 0;
+        height    : 100%;
+        padding   : 0;
+        border    : 0;
+        background: none;
+        font      : inherit;
+        font-size : 15px;
+        color     : inherit;
+
+        &::placeholder {
+            color: rgba(29, 29, 31, 0.4);
+        }
+
+        // The field draws its own clear button.
+        &::-webkit-search-cancel-button {
+            -webkit-appearance: none;
+            appearance        : none;
+        }
+    }
+}
+
+.liquid-autocomplete-list {
+    // The offset parent of its rows, which is what `revealActive` measures from.
+    position           : relative;
+    flex               : 1 1 auto;
+    min-height         : 0;
+    padding            : 6px;
+    overflow-y         : auto;
+    overscroll-behavior: contain;
+    scrollbar-width    : thin;
+}
+
+.liquid-autocomplete-group-title {
+    padding       : 10px 10px 4px;
+    font-size     : 12px;
+    font-weight   : 600;
+    letter-spacing: 0.02em;
+    color         : rgba(29, 29, 31, 0.5);
+}
+
+.liquid-autocomplete-option {
+    display              : grid;
+    grid-template-columns: 1fr auto;
+    align-items          : center;
+    gap                  : 12px;
+    min-height           : 42px;
+    padding              : 6px 10px;
+    border-radius        : 14px;
+    cursor               : pointer;
+    transition           : background-color 0.12s ease-in-out;
+
+    &.has-icon {
+        grid-template-columns: 32px 1fr auto;
+    }
+
+    &.is-active {
+        background-color: rgba(0, 0, 0, 0.05);
+
+        .liquid-autocomplete-option-icon {
+            background-color: var(--_tint);
+            color           : #fff;
+        }
+    }
+
+    &.is-selected .liquid-autocomplete-option-title {
+        color      : var(--_tint);
+        font-weight: 600;
+    }
+
+    &.is-disabled {
+        opacity: 0.4;
+        cursor : default;
+    }
+}
+
+.liquid-autocomplete-option-icon {
+    display         : grid;
+    place-items     : center;
+    width           : 32px;
+    height          : 32px;
+    border-radius   : 10px;
+    background-color: oklch(48% 0.16 var(--_h) / 0.1);
+    color           : var(--_tint);
+    font-size       : 17px;
+    transition      : background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.liquid-autocomplete-option-text {
+    display       : flex;
+    flex-direction: column;
+    min-width     : 0;
+}
+
+.liquid-autocomplete-option-title {
+    overflow     : hidden;
+    font-size    : 14px;
+    font-weight  : 500;
+    line-height  : 1.5;
+    text-overflow: ellipsis;
+    white-space  : nowrap;
+
+    mark {
+        background : none;
+        color      : var(--_tint);
+        font-weight: 700;
+    }
+}
+
+.liquid-autocomplete-option-caption {
+    overflow     : hidden;
+    font-size    : 12px;
+    line-height  : 1.45;
+    text-overflow: ellipsis;
+    white-space  : nowrap;
+    color        : rgba(29, 29, 31, 0.5);
+}
+
+// Where the search result's arrow is: the same slide-in, for a different answer.
+.liquid-autocomplete-option-check {
+    display   : flex;
+    font-size : 17px;
+    color     : var(--_tint);
+    opacity   : 0;
+    translate : -4px 0;
+    transition: opacity 0.15s ease-out, translate 220ms var(--menu-spring, ease);
+
+    .is-selected>& {
+        opacity  : 1;
+        translate: 0 0;
+    }
+}
+
+.liquid-autocomplete-empty {
+    display        : flex;
+    flex-direction : column;
+    align-items    : center;
+    justify-content: center;
+    gap            : 8px;
+    height         : 100%;
+    min-height     : 110px;
+    font-size      : 14px;
+    font-weight    : 600;
+    text-align     : center;
+}
+
+.liquid-autocomplete-empty-icon {
+    display         : grid;
+    place-items     : center;
+    width           : 48px;
+    height          : 48px;
+    border-radius   : 50%;
+    background-color: rgba(0, 0, 0, 0.05);
+    font-size       : 22px;
+    color           : rgba(29, 29, 31, 0.45);
+}
+
+// Drawn in the popup's footer, under the list.
+.liquid-autocomplete-hints {
+    display    : flex;
+    flex-wrap  : wrap;
+    align-items: center;
+    gap        : 6px 16px;
+    padding    : 10px 10px 4px;
+    font-size  : 12px;
+    color      : rgba(29, 29, 31, 0.55);
+
+    // Keyboard hints mean nothing on a phone.
+    @media (hover: none) {
+        display: none;
+    }
+
+    kbd {
+        display         : inline-grid;
+        place-items     : center;
+        min-width       : 20px;
+        height          : 20px;
+        padding         : 0 5px;
+        border-radius   : 6px;
+        background-color: #fff;
+        box-shadow      : 0 0 0 1px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(0, 0, 0, 0.08);
+        font-family     : inherit;
+        font-size       : 11px;
+        font-weight     : 500;
+    }
+}
+
+.liquid-autocomplete-hint {
+    display    : inline-flex;
+    align-items: center;
+    gap        : 4px;
+
+    >span {
+        margin-inline-start: 2px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .liquid-autocomplete-chevron,
+    .liquid-autocomplete-option-check {
+        transition: none;
+    }
+}
+
+
+// ── As a segment of a group ──────────────────────────────────────────────────
+// The box, the ring and the spacing belong to the group that drew them, and
+// this is only what stands inside it. See `liquid-input-group`.
+
+:host(.is-bare) .liquid-autocomplete-field {
+    height    : 100%;
+    background: none;
+    box-shadow: none;
+    transition: none;
+
+    &:hover {
+        background: none;
+    }
+}
+
+:host(.is-bare) .liquid-autocomplete-trigger {
+    padding: 0 22px 0 0;
+}
+
+:host(.is-bare) .liquid-autocomplete-chevron {
+    right: 0;
+}

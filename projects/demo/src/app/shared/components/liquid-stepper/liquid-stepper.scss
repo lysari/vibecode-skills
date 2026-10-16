@@ -1,0 +1,281 @@
+// Not encapsulated: the steps are the consumer's own elements, projected in, and
+// encapsulated rules would never reach them. Every selector hangs off a class the
+// component or its directives put on their own hosts instead.
+//
+// Tunables are read with a fallback rather than declared here, so a
+// `--liquid-stepper-*` set on any ancestor reaches the stepper too.
+
+@use '../liquid-tabs/liquid-tab-panel';
+
+// The default check, drawn as a mask so `--liquid-stepper-check-image` can swap it
+// for any `url(...)` and it still takes the marker's colour.
+$check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5 6.5 11.5 12.5 4.5'/%3E%3C/svg%3E");
+
+.liquid-stepper,
+.liquid-step {
+    // Resolved on the step as well, so a step that sets its own colour keeps it to itself.
+    --_liquid-stepper-color: var(--liquid-stepper-color, var(--color-primary, #1a73e8));
+}
+
+.liquid-stepper {
+    --_liquid-stepper-marker: var(--liquid-stepper-marker-size, 32px);
+    // The fill reaches a marker about here in its pour; the marker takes its colour then.
+    // 340ms is the component's own fallback for `--liquid-stepper-duration`.
+    --_liquid-stepper-arrive: calc(var(--liquid-stepper-duration, 340ms) * 0.4);
+
+    position         : relative;
+    isolation        : isolate;
+    display          : grid;
+    grid-auto-flow   : column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap              : var(--liquid-stepper-gap, 0px);
+    box-sizing       : border-box;
+    font-size        : var(--liquid-stepper-font-size, 13px);
+
+    &.is-vertical {
+        grid-auto-flow   : row;
+        grid-auto-columns: auto;
+    }
+}
+
+// An end step takes one track and a step between takes two. The grid is inset by half a
+// marker and half a gap, and the end steps reach back out over that inset: their markers
+// land on the edges and every marker is the same distance from the next, whatever the gap.
+.liquid-stepper.is-flush:not(.is-vertical, .is-pill) {
+    --_liquid-stepper-inset: calc(var(--_liquid-stepper-marker) / 2 + var(--liquid-stepper-gap, 0px) / 2);
+
+    padding-inline: var(--_liquid-stepper-inset);
+
+    >.liquid-step {
+        grid-column: span 2;
+    }
+
+    >.liquid-stepper-fill+.liquid-step {
+        grid-column         : span 1;
+        align-items         : flex-start;
+        margin-inline-start : calc(var(--_liquid-stepper-inset) * -1);
+        padding-inline-start: 0;
+        text-align          : start;
+    }
+
+    >.liquid-step:last-child {
+        grid-column       : span 1;
+        align-items       : flex-end;
+        margin-inline-end : calc(var(--_liquid-stepper-inset) * -1);
+        padding-inline-end: 0;
+        text-align        : end;
+    }
+}
+
+// Placed and sized by the component: the whole box, in layout offsets.
+@mixin box($name, $color) {
+    .liquid-stepper-#{$name} {
+        position        : absolute;
+        top             : 0;
+        left            : 0;
+        z-index         : 0;
+        width           : var(--liquid-stepper-#{$name}-width, 0px);
+        height          : var(--liquid-stepper-#{$name}-height, 0px);
+        translate       : var(--liquid-stepper-#{$name}-x, 0px) var(--liquid-stepper-#{$name}-y, 0px);
+        border-radius   : 999px;
+        background      : $color;
+        pointer-events  : none;
+    }
+}
+
+@include box(track, var(--liquid-stepper-track-color, rgba(0, 0, 0, 0.1)));
+// Only the pour moves it: a CSS transition on the same properties would outrank the animation.
+@include box(fill, var(--liquid-stepper-fill-color, var(--_liquid-stepper-color)));
+
+// Sized to the track, not the fill, so a gradient is laid by position along the line and
+// the fill uncovers more of it as it grows, instead of squeezing the whole of it into itself.
+.liquid-stepper-fill {
+    background-size: var(--liquid-stepper-track-width, 100%) 100%;
+
+    .is-vertical>& {
+        background-size: 100% var(--liquid-stepper-track-height, 100%);
+    }
+}
+
+.liquid-step {
+    position                   : relative;
+    z-index                    : 1;
+    display                    : flex;
+    flex-direction             : column;
+    align-items                : center;
+    gap                        : 8px;
+    min-width                  : 0;
+    padding                    : 4px 8px;
+    border                     : none;
+    border-radius              : 12px;
+    background                 : none;
+    font                       : inherit;
+    text-align                 : center;
+    cursor                     : pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    &.is-disabled {
+        opacity: 0.4;
+        cursor : default;
+    }
+
+    &:focus-visible {
+        outline       : 2px solid var(--_liquid-stepper-color);
+        outline-offset: 2px;
+    }
+
+    .is-vertical>& {
+        flex-direction: row;
+        gap           : 12px;
+        padding       : 12px 8px;
+        text-align    : left;
+    }
+}
+
+// Opaque, so the line passes behind it rather than through it.
+.liquid-step-marker {
+    display             : grid;
+    flex                : none;
+    place-items         : center;
+    box-sizing          : border-box;
+    width               : var(--_liquid-stepper-marker);
+    height              : var(--_liquid-stepper-marker);
+    border              : 2px solid var(--liquid-stepper-track-color, rgba(0, 0, 0, 0.1));
+    border-radius       : var(--liquid-stepper-marker-radius, 50%);
+    background-color    : var(--liquid-stepper-background, #fff);
+    color               : var(--liquid-stepper-label-color, rgba(29, 29, 31, 0.55));
+    font-weight         : 600;
+    font-variant-numeric: tabular-nums;
+
+    .is-ready & {
+        transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .is-selected>& {
+        border-color: var(--_liquid-stepper-color);
+        color       : var(--_liquid-stepper-color);
+        box-shadow  : 0 0 0 4px color-mix(in srgb, var(--_liquid-stepper-color) 18%, transparent);
+    }
+
+    .is-complete>& {
+        border-color    : var(--_liquid-stepper-color);
+        background-color: var(--_liquid-stepper-color);
+        color           : var(--liquid-stepper-check-color, #fff);
+    }
+
+    // Only on the way in: a marker leaves its state at once, as the fill draws back off it.
+    .is-ready .is-selected>&,
+    .is-ready .is-complete>& {
+        transition-delay: var(--_liquid-stepper-arrive);
+    }
+}
+
+.liquid-step-check {
+    width           : 60%;
+    height          : 60%;
+    background-color: currentColor;
+    -webkit-mask    : var(--liquid-stepper-check-image, #{$check}) center / contain no-repeat;
+    mask            : var(--liquid-stepper-check-image, #{$check}) center / contain no-repeat;
+}
+
+// An icon or done element the page put in: sized off the marker, coloured by it.
+.liquid-step-glyph {
+    display    : flex;
+    font-size  : calc(var(--_liquid-stepper-marker) * 0.55);
+    line-height: 1;
+}
+
+.liquid-step-label {
+    display       : flex;
+    flex-direction: column;
+    gap           : 2px;
+    min-width     : 0;
+    color         : var(--liquid-stepper-label-color, rgba(29, 29, 31, 0.55));
+    font-weight   : 500;
+    transition    : color 150ms ease-in-out;
+
+    .liquid-step:hover:not(.is-selected, .is-disabled)>& {
+        color: var(--liquid-stepper-hover-label-color, rgba(29, 29, 31, 0.8));
+    }
+
+    .is-selected>& {
+        color: var(--liquid-stepper-selected-label-color, #1d1d1f);
+    }
+}
+
+// The segmented bar: tabs' look, with the markers kept small inside it.
+.liquid-stepper.is-pill {
+    --_liquid-stepper-marker : var(--liquid-stepper-marker-size, 22px);
+    --_liquid-stepper-padding: var(--liquid-stepper-padding, 4px);
+    --_liquid-stepper-radius : var(--liquid-stepper-radius, 999px);
+
+    display          : inline-grid;
+    grid-auto-columns: auto;
+    max-width        : 100%;
+    padding          : var(--_liquid-stepper-padding);
+    border-radius    : var(--_liquid-stepper-radius);
+    background-color : var(--liquid-stepper-pill-background, rgba(0, 0, 0, 0.05));
+
+    &.is-stretched {
+        display          : grid;
+        grid-auto-columns: minmax(0, 1fr);
+    }
+
+    // A pill-shaped column reads as a blob; a vertical bar gets corners.
+    &.is-vertical {
+        --_liquid-stepper-radius: var(--liquid-stepper-radius, 16px);
+
+        grid-auto-columns: auto;
+    }
+
+    >.liquid-stepper-track {
+        display: none;
+    }
+
+    >.liquid-stepper-fill {
+        border-radius   : calc(var(--_liquid-stepper-radius) - var(--_liquid-stepper-padding));
+        background      : var(--liquid-stepper-indicator-color, #fff);
+        box-shadow      : var(--liquid-stepper-indicator-shadow, 0 1px 4px rgba(0, 0, 0, 0.12));
+    }
+
+    .liquid-step {
+        flex-direction : row;
+        justify-content: center;
+        gap            : 8px;
+        padding        : 6px 14px;
+        border-radius  : calc(var(--_liquid-stepper-radius) - var(--_liquid-stepper-padding));
+        white-space    : nowrap;
+    }
+
+    &.is-vertical .liquid-step {
+        justify-content: flex-start;
+    }
+
+    .liquid-step-marker {
+        border-width    : 0;
+        background-color: var(--liquid-stepper-marker-background, rgba(0, 0, 0, 0.07));
+        font-size       : 11.5px;
+        box-shadow      : none;
+    }
+
+    // Under the highlight with the selected step, so they read as done, not as upcoming.
+    &.is-progress .liquid-step.is-complete>.liquid-step-label {
+        color: var(--liquid-stepper-selected-label-color, #1d1d1f);
+    }
+
+    // Both the step being shown and the ones behind it are filled in.
+    .liquid-step.is-selected>.liquid-step-marker,
+    .liquid-step.is-complete>.liquid-step-marker {
+        background-color: var(--_liquid-stepper-color);
+        color           : var(--liquid-stepper-check-color, #fff);
+        box-shadow      : none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .liquid-stepper.is-ready .liquid-step-marker,
+    .liquid-step-label {
+        transition: none;
+    }
+}

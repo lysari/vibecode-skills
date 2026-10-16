@@ -1,0 +1,81 @@
+<ng-template liquidMenuHeaderIcon>
+  <ng-icon name="ionChatbubbleEllipsesOutline"></ng-icon>
+</ng-template>
+
+<div #log class="chat-log" role="log" aria-live="polite">
+  @for (message of messages(); track message.id) {
+    <div
+      class="chat-row"
+      [class.is-user]="message.from === 'user'"
+      [class.is-new]="message.id >= arrivedBefore()"
+    >
+      @if (message.from === 'bot') {
+        <span class="chat-avatar" aria-hidden="true">
+          <ng-icon name="ionSparkles"></ng-icon>
+        </span>
+      }
+      <p class="chat-bubble">{{ message.text }}</p>
+    </div>
+  }
+  @if (isTyping()) {
+    <div class="chat-row is-new">
+      <span class="chat-avatar" aria-hidden="true">
+        <ng-icon name="ionSparkles"></ng-icon>
+      </span>
+      <span class="chat-bubble is-typing" i18n-aria-label="@@chatbot.typing" aria-label="Typing">
+        <span class="chat-dot"></span>
+        <span class="chat-dot"></span>
+        <span class="chat-dot"></span>
+      </span>
+    </div>
+  }
+</div>
+
+@if (suggestions().length) {
+  <div
+    class="chat-suggestions"
+    role="group"
+    i18n-aria-label="@@chatbot.suggestions"
+    aria-label="Suggested questions"
+  >
+    @for (faq of suggestions(); track faq.key) {
+      <button
+        class="chat-suggestion"
+        type="button"
+        liquidButton
+        variant="tinted"
+        [disabled]="isTyping()"
+        (click)="pick(faq)"
+      >
+        {{ faq.question }}
+      </button>
+    }
+  </div>
+}
+
+<form class="chat-composer" (submit)="$event.preventDefault(); send()">
+  <input
+    #field
+    class="chat-input"
+    type="text"
+    autofocus
+    autocomplete="off"
+    enterkeyhint="send"
+    i18n-aria-label="@@chatbot.message"
+    aria-label="Message"
+    i18n-placeholder="@@chatbot.placeholder"
+    placeholder="Ask a question"
+    [value]="draft()"
+    (input)="draft.set(field.value)"
+  />
+  <button
+    class="chat-send"
+    type="submit"
+    liquidButton
+    i18n-aria-label="@@chatbot.send"
+    aria-label="Send"
+    [disabled]="!canSend()"
+  >
+    <ng-icon name="ionArrowUp"></ng-icon>
+  </button>
+</form>

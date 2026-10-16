@@ -22,6 +22,7 @@
   --blue-200: #cdd7f2;
   --blue-500: #3b6cdb;
   --blue-600: #0f62fe;
+  --red-500: #da1e28;
   --glass-window: rgb(225 232 240 / 0.42);
   --glass-sidebar: rgb(244 246 250 / 0.62);
   --glass-panel: rgb(246 248 252 / 0.68);
@@ -30,6 +31,17 @@
   --glass-search: rgb(215 222 230 / 0.55);
   --glass-nav-active: rgb(255 255 255 / 0.72);
   --glass-border: rgb(255 255 255 / 0.55);
+  --google-blue: #1a73e8;
+  --steel: #4e6994;
+  --red-400: #f44336;
+  --red-800: #c62828;
+  --orange-500: #fb9001;
+  --green-500: #41b35d;
+  --gray-75: #f5f5f7;
+  --gray-550: #6e6e73;
+  --gray-650: #65676b;
+  --gray-950: #1d1d1f;
+  --gray-950-a50: rgb(29 29 31 / 0.5);
 
   --color-window-bg: var(--glass-window);
   --color-window-border: var(--glass-border);
@@ -59,4 +71,17 @@
   --color-chart-bar-light: var(--blue-200);
   --color-chart-grid: var(--gray-200);
   --color-star-icon: var(--blue-600);
+  --color-primary: var(--google-blue);
+  --color-secondary: var(--steel);
+  --danger: var(--red-400);
+  --invalid: var(--red-800);
+  --success: var(--green-500);
+  --bgColorFinal: var(--orange-500);
+  --dockIconColor: var(--gray-650);
+  --background: var(--gray-75);
+  --surface: var(--white);
+  --ink: var(--gray-950);
+  --ink-soft: var(--gray-550);
+  --muted: var(--gray-950-a50);
+  --text-inverse: var(--white);
 }

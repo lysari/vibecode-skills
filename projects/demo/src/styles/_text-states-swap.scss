@@ -1,0 +1,89 @@
+// Styles for the `[textStatesSwap]` directive — Transitions.dev "Text states
+// swap" (https://transitions.dev/detail.html?t=text-states-swap).
+//
+// A directive has no view encapsulation, so — same reason as `_liquid-glass.scss`
+// — these rules have to live globally. The upstream class names are kept as
+// authored (`.t-text-swap` / `.is-exit` / `.is-enter-start`) so markup driving
+// the three phases by hand keeps working next to the directive.
+//
+// Unlike the number pop-in this is a *transition*, not an animation: the element
+// is one span whose text is replaced, and the three phases are class changes the
+// directive makes at the right moments.
+
+:root {
+  --text-swap-dur: 150ms;
+  --text-swap-blur: 2px;
+  --text-swap-ease: ease-in-out;
+
+  // Signed offset between the end of the exit and the start of the entrance,
+  // matching upstream: positive pauses between the phases, 0 runs them
+  // back-to-back, negative overlaps them (both sides cross through opacity 0).
+  --text-swap-enter-delay: 0ms;
+
+  // Upstream exposes the travel as one signed length. It is kept as the value
+  // the rules below read, but composed here, so `swapDistance` and
+  // `swapDirection` can be set independently without either having to restate
+  // the other's default. Overriding --text-swap-translate-y directly still works.
+  --text-swap-distance: 4px;
+  --text-swap-dir: 1;
+  --text-swap-translate-y: calc(var(--text-swap-distance) * var(--text-swap-dir));
+}
+
+// The host: an inline box holding the visible text span and the hidden span the
+// value is read from. `relative` only so the hidden one has something local to
+// position against.
+.t-text-swap-group {
+  position: relative;
+}
+
+.t-text-swap {
+  display: inline-block;
+  transform: translateY(0);
+  filter: blur(0);
+  opacity: 1;
+  transition:
+    transform var(--text-swap-dur) var(--text-swap-ease),
+    filter var(--text-swap-dur) var(--text-swap-ease),
+    opacity var(--text-swap-dur) var(--text-swap-ease);
+  will-change: transform, filter, opacity;
+}
+
+// Phase 1: the outgoing text leaves against the travel direction.
+.t-text-swap.is-exit {
+  transform: translateY(calc(var(--text-swap-translate-y) * -1));
+  filter: blur(var(--text-swap-blur));
+  opacity: 0;
+}
+
+// Phase 2: the incoming text is placed on the far side with no transition, so
+// the jump is instant and invisible. Removing this class is phase 3 — the
+// transition above then carries it back to rest.
+.t-text-swap.is-enter-start {
+  transform: translateY(var(--text-swap-translate-y));
+  filter: blur(var(--text-swap-blur));
+  opacity: 0;
+  transition: none;
+}
+
+// Where the value is read from: the node an interpolation writes to, kept in the
+// document so the binding stays live, and hidden from assistive tech because the
+// visible span is what should be read.
+.t-text-swap-src {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  // The directive also skips the phases and sets the text outright, so nothing
+  // waits on a transition this just cancelled.
+  .t-text-swap {
+    transition: none !important;
+  }
+}

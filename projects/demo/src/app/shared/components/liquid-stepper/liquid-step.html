@@ -1,0 +1,14 @@
+<span #marker class="liquid-step-marker" aria-hidden="true">
+  @if (isComplete()) {
+    @if (done()) {
+      <ng-content select="[liquidStepDone]" />
+    } @else {
+      <span class="liquid-step-check"></span>
+    }
+  } @else if (icon()) {
+    <ng-content select="[liquidStepIcon]" />
+  } @else {
+    {{ index() + 1 }}
+  }
+</span>
+<span class="liquid-step-label"><ng-content /></span>

@@ -1,0 +1,44 @@
+
+.toggle-panel {
+    display: grid;
+    gap: 14px;
+    max-width: 444px;
+    margin-top: 20px;
+    padding: 22px;
+    border-radius: 22px;
+    background: #fff;
+}
+
+.toggle-panel-title {
+    margin: 0 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.toggle-sizes {
+    display: grid;
+    gap: 16px;
+    max-width: 444px;
+}
+
+.size-compact {
+    --liquid-toggle-height: 24px;
+}
+
+.size-large {
+    --liquid-toggle-height: 44px;
+}
+
+.size-narrow {
+    --liquid-toggle-width: 44px;
+}
+
+.docs-control input[type='color'] {
+    width: 100%;
+    height: 38px;
+    padding: 4px;
+    cursor: pointer;
+}

@@ -1,0 +1,286 @@
+@use 'liquid-field'as field;
+
+// The box, the label and the line under it are the shared chrome — see
+// `src/styles/_liquid-field.scss`. What is inside the box is this component's:
+// the control, the icons, and the buttons at the end of the row.
+
+$ease  : field.$ease;
+$leave : field.$leave;
+$arrive: field.$arrive;
+
+:host {
+    @include field.tokens;
+}
+
+:host(.is-disabled) {
+    opacity: 0.5;
+}
+
+@include field.field;
+
+// A segment of a group: the box, the ring and the spacing belong to the group
+// that drew them, and this is only what stands inside it. The press wrapper
+// stays in the markup and does nothing — the group presses for all of them.
+:host(.is-bare) .liquid-input-field {
+    min-height   : auto;
+    padding      : 0;
+    border-radius: 0;
+    background   : none;
+    box-shadow   : none;
+    transition   : none;
+}
+
+// A text area is a box of lines, not a line: its contents sit at the top of it
+// and its height is the text's.
+:host(.is-textarea) .liquid-input-field {
+    align-items: flex-start;
+    padding    : 11px 14px;
+}
+
+.liquid-input-control {
+    flex       : 1;
+    width      : 100%;
+    min-width  : 0;
+    height     : var(--_height);
+    padding    : 0;
+    border     : 0;
+    background : none;
+    font       : inherit;
+    font-size  : var(--liquid-input-font-size, 14px);
+    // Khmer stacks subscripts below the line; the leading keeps them unclipped.
+    line-height: 1.7;
+    color      : inherit;
+    outline    : none;
+
+    &::placeholder {
+        color  : rgba(29, 29, 31, 0.45);
+        opacity: 1;
+    }
+
+    &:disabled {
+        cursor                 : default;
+        // Safari greys a disabled control out on its own; the host already dims.
+        -webkit-text-fill-color: var(--ink);
+        opacity                : 1;
+    }
+
+    &.is-upper {
+        text-transform: uppercase;
+    }
+
+    // ── Native chrome ────────────────────────────────────────────────────
+    // A field is drawn, not decorated by the browser. Everything the platform
+    // would put inside the box is taken out, and whatever it stood for is
+    // offered back in the field's own vocabulary — its own clear button, its
+    // own eye, its own way into the picker.
+
+    // The spinner on a number field, in both engines. Nothing is lost: the
+    // arrow keys step the value as they always did.
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        appearance: none;
+        margin    : 0;
+    }
+
+    &[type='number'] {
+        appearance: textfield;
+    }
+
+    // A `search` field's clear button, its results button and its decoration.
+    // Ours presses, answers a screen reader, and is there for every other type.
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-results-button,
+    &::-webkit-search-decoration {
+        display: none;
+    }
+
+    // Edge's own reveal and clear, which would sit beside the field's.
+    &::-ms-reveal,
+    &::-ms-clear {
+        display: none;
+    }
+
+    // The date and time glyph. The field offers the same thing as a button of
+    // its own — see `openPicker` — so this would only be a second one.
+    &::-webkit-calendar-picker-indicator {
+        display: none;
+    }
+
+    // An autofilled field is painted by the browser, in its own colour, inside
+    // the box the field has already drawn. The paint arrives on a transition,
+    // so a transition that never arrives keeps the field's own surface; the
+    // text colour has to be pinned separately, since the fill is not a colour.
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus {
+        -webkit-text-fill-color: var(--ink);
+        transition             : background-color 600000s 0s;
+    }
+
+    :host(.is-textarea) & {
+        height    : auto;
+        min-height: calc(1.7em * 2);
+        padding   : 0;
+        resize    : vertical;
+    }
+}
+
+.liquid-input-icon {
+    flex           : none;
+    display        : inline-flex;
+    align-items    : center;
+    justify-content: center;
+    align-self     : center;
+    font-size      : 17px;
+    color          : var(--muted);
+    transition     : color 200ms $leave;
+
+    // Named rather than counted: the fill is the row's first child now, and a
+    // `:first-child` here would be pointing at it.
+    &.is-prefix {
+        margin-right: 10px;
+    }
+
+    &.is-suffix {
+        margin-left: 8px;
+    }
+
+    // Nothing moves in lockstep: the box leads on the way in — the icon follows
+    // it by the popup's own 40ms — and the content leads on the way out, which
+    // is the line above, with no delay on it.
+    :host(.is-focused) & {
+        color     : var(--_tint);
+        transition: color 260ms 40ms $arrive;
+    }
+
+    :host(.is-invalid) & {
+        color: var(--invalid);
+    }
+}
+
+// Whatever was projected, in the field's own row. Nothing projected leaves an
+// element with no children at all, and `:empty` takes it back out of the row.
+.liquid-input-affix {
+    flex       : none;
+    display    : flex;
+    align-items: center;
+    align-self : center;
+
+    &:empty {
+        display: none;
+    }
+
+    &.is-prefix {
+        margin-right: 10px;
+    }
+
+    &.is-suffix {
+        margin-left: 8px;
+    }
+}
+
+// ── The buttons at the end ───────────────────────────────────────────────────
+
+.liquid-input-action {
+    flex         : none;
+    display      : grid;
+    place-items  : center;
+    align-self   : center;
+    width        : 26px;
+    height       : 26px;
+    margin-left  : 4px;
+    padding      : 0;
+    border       : 0;
+    border-radius: 50%;
+    background   : none;
+    color        : rgba(29, 29, 31, 0.35);
+    font-size    : 18px;
+    cursor       : pointer;
+    transition   : color 0.15s ease-in-out;
+
+    &:hover,
+    &:focus-visible {
+        color: var(--_tint);
+    }
+
+    &:focus-visible {
+        outline   : none;
+        box-shadow: 0 0 0 2px oklch(48% 0.16 var(--_h) / 0.35);
+    }
+
+    ng-icon {
+        display: flex;
+    }
+}
+
+// A button arriving folds the row open for itself — its width and the margin
+// that spaces it, on the same clock as the icon it holds. The icon may scale;
+// it is a glyph, not text.
+.liquid-input-action-in {
+    animation: liquid-input-action-in 260ms both;
+}
+
+.liquid-input-action-out {
+    animation: liquid-input-action-out 170ms both;
+}
+
+@keyframes liquid-input-action-in {
+    from {
+        width                    : 0;
+        margin-left              : 0;
+        opacity                  : 0;
+        scale                    : 0.6;
+        animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    58% {
+        width                    : 26px;
+        margin-left              : 4px;
+        opacity                  : 1;
+        scale                    : 1.08;
+        animation-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
+    }
+
+    to {
+        width      : 26px;
+        margin-left: 4px;
+        opacity    : 1;
+        scale      : 1;
+    }
+}
+
+@keyframes liquid-input-action-out {
+    from {
+        width                    : 26px;
+        margin-left              : 4px;
+        opacity                  : 1;
+        scale                    : 1;
+        animation-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
+    }
+
+    to {
+        width      : 0;
+        margin-left: 0;
+        opacity    : 0;
+        scale      : 0.7;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .liquid-input-field,
+    .liquid-input-icon,
+    .liquid-input-action {
+        transition: none;
+    }
+
+    // The press is script-driven, so it checks the same query in TypeScript.
+    // Every end state here is the resting one, so removing the travel leaves the
+    // line and the button simply there.
+    .liquid-input-said-in,
+    .liquid-input-said-out,
+    .liquid-input-action-in,
+    .liquid-input-action-out {
+        animation: none;
+    }
+}

@@ -11,45 +11,52 @@
 
     <span class="divider" aria-hidden="true">/</span>
 
-    <button type="button" class="account-button">
+    <button type="button" class="account-button" liquidPress>
       <span class="avatar-circle" aria-hidden="true">
-        <svg class="icon-user" viewBox="0 0 24 24">
-          <circle cx="12" cy="8" r="3.5" />
-          <path d="M5 19a7 7 0 0 1 14 0" />
+        <svg class="icon-user" viewBox="0 0 24 24" fill="none">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M11.8445 21.6619C8.15273 21.6619 5 21.0874 5 18.7867C5 16.4859 8.13273 14.3619 11.8445 14.3619C15.5364 14.3619 18.6891 16.4653 18.6891 18.7661C18.6891 21.0659 15.5564 21.6619 11.8445 21.6619Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M11.8372 11.1737C14.26 11.1737 16.2236 9.21002 16.2236 6.7873C16.2236 4.36457 14.26 2.40002 11.8372 2.40002C9.41452 2.40002 7.44998 4.36457 7.44998 6.7873C7.4418 9.20184 9.3918 11.1655 11.8063 11.1737C11.8172 11.1737 11.8272 11.1737 11.8372 11.1737Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
       <span class="account-email">{{ config().accountEmail }}</span>
       <span class="badge-free">{{ config().accountPlan }}</span>
-      <svg class="icon-chevron" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m6 9 6 6 6-6" />
+      <svg class="icon-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M19 8.5C19 8.5 14.856 15.5 12 15.5C9.145 15.5 5 8.5 5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
 
     <span class="divider" aria-hidden="true">/</span>
 
-    <button type="button" class="project-button">
-      <svg class="icon-project" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 7h12M4 12h16M4 17h8" />
+    <button type="button" class="project-button" liquidPress>
+      <svg class="icon-project" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M21.0004 6.6738C21.0004 8.7024 19.3552 10.3476 17.3266 10.3476C15.298 10.3476 13.6537 8.7024 13.6537 6.6738C13.6537 4.6452 15.298 3 17.3266 3C19.3552 3 21.0004 4.6452 21.0004 6.6738Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.3467 6.6738C10.3467 8.7024 8.7024 10.3476 6.6729 10.3476C4.6452 10.3476 3 8.7024 3 6.6738C3 4.6452 4.6452 3 6.6729 3C8.7024 3 10.3467 4.6452 10.3467 6.6738Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M21.0004 17.2619C21.0004 19.2905 19.3552 20.9348 17.3266 20.9348C15.298 20.9348 13.6537 19.2905 13.6537 17.2619C13.6537 15.2333 15.298 13.5881 17.3266 13.5881C19.3552 13.5881 21.0004 15.2333 21.0004 17.2619Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.3467 17.2619C10.3467 19.2905 8.7024 20.9348 6.6729 20.9348C4.6452 20.9348 3 19.2905 3 17.2619C3 15.2333 4.6452 13.5881 6.6729 13.5881C8.7024 13.5881 10.3467 15.2333 10.3467 17.2619Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span class="project-name">{{ config().projectName }}</span>
-      <svg class="icon-chevron" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m6 9 6 6 6-6" />
+      <svg class="icon-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M19 8.5C19 8.5 14.856 15.5 12 15.5C9.145 15.5 5 8.5 5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
   </div>
 
   <div class="header-actions">
-    <button type="button" class="header-pill">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    <a routerLink="/components-docs" class="header-pill" liquidPress>
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15.5957 15.6964H8.37573" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M15.5957 11.9366H8.37573" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11.131 8.17737H8.37598" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M3.60999 12.0001C3.60999 18.9371 5.70798 21.2501 12.001 21.2501C18.295 21.2501 20.392 18.9371 20.392 12.0001C20.392 5.06312 18.295 2.75012 12.001 2.75012C5.70798 2.75012 3.60999 5.06312 3.60999 12.0001Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       Docs
-    </button>
-    <button type="button" class="header-pill is-connect">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <polyline points="16 18 22 12 16 6" />
-        <polyline points="8 6 2 12 8 18" />
+    </a>
+    <button type="button" class="header-pill is-connect" liquidPress>
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6.979 4.60132V17.2193" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2.8999 8.69998C2.8999 8.69998 5.0689 4.59998 6.9779 4.59998C8.8859 4.59998 11.0559 8.69998 11.0559 8.69998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16.9058 19.4274V6.80945" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M20.9849 15.3284C20.9849 15.3284 18.8149 19.4284 16.9069 19.4284C14.9989 19.4284 12.8289 15.3284 12.8289 15.3284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       Connect
     </button>

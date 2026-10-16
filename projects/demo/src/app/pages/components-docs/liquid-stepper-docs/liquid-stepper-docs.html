@@ -1,0 +1,1087 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid stepper</h1>
+      <p class="docs-lede">
+        Numbered steps joined by a line that fills up to the one you are on. When the step changes
+        the fill pours along the line the way the tab pill does, and each marker takes its colour as
+        the fill reaches it.
+      </p>
+      <p class="docs-lede">
+        Steps behind the selected one turn to a check. Numbers, checks, colours and the whole look
+        can be swapped out, and a pill variant draws it like the tabs. Arrow keys move focus; Enter
+        or Space picks.
+      </p>
+    </header>
+
+    <section class="docs-case" id="playground">
+      <h2>Playground</h2>
+      <p class="docs-note">
+        Every input, the <code>blocked</code> output and the custom properties on one stepper. Hold
+        a step with <code>[valid]="false"</code> and press Next to see <code>blocked</code> fire.
+        Line size is read when the stepper lays out, so the playground redraws it when that changes.
+      </p>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          orientation
+          <select (change)="setOrientation($event)">
+            <option value="horizontal" [selected]="play.orientation() === 'horizontal'">
+              horizontal
+            </option>
+            <option value="vertical" [selected]="play.orientation() === 'vertical'">
+              vertical
+            </option>
+          </select>
+        </label>
+        <label class="docs-control">
+          variant
+          <select (change)="setVariant($event)">
+            <option value="line" [selected]="play.variant() === 'line'">line</option>
+            <option value="pill" [selected]="play.variant() === 'pill'">pill</option>
+          </select>
+        </label>
+        <label class="docs-control">
+          disabled on
+          <select (change)="setStep('disabledStep', $event)">
+            <option value="" [selected]="!play.disabledStep()">none</option>
+            @for (item of steps; track item.value) {
+              <option [value]="item.value" [selected]="play.disabledStep() === item.value">
+                {{ item.label }}
+              </option>
+            }
+          </select>
+        </label>
+        <label class="docs-control">
+          [valid]="false" on
+          <select (change)="setStep('heldStep', $event)">
+            <option value="" [selected]="!play.heldStep()">none</option>
+            @for (item of steps; track item.value) {
+              <option [value]="item.value" [selected]="play.heldStep() === item.value">
+                {{ item.label }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <div class="docs-flags">
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.linear()" (change)="setFlag('linear', $event)" />
+          linear
+        </label>
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.disabled()"
+            (change)="setFlag('disabled', $event)"
+          />
+          disabled
+        </label>
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.stretch()"
+            [disabled]="play.variant() !== 'pill'"
+            (change)="setFlag('stretch', $event)"
+          />
+          stretch (pill)
+        </label>
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.progress()"
+            [disabled]="play.variant() !== 'pill'"
+            (change)="setFlag('progress', $event)"
+          />
+          progress (pill)
+        </label>
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.flush()"
+            [disabled]="play.variant() !== 'line' || play.orientation() !== 'horizontal'"
+            (change)="setFlag('flush', $event)"
+          />
+          flush (horizontal line)
+        </label>
+      </div>
+
+      <div class="docs-controls">
+        @for (tune of tunes; track tune.name) {
+          @if (!tune.pill || play.variant() === 'pill') {
+            <label class="docs-control">
+              <span>
+                {{ tune.name }} · {{ play.tuned()[tune.name] ?? 'default'
+                }}{{ play.tuned()[tune.name] === undefined ? '' : tune.unit }}
+              </span>
+              <input
+                type="range"
+                [min]="tune.min"
+                [max]="tune.max"
+                [value]="play.tuned()[tune.name] ?? tune.start"
+                (input)="setTune(tune.name, $event)"
+              />
+            </label>
+          }
+        }
+        @for (paint of paints; track paint.name) {
+          @if (!paint.only || paint.only === play.variant()) {
+            <label class="docs-control" [class.is-wide]="paint.kind === 'text'">
+              @if (paint.kind === 'color') {
+                <span>{{ paint.name }} · {{ play.painted()[paint.name] || 'default' }}</span>
+                <input
+                  type="color"
+                  [value]="play.painted()[paint.name] || paint.start"
+                  (input)="setPaint(paint.name, $event)"
+                />
+              } @else {
+                <span>{{ paint.name }}</span>
+                <input
+                  type="text"
+                  [placeholder]="paint.start"
+                  [value]="play.painted()[paint.name] ?? ''"
+                  (input)="setPaint(paint.name, $event)"
+                />
+              }
+            </label>
+          }
+        }
+      </div>
+
+      <div class="stepper-stage">
+        @for (size of playLine(); track size) {
+          <x-liquid-stepper
+            #played="liquidStepper"
+            aria-label="Playground"
+            [style]="playStyle()"
+            [orientation]="play.orientation()"
+            [variant]="play.variant()"
+            [stretch]="play.stretch()"
+            [flush]="play.flush()"
+            [progress]="play.progress()"
+            [linear]="play.linear()"
+            [disabled]="play.disabled()"
+            [(value)]="playStep"
+            (blocked)="playLog.set('blocked: ' + $event.getLabel())"
+          >
+            @for (item of steps; track item.value) {
+              <button
+                type="button"
+                [liquidStep]="item.value"
+                [disabled]="play.disabledStep() === item.value"
+                [valid]="play.heldStep() === item.value ? false : undefined"
+              >
+                {{ item.label }}
+              </button>
+            }
+          </x-liquid-stepper>
+
+          <p class="stepper-panel" role="status">
+            value: {{ playStep() ?? 'null' }} · index {{ played.selectedIndex() }}
+            {{ playLog() ? ' · ' + playLog() : '' }}
+          </p>
+
+          <div class="docs-actions">
+            <button
+              class="docs-ghost"
+              type="button"
+              liquidPress
+              [disabled]="!played.canPrevious()"
+              (click)="played.previous()"
+            >
+              Back
+            </button>
+            <button
+              class="docs-ghost"
+              type="button"
+              liquidPress
+              [disabled]="!played.canNext()"
+              (click)="playLog.set(''); played.next()"
+            >
+              Next
+            </button>
+            <button class="docs-ghost" type="button" liquidPress (click)="resetStyle()">
+              Reset styles
+            </button>
+          </div>
+        }
+      </div>
+
+      <pre class="docs-code">{{ playMarkup() }}</pre>
+    </section>
+
+    <section class="docs-case" id="horizontal">
+      <h2>Horizontal</h2>
+      <p class="docs-note">
+        Starts on the first step. Each step can point at a panel, which is hidden until its step is
+        selected.
+      </p>
+
+      <div class="stepper-stage">
+        <x-liquid-stepper #stepper="liquidStepper" aria-label="Application" [(value)]="step">
+          @for (item of steps; track item.value) {
+            <button
+              type="button"
+              [liquidStep]="item.value"
+              [disabled]="blocked() && item.value === 'review'"
+            >
+              {{ item.label }}
+            </button>
+          }
+        </x-liquid-stepper>
+
+        @for (item of steps; track item.value) {
+          <section
+            class="stepper-panel"
+            [liquidStepPanel]="item.value"
+            [liquidStepPanelFor]="stepper"
+            tabindex="0"
+          >
+            {{ item.label }} — step {{ stepper.selectedIndex() + 1 }} of {{ steps.length }}.
+          </section>
+        }
+
+        <div class="docs-actions">
+          <button
+            class="docs-ghost"
+            type="button"
+            liquidPress
+            [disabled]="!stepper.canPrevious()"
+            (click)="stepper.previous()"
+          >
+            Back
+          </button>
+          <button
+            class="docs-ghost"
+            type="button"
+            liquidPress
+            [disabled]="!stepper.canNext()"
+            (click)="stepper.next()"
+          >
+            Next
+          </button>
+          <button class="docs-ghost" type="button" liquidPress (click)="blocked.set(!blocked())">
+            {{ blocked() ? 'Enable' : 'Disable' }} review
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="linear">
+      <h2>Linear</h2>
+      <p class="docs-note">
+        With <code>linear</code> a step further on than the next one cannot be reached by click or
+        key. What makes a step done is the page's call: it only runs <code>next()</code> when it is.
+      </p>
+
+      <div class="stepper-stage">
+        <x-liquid-stepper
+          #linear="liquidStepper"
+          aria-label="Linear application"
+          linear
+          [(value)]="linearStep"
+        >
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+
+        <div class="docs-actions">
+          <button
+            class="docs-ghost"
+            type="button"
+            liquidPress
+            [disabled]="!linear.canPrevious()"
+            (click)="linear.previous()"
+          >
+            Back
+          </button>
+          <button
+            class="docs-ghost"
+            type="button"
+            liquidPress
+            [disabled]="!linear.canNext()"
+            (click)="linear.next()"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="vertical">
+      <h2>Vertical</h2>
+      <p class="docs-note">The line runs down the markers and the fill pours down it.</p>
+
+      <div class="stepper-stage stepper-vertical">
+        <x-liquid-stepper aria-label="Vertical application" orientation="vertical">
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+        <p class="docs-note">
+          Click a step: the fill follows it, and the markers behind it turn to checks.
+        </p>
+      </div>
+    </section>
+
+    <section class="docs-case" id="rules">
+      <h2>Rules</h2>
+      <p class="docs-note">
+        The stepper keeps the rules of moving, so the page only says what is true.
+        <code>next()</code> and <code>previous()</code> stop at the ends, and
+        <code>isFirst</code> and <code>isLast</code> choose the buttons. A step that says
+        <code>[valid]="false"</code> holds the stepper where it is — for <code>next()</code>, a
+        click and a key alike — and <code>(blocked)</code> says which, so the page can show what is
+        missing. Going back is never held.
+      </p>
+
+      <div class="stepper-stage">
+        <x-liquid-stepper
+          #ruled="liquidStepper"
+          aria-label="Held steps"
+          linear
+          [(value)]="ruledStep"
+          (blocked)="refusal.set($event.getLabel() + ' is not done yet.')"
+        >
+          <button type="button" liquidStep="details" [valid]="detailsDone()">Details</button>
+          <button type="button" liquidStep="documents">Documents</button>
+          <button type="button" liquidStep="review">Review</button>
+        </x-liquid-stepper>
+
+        <p class="stepper-panel" role="status">
+          {{ refusal() || 'Press Next with Details not done.' }}
+        </p>
+
+        <div class="docs-actions">
+          @if (!ruled.isFirst()) {
+            <button class="docs-ghost" type="button" liquidPress (click)="ruled.previous()">
+              Back
+            </button>
+          }
+          @if (ruled.isLast()) {
+            <button class="docs-ghost" type="button" liquidPress>Submit</button>
+          } @else {
+            <button
+              class="docs-ghost"
+              type="button"
+              liquidPress
+              (click)="refusal.set(''); ruled.next()"
+            >
+              Next
+            </button>
+          }
+          <button
+            class="docs-ghost"
+            type="button"
+            liquidPress
+            (click)="detailsDone.set(!detailsDone())"
+          >
+            Details is {{ detailsDone() ? 'done' : 'not done' }}
+          </button>
+        </div>
+      </div>
+
+      <pre class="docs-code">{{ rules }}</pre>
+    </section>
+
+    <section class="docs-case" id="forms">
+      <h2>Forms</h2>
+      <p class="docs-note">
+        Give a step its part of a form with <code>[control]</code> and the stepper does the rest: it
+        holds while that control is invalid or still checking, and marks it all touched as it
+        refuses, so the fields show their own errors. No <code>(blocked)</code> handler, no
+        <code>[valid]</code>.
+      </p>
+
+      <p class="docs-note">
+        Reactive: one <code>FormGroup</code> per step. It exists whether or not its step is on
+        screen, so even a step not yet visited is checked.
+      </p>
+      <form class="stepper-stage" [formGroup]="application" (submit)="$event.preventDefault()">
+        <x-liquid-stepper
+          #reactive="liquidStepper"
+          aria-label="Reactive application"
+          linear
+          [(value)]="reactiveStep"
+        >
+          <button type="button" liquidStep="details" [control]="application.controls.details">
+            Details
+          </button>
+          <button type="button" liquidStep="contact" [control]="application.controls.contact">
+            Contact
+          </button>
+          <button type="button" liquidStep="review">Review</button>
+        </x-liquid-stepper>
+
+        <div liquidStepPanel [liquidStepPanelFor]="reactive">
+          <ng-template liquidStepContent="details">
+            <div class="stepper-fields" formGroupName="details">
+              <x-liquid-input
+                label="Full name"
+                formControlName="name"
+                [errorMessages]="{ required: 'Name is required' }"
+              />
+            </div>
+          </ng-template>
+          <ng-template liquidStepContent="contact">
+            <div class="stepper-fields" formGroupName="contact">
+              <x-liquid-input
+                label="Email"
+                type="email"
+                formControlName="email"
+                [errorMessages]="{ required: 'Email is required', email: 'Not an email' }"
+              />
+            </div>
+          </ng-template>
+          <ng-template liquidStepContent="review">
+            <p class="stepper-panel">
+              {{ application.value.details?.name }} — {{ application.value.contact?.email }}
+            </p>
+          </ng-template>
+        </div>
+
+        <div class="docs-actions">
+          @if (!reactive.isFirst()) {
+            <button class="docs-ghost" type="button" liquidPress (click)="reactive.previous()">
+              Back
+            </button>
+          }
+          @if (!reactive.isLast()) {
+            <button class="docs-ghost" type="button" liquidPress (click)="reactive.next()">
+              Continue
+            </button>
+          }
+        </div>
+      </form>
+
+      <p class="docs-note">
+        Split forms: a form of its own per step, as the <code>[formGroup]</code> of its
+        <code>liquidStepContent</code> — no <code>&lt;form&gt;</code> and no <code>[control]</code>.
+        The fields inside bind to it, and the stepper holds on it. The directive is there even while
+        its content is not built, so it is checked just the same.
+      </p>
+      <div class="stepper-stage">
+        <x-liquid-stepper
+          #split="liquidStepper"
+          aria-label="Split-form application"
+          linear
+          [(value)]="splitStep"
+        >
+          @for (item of formSteps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+
+        <div liquidStepPanel [liquidStepPanelFor]="split">
+          <ng-template liquidStepContent="details" [formGroup]="detailsForm">
+            <div class="stepper-fields">
+              <x-liquid-input
+                label="Full name"
+                formControlName="name"
+                [errorMessages]="{ required: 'Name is required' }"
+              />
+            </div>
+          </ng-template>
+          <ng-template liquidStepContent="contact" [formGroup]="contactForm">
+            <div class="stepper-fields">
+              <x-liquid-input
+                label="Email"
+                type="email"
+                formControlName="email"
+                [errorMessages]="{ required: 'Email is required', email: 'Not an email' }"
+              />
+            </div>
+          </ng-template>
+          <ng-template liquidStepContent="review">
+            <p class="stepper-panel">
+              {{ detailsForm.value.name }} — {{ contactForm.value.email }}
+            </p>
+          </ng-template>
+        </div>
+
+        <div class="docs-actions">
+          @if (!split.isFirst()) {
+            <button class="docs-ghost" type="button" liquidPress (click)="split.previous()">
+              Back
+            </button>
+          }
+          @if (!split.isLast()) {
+            <button class="docs-ghost" type="button" liquidPress (click)="split.next()">
+              Continue
+            </button>
+          }
+        </div>
+      </div>
+
+      <p class="docs-note">
+        Template-driven: a step's fields only join <code>ngForm</code> while its content is built,
+        so the form holds just the step on screen — give every step <code>td.form</code>.
+      </p>
+      <form class="stepper-stage" #td="ngForm" (submit)="$event.preventDefault()">
+        <x-liquid-stepper
+          #driven="liquidStepper"
+          aria-label="Template-driven application"
+          linear
+          [(value)]="drivenStep"
+        >
+          @for (item of formSteps; track item.value) {
+            <button type="button" [liquidStep]="item.value" [control]="td.form">
+              {{ item.label }}
+            </button>
+          }
+        </x-liquid-stepper>
+
+        <div liquidStepPanel [liquidStepPanelFor]="driven">
+          <ng-template liquidStepContent="details">
+            <div class="stepper-fields">
+              <x-liquid-input
+                label="Full name"
+                name="name"
+                required
+                [(ngModel)]="person.name"
+                [errorMessages]="{ required: 'Name is required' }"
+              />
+            </div>
+          </ng-template>
+          <ng-template liquidStepContent="contact">
+            <div class="stepper-fields">
+              <x-liquid-input
+                label="Email"
+                type="email"
+                name="email"
+                required
+                email
+                [(ngModel)]="person.email"
+                [errorMessages]="{ required: 'Email is required', email: 'Not an email' }"
+              />
+            </div>
+          </ng-template>
+          <ng-template liquidStepContent="review">
+            <p class="stepper-panel">{{ person.name() }} — {{ person.email() }}</p>
+          </ng-template>
+        </div>
+
+        <div class="docs-actions">
+          @if (!driven.isFirst()) {
+            <button class="docs-ghost" type="button" liquidPress (click)="driven.previous()">
+              Back
+            </button>
+          }
+          @if (!driven.isLast()) {
+            <button class="docs-ghost" type="button" liquidPress (click)="driven.next()">
+              Continue
+            </button>
+          }
+        </div>
+      </form>
+
+      <pre class="docs-code">{{ forms }}</pre>
+    </section>
+
+    <section class="docs-case" id="content">
+      <h2>Content</h2>
+      <p class="docs-note">
+        Put the steps' content in <code>ng-template liquidStepContent</code> inside a
+        <code>liquidStepPanel</code>. A step's content is built when it is picked and destroyed once
+        another is, so it starts fresh on each visit. Switching dissolves, with the panel easing to
+        the new height; <code>panelMode="slider"</code> carries the contents along like a carousel
+        instead. It is the tabs' content, under the stepper's names.
+      </p>
+
+      <div class="stepper-stage">
+        <x-liquid-stepper
+          #dissolve="liquidStepper"
+          aria-label="Dissolving content"
+          [(value)]="dissolveStep"
+        >
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+        <div liquidStepPanel [liquidStepPanelFor]="dissolve">
+          @for (item of steps; track item.value) {
+            <ng-template [liquidStepContent]="item.value">
+              <div class="stepper-panel" [style.height.px]="item.value === 'review' ? 120 : 72">
+                {{ item.label }} — built just now.
+              </div>
+            </ng-template>
+          }
+        </div>
+        <div class="docs-actions">
+          <button
+            class="docs-ghost"
+            type="button"
+            liquidPress
+            [disabled]="!dissolve.canPrevious()"
+            (click)="dissolve.previous()"
+          >
+            Back
+          </button>
+          <button
+            class="docs-ghost"
+            type="button"
+            liquidPress
+            [disabled]="!dissolve.canNext()"
+            (click)="dissolve.next()"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <div class="stepper-stage">
+        <x-liquid-stepper
+          #slider="liquidStepper"
+          aria-label="Sliding content"
+          [(value)]="sliderStep"
+        >
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+        <div liquidStepPanel [liquidStepPanelFor]="slider" panelMode="slider">
+          @for (item of steps; track item.value) {
+            <ng-template [liquidStepContent]="item.value">
+              <div class="stepper-panel">{{ item.label }}</div>
+            </ng-template>
+          }
+        </div>
+        <div class="docs-actions">
+          <button
+            class="docs-ghost"
+            type="button"
+            liquidPress
+            [disabled]="!slider.canPrevious()"
+            (click)="slider.previous()"
+          >
+            Back
+          </button>
+          <button
+            class="docs-ghost"
+            type="button"
+            liquidPress
+            [disabled]="!slider.canNext()"
+            (click)="slider.next()"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <pre class="docs-code">{{ contentSetup }}</pre>
+    </section>
+
+    <section class="docs-case" id="pill">
+      <h2>Pill</h2>
+      <p class="docs-note">
+        <code>variant="pill"</code> draws it as the tabs do: a segmented bar with a pill that pours
+        under the selected step. <code>stretch</code> fills the container, and it runs vertically
+        too. With <code>progress</code> the pill runs from the first step instead, and grows or
+        shrinks to the one you pick.
+      </p>
+
+      <div class="stepper-stage">
+        <x-liquid-stepper aria-label="Pill application" variant="pill" [(value)]="pillStep">
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+      </div>
+      <div class="stepper-stage">
+        <x-liquid-stepper aria-label="Stretched pill" variant="pill" stretch>
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+      </div>
+      <div class="stepper-stage">
+        <x-liquid-stepper
+          aria-label="Progress pill"
+          variant="pill"
+          progress
+          stretch
+          [(value)]="progressStep"
+        >
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+      </div>
+    </section>
+
+    <section class="docs-case" id="icons">
+      <h2>Icons</h2>
+      <p class="docs-note">
+        Put <code>liquidStepIcon</code> on any element inside a step and it takes the number's
+        place; <code>liquidStepDone</code> takes the check's. Both take the marker's colour and
+        size. Give a step neither and you get the number and the tick.
+      </p>
+
+      <div class="stepper-stage">
+        <x-liquid-stepper aria-label="Icon application" [(value)]="iconStep">
+          <button type="button" liquidStep="details">
+            <ng-icon liquidStepIcon name="ionPersonOutline" />
+            <ng-icon liquidStepDone name="ionCheckmarkDone" />
+            Details
+          </button>
+          <button type="button" liquidStep="family">
+            <ng-icon liquidStepIcon name="ionPeopleOutline" />
+            <ng-icon liquidStepDone name="ionCheckmarkDone" />
+            Family
+          </button>
+          <button type="button" liquidStep="documents">
+            <ng-icon liquidStepIcon name="ionDocumentTextOutline" />
+            <ng-icon liquidStepDone name="ionCheckmarkDone" />
+            Documents
+          </button>
+          <button type="button" liquidStep="submit">
+            <ng-icon liquidStepIcon name="ionSendOutline" />
+            <ng-icon liquidStepDone name="ionCheckmarkDone" />
+            Submit
+          </button>
+        </x-liquid-stepper>
+      </div>
+
+      <div class="stepper-stage">
+        <x-liquid-stepper aria-label="Icons in a pill" variant="pill" value="family">
+          <button type="button" liquidStep="details">
+            <ng-icon liquidStepIcon name="ionPersonOutline" />
+            Details
+          </button>
+          <button type="button" liquidStep="family">
+            <ng-icon liquidStepIcon name="ionPeopleOutline" />
+            Family
+          </button>
+          <button type="button" liquidStep="documents">
+            <ng-icon liquidStepIcon name="ionDocumentTextOutline" />
+            Documents
+          </button>
+        </x-liquid-stepper>
+      </div>
+    </section>
+
+    <section class="docs-case" id="colour">
+      <h2>Colour</h2>
+      <p class="docs-note">
+        Everything is a <code>--liquid-stepper-*</code> custom property, so a class makes a theme.
+        Set <code>--liquid-stepper-color</code> on a single step to colour just that one.
+        <code>--liquid-stepper-fill-color</code> colours the line alone and takes a gradient, laid
+        along the whole line, so the colour changes as it fills.
+      </p>
+
+      <div class="stepper-stage stepper-themes">
+        <x-liquid-stepper class="theme-green" aria-label="Green" [(value)]="colourStep">
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+        <x-liquid-stepper class="theme-gradient" aria-label="Gradient line" [(value)]="colourStep">
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+        <x-liquid-stepper class="theme-square" aria-label="Square markers" [(value)]="colourStep">
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+        <x-liquid-stepper
+          class="theme-dark"
+          variant="pill"
+          aria-label="Dark pill"
+          [(value)]="colourStep"
+        >
+          @for (item of steps; track item.value) {
+            <button type="button" [liquidStep]="item.value">{{ item.label }}</button>
+          }
+        </x-liquid-stepper>
+        <x-liquid-stepper aria-label="One step coloured" [(value)]="colourStep">
+          @for (item of steps; track item.value) {
+            <button
+              type="button"
+              [liquidStep]="item.value"
+              [style.--liquid-stepper-color]="item.value === 'review' ? '#c62828' : null"
+            >
+              {{ item.label }}
+            </button>
+          }
+        </x-liquid-stepper>
+      </div>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">
+        Steps are your own elements with <code>liquidStep</code>; put it on a
+        <code>&lt;button&gt;</code>. The marker is drawn for you and what you put inside is the
+        label.
+      </p>
+      <pre class="docs-code">{{ setup }}</pre>
+      <p class="docs-note">Making it your own</p>
+      <pre class="docs-code">{{ custom }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API</h2>
+
+      <p class="docs-note"><code>&lt;x-liquid-stepper&gt;</code></p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Input</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of stepperApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>
+                  <code>{{ row.value }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note">Members, through a template reference</p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of members; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note"><code>[liquidStep]</code></p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of stepApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>
+                  <code>{{ row.value ?? '—' }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note">Slots inside a step</p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th>Type</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of stepSlots; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>{{ row.type }}</td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note"><code>ng-template[liquidStepContent]</code></p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of contentApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>
+                  <code>{{ row.value ?? '—' }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note"><code>[liquidStepPanel]</code></p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of panelApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note">Classes</p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Where</th>
+              <th>Means</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of classes; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>{{ row.type }}</td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note">Custom properties, settable on the stepper or any ancestor</p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of cssApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="docs-note">The pill’s own custom properties</p>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of pillCssApi; track row.name) {
+              <tr>
+                <td>
+                  <code>{{ row.name }}</code>
+                </td>
+                <td>
+                  <code>{{ row.type }}</code>
+                </td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>

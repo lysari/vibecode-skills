@@ -1,0 +1,25 @@
+.button-row {
+    display    : flex;
+    flex-wrap  : wrap;
+    align-items: center;
+    gap        : 12px;
+    margin-top : 12px;
+}
+
+.button-block {
+    max-width : 420px;
+    margin-top: 16px;
+}
+
+.button-dark {
+    --liquid-button-fill  : #1d1d1f;
+    --liquid-button-shadow: none;
+}
+
+.button-outline {
+    --liquid-button-border: 1px solid currentcolor;
+}
+
+.docs-table + .docs-note {
+    margin-top: 24px;
+}
