@@ -2,7 +2,7 @@
 name: vibecode-design
 description: Use when building or changing user interface screens, components, layouts, or styles, so the UI reuses the project's existing components and design values, looks consistent across screens, and stays accessible
 metadata:
-  version: "0.0.1-20261015.1"
+  version: "0.0.1-20261016.1"
 ---
 
 # Vibecode design
@@ -15,9 +15,16 @@ Build UI that looks as if one careful designer and developer made every screen: 
 
 - When the user gives a reference image, write every design value it shows into the project's design tokens before building any screen: colours, spacing and gaps, padding, radii, font sizes, weights, line heights, letter spacing, control and icon sizes, border widths, shadows and breakpoints, e.g. `space-section = 32` measured between two stacked cards.
 - Take each value from the reference's pixels: sample colours from flat fills and glyph cores, and measure edges and text boxes at the image's scale. Never estimate a value by eye, e.g. a heading colour sampled from the glyph core, never "dark grey".
+- When a reference image shows a cropped or partial capture of a screen, expand the layout to the full screen and complete the cut-off grid with the same tokens; never crop the built screen to the image's pixel bounds, e.g. a half-cropped two-column grid builds as a full two-column grid.
+- When a surface sits over a background with backdrop blur, define its colour token with alpha below `1` so the blurred background shows through; never use the opaque composite RGB sampled from the image, e.g. `rgb(255 255 255 / 0.7)` with blur, never `#ffffff`.
 - Build every screen from those tokens. Never write a colour, spacing, radius, type, border or shadow value inside a component, e.g. a list gap reads `space-section`, never a literal `32`.
 - Fix each mismatch found when comparing the render with the reference by changing the token, never by overriding the value in one component, e.g. raise `radius-card`, never give one card its own radius.
 - Use the tokens from the reference on every screen of the site. Add a new token only for a value the reference does not show, e.g. a table row height on a site whose reference has no table.
+
+## Layout and scrolling
+
+- Stretch a full-screen application layout across `100%` of the viewport width and height; never cap the outer shell with a fixed pixel `max-width` that leaves dead margins on wider monitors, e.g. `width: 100%`, never `max-width: 1200px`.
+- Lock the outer application shell to the viewport height on desktop (`height: 100dvh; overflow: hidden`) and make the content pane and sidebar navigation list scroll independently (`min-height: 0; overflow-y: auto`); never let the document body scroll the header or sidebar off-screen.
 
 ## Corner radius
 
