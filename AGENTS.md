@@ -1,1 +1,1 @@
-- always use skill `/vibecode` to write code in this project
+- always use skill `/vibecode`,`/vibecode-design` to write code in this project
