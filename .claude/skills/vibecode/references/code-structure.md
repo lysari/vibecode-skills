@@ -6,8 +6,7 @@
 - Do not introduce a new abstraction, helper, service, mapper, factory, or utility unless:
   - The same logic already appears in 3 or more places, **or**
   - The user explicitly asked for it.
-- When in doubt, keep the logic inline or in the existing function/file.
-- Never create a new file or layer just to make the code look “cleaner” or more “professional”.
+- Keep helper logic inline in the file that uses it until 3 callers share it; never inline distinct UI regions (`layout`, `header`, `sidebar`, `card`) into one file.
 - Prefer a little duplication over an abstraction that forces the reader to jump between files.
 - Avoid patterns that add indirection without clear benefit (extra mappers, converters, adapters, strategy objects, etc.) unless the project already uses that pattern heavily.
 

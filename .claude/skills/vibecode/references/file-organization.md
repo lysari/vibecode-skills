@@ -8,6 +8,8 @@
 ## Structure
 - Follow the project's existing layout. Add a new folder only when the project already groups files that way or the user asks.
 - One responsibility per file. Split a file when it covers two unrelated concerns.
+- Keep the root entry file to mounting the layout shell and router; never write header, sidebar, or page content directly in it, e.g. `app` mounts `layout` and `router`.
+- Put each distinct UI region (layout, header, sidebar, content section, card) in its own file instead of combining them in the root or page file, e.g. `layout`, `header`, `sidebar`.
 - Keep related files close: a module and its types sit side by side.
 - Put tests in the project's dedicated test folder, at the same relative path as the code they test. Never put a test file beside the code it tests.
 
