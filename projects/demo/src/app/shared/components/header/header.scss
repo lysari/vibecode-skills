@@ -1,0 +1,144 @@
+:host {
+  display: block;
+}
+
+.window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-item-gap);
+  min-height: var(--header-height);
+  padding: 0 6px 8px;
+  flex-wrap: wrap;
+
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-item-gap);
+    flex-wrap: wrap;
+
+    .logo-box {
+      display: grid;
+      place-items: center;
+      width: var(--logo-size);
+      height: var(--logo-size);
+      border-radius: var(--logo-radius);
+      background: var(--color-logo-bg);
+      color: var(--color-card-bg);
+      box-shadow: var(--shadow-pill);
+
+      svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .divider {
+      font-size: var(--text-button-size);
+      color: var(--color-text-muted);
+      opacity: 0.45;
+      user-select: none;
+    }
+
+    .account-button,
+    .project-button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-inline-gap);
+      height: var(--top-pill-height);
+      padding: 0 16px 0 10px;
+      border-radius: var(--pill-radius);
+      background: var(--color-dropdown-bg);
+      box-shadow: var(--shadow-pill);
+
+      .avatar-circle {
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        border-radius: var(--pill-radius);
+        background: var(--color-sidebar-bg);
+
+        .icon-user {
+          width: 14px;
+          height: 14px;
+          fill: var(--color-text-muted);
+          stroke: none;
+        }
+      }
+
+      .icon-project {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: var(--color-text-subheading);
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .account-email,
+      .project-name {
+        font-size: var(--text-nav-size);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text);
+      }
+
+      .badge-free {
+        padding: 3px 8px;
+        border-radius: var(--badge-radius);
+        background: var(--color-badge-free-bg);
+        font-size: var(--text-badge-size);
+        font-weight: var(--font-weight-medium);
+        line-height: var(--text-badge-line);
+        color: var(--color-text-badge);
+      }
+
+      .icon-chevron {
+        width: 15px;
+        height: 15px;
+        fill: none;
+        stroke: var(--color-text-subheading);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-inline-gap);
+
+    .header-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: var(--top-pill-height);
+      padding: 0 16px;
+      border-radius: var(--pill-radius);
+      background: var(--color-dropdown-bg);
+      box-shadow: var(--shadow-pill);
+      font-size: var(--text-nav-size);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text);
+
+      svg {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      &.is-connect {
+        background: var(--color-logo-bg);
+        color: var(--color-card-bg);
+      }
+    }
+  }
+}
+

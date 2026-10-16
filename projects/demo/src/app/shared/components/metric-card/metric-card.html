@@ -1,0 +1,66 @@
+<div class="card" [class]="config().variant + '-card'">
+  <div class="card-head">
+    <div>
+      <h2 class="card-title">{{ config().title }}</h2>
+      <div class="card-metric">{{ config().subtitle }}</div>
+    </div>
+    <span class="card-badge">{{ config().badge }}</span>
+  </div>
+
+  @if (config().kpis?.length) {
+    <div class="kpi-strip">
+      @for (kpi of config().kpis; track kpi.label) {
+        <div class="kpi-box">
+          <span class="kpi-label">{{ kpi.label }}</span>
+          <span class="kpi-val">{{ kpi.value }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="chart-box">
+    <div class="chart-y-axis">
+      @for (label of config().yAxis; track label) {
+        <span>{{ label }}</span>
+      }
+    </div>
+
+    <div class="chart-viewport">
+      <div class="grid-line is-top"></div>
+      <div class="grid-line is-middle"></div>
+      <div class="grid-line is-bottom"></div>
+      <div class="grid-hatch"></div>
+
+      <div class="bars-container">
+        @for (bar of config().bars; track bar.id) {
+          <div class="bar-col">
+            @if (bar.segments?.length) {
+              <div class="segmented-bar">
+                @for (seg of bar.segments; track $index) {
+                  <span
+                    class="seg"
+                    [class.is-primary]="seg === 'primary'"
+                    [class.is-light]="seg === 'light'"
+                  ></span>
+                }
+              </div>
+            } @else if (bar.heightPercent) {
+              <div
+                class="util-bar"
+                [class.is-peak]="bar.isPeak"
+                [style.height.%]="bar.heightPercent"
+              ></div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="chart-x-axis">
+        @for (tick of config().xAxis; track tick) {
+          <span>{{ tick }}</span>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,58 @@
+<header class="window-header">
+  <div class="brand-group">
+    <div class="logo-box" aria-label="Neon Postgres">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M5 18V7.5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 2 2V18h-3.8v-6.5h-3.9V18H5zm11.5-8.5H19V18h-2.5V9.5z"
+          fill="currentColor"
+        />
+      </svg>
+    </div>
+
+    <span class="divider" aria-hidden="true">/</span>
+
+    <button type="button" class="account-button">
+      <span class="avatar-circle" aria-hidden="true">
+        <svg class="icon-user" viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="3.5" />
+          <path d="M5 19a7 7 0 0 1 14 0" />
+        </svg>
+      </span>
+      <span class="account-email">{{ config().accountEmail }}</span>
+      <span class="badge-free">{{ config().accountPlan }}</span>
+      <svg class="icon-chevron" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </button>
+
+    <span class="divider" aria-hidden="true">/</span>
+
+    <button type="button" class="project-button">
+      <svg class="icon-project" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 7h12M4 12h16M4 17h8" />
+      </svg>
+      <span class="project-name">{{ config().projectName }}</span>
+      <svg class="icon-chevron" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="header-actions">
+    <button type="button" class="header-pill">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      </svg>
+      Docs
+    </button>
+    <button type="button" class="header-pill is-connect">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <polyline points="16 18 22 12 16 6" />
+        <polyline points="8 6 2 12 8 18" />
+      </svg>
+      Connect
+    </button>
+  </div>
+</header>
+

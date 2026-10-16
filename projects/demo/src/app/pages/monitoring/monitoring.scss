@@ -1,0 +1,28 @@
+@use 'styles/variables' as v with (
+  $emit-custom-properties: false
+);
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100%;
+}
+
+.monitoring {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-between-cards);
+
+  .section {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-between-cards);
+
+    @media (max-width: v.$compact) {
+      grid-template-columns: 1fr;
+    }
+  }
+}

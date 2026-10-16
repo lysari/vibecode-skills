@@ -1,0 +1,11 @@
+<div class="monitoring">
+  <app-page-header [config]="header" />
+
+  <section class="section">
+    <app-resource-card [config]="resourceCard" />
+
+    @for (card of metricCards; track card.id) {
+      <app-metric-card [config]="card" />
+    }
+  </section>
+</div>

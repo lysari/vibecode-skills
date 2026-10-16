@@ -11,11 +11,19 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('marks Today as the current page in the main navigation', async () => {
+  it('marks Monitoring as the active page in the branch navigation', async () => {
     const fixture = TestBed.createComponent(App);
     await TestBed.inject(Router).navigateByUrl('/');
     await fixture.whenStable();
-    const current = (fixture.nativeElement as HTMLElement).querySelector('[aria-current="page"]');
-    expect(current?.getAttribute('aria-label')).toBe('Today');
+    const current = (fixture.nativeElement as HTMLElement).querySelector('.nav-item.is-active');
+    expect(current?.textContent).toContain('Monitoring');
+  });
+
+  it('displays the workspace email and project title in the header', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('.account-email')?.textContent).toContain('cansaas@gmail.com');
+    expect(host.querySelector('.project-name')?.textContent).toContain('Monalisa');
   });
 });

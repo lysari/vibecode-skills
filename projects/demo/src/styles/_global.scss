@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :root {
   font-family: var(--font-sans);
   color: var(--color-text);
@@ -7,65 +13,36 @@
 
 body {
   margin: 0;
-  background: var(--color-page);
+  min-height: 100vh;
+  background-color: var(--color-window-bg);
+  background-image: url('/wallpaper.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding: var(--page-padding);
 }
 
 button {
   font: inherit;
-}
-
-.button {
-  height: var(--control-height);
-  padding: 0 var(--control-padding-x);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-size: var(--text-button-size);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-
-  &.is-primary {
-    border-color: var(--color-primary);
-    background: var(--color-primary);
-    color: var(--color-surface);
-  }
-}
-
-.action-button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--control-icon-gap);
-  height: var(--control-height);
-  padding: 0 var(--control-padding-end) 0 var(--control-padding-start);
+  color: inherit;
+  background: transparent;
   border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-pill);
-  color: var(--color-text);
-  font-size: var(--text-action-size);
-  font-weight: var(--font-weight-semibold);
+  padding: 0;
   cursor: pointer;
+}
 
-  svg {
-    width: var(--icon-size);
-    height: var(--icon-size);
-    fill: none;
-    stroke: var(--color-icon);
-    stroke-width: var(--icon-stroke);
-    stroke-linecap: round;
-  }
+input {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: transparent;
 
-  &.is-accent {
-    color: var(--color-accent);
-
-    svg {
-      stroke: var(--color-accent-icon);
-    }
+  &:focus {
+    outline: none;
   }
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-focus);
+  outline: 2px solid var(--color-chart-bar);
   outline-offset: 2px;
 }

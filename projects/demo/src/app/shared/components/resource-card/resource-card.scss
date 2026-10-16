@@ -1,0 +1,163 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--card-padding);
+  border-radius: var(--card-radius);
+  background: var(--color-card-bg);
+  box-shadow: var(--shadow-card);
+
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-inline-gap);
+
+    .card-title {
+      margin: 0;
+      font-size: var(--text-h2-size);
+      font-weight: var(--font-weight-semibold);
+      line-height: var(--text-h2-line);
+      letter-spacing: var(--text-h2-tracking);
+      color: var(--color-text-heading);
+    }
+
+    .card-metric {
+      margin-top: 4px;
+      font-size: var(--text-item-subtitle-size);
+      color: var(--color-text-subheading);
+    }
+
+    .card-badge {
+      padding: 4px 10px;
+      border-radius: var(--pill-radius);
+      background: var(--color-panel-bg);
+      font-size: var(--text-badge-size);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-subheading);
+      white-space: nowrap;
+    }
+  }
+
+  .resource-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--well-padding);
+    margin-top: var(--space-section);
+    padding: var(--well-padding);
+    border-radius: var(--well-radius);
+    background: var(--color-panel-bg);
+
+    .resource-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-item-gap);
+      padding: 12px var(--space-item-gap);
+      border-radius: var(--control-radius);
+      background: var(--color-card-bg);
+      box-shadow: var(--shadow-card);
+
+      .icon-box {
+        display: grid;
+        place-items: center;
+        width: var(--item-icon-size);
+        height: var(--item-icon-size);
+        flex-shrink: 0;
+        border: var(--border-width) solid var(--color-card-border);
+        border-radius: var(--item-icon-radius);
+        background: var(--color-card-bg);
+
+        svg {
+          width: 19px;
+          height: 19px;
+          fill: none;
+          stroke: var(--color-text);
+          stroke-width: 1.8;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+      }
+
+      .item-details {
+        flex: 1;
+        min-width: 0;
+
+        .item-name {
+          font-size: var(--text-item-title-size);
+          font-weight: var(--font-weight-semibold);
+          line-height: var(--text-item-title-line);
+          color: var(--color-text);
+        }
+
+        .item-desc {
+          font-size: var(--text-item-subtitle-size);
+          line-height: var(--text-item-subtitle-line);
+          color: var(--color-text-subheading);
+        }
+      }
+
+      .item-value {
+        padding: 4px 10px;
+        border-radius: var(--badge-radius);
+        background: var(--color-panel-bg);
+        font-size: var(--text-section-size);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text);
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .status-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: var(--space-section);
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .status-heading {
+        font-size: var(--text-section-size);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text-subheading);
+      }
+
+      .status-value {
+        font-size: var(--text-section-size);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text);
+      }
+    }
+
+    .manage-button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-inline-gap);
+      width: 100%;
+      height: var(--manage-btn-height);
+      border-radius: var(--pill-radius);
+      background: var(--color-manage-btn-bg);
+      font-size: var(--text-nav-size);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-subheading);
+
+      svg {
+        width: 16px;
+        height: 16px;
+        fill: var(--color-text);
+        stroke: none;
+      }
+    }
+  }
+}
+

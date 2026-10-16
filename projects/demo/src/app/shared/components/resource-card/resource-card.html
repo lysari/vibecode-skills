@@ -1,0 +1,55 @@
+<div class="card resource-card">
+  <div class="card-head">
+    <div>
+      <h2 class="card-title">{{ config().title }}</h2>
+      <div class="card-metric">{{ config().subtitle }}</div>
+    </div>
+    <span class="card-badge">{{ config().badge }}</span>
+  </div>
+
+  <div class="resource-items">
+    @for (item of config().items; track item.id) {
+      <div class="resource-item">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            @switch (item.icon) {
+              @case ('capacity') {
+                <rect x="6" y="4" width="12" height="16" rx="2.5" />
+                <path d="M9 4.5h6M9 11h6" />
+              }
+              @case ('limit') {
+                <rect x="6" y="4" width="12" height="16" rx="2.5" />
+                <path d="M9 4.5h6M12 10v5M9.5 12.5h5" />
+              }
+              @case ('timeout') {
+                <circle cx="12" cy="12" r="7.5" />
+                <path d="M12 8.5v4l2.5 1.5" />
+              }
+            }
+          </svg>
+        </div>
+        <div class="item-details">
+          <div class="item-name">{{ item.title }}</div>
+          <div class="item-desc">{{ item.subtitle }}</div>
+        </div>
+        <span class="item-value">{{ item.value }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="status-area">
+    <div class="status-row">
+      <span class="status-heading">Status</span>
+      <span class="status-value">{{ config().statusText }}</span>
+    </div>
+    <button type="button" class="manage-button">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+        />
+      </svg>
+      Manage...
+    </button>
+  </div>
+</div>
+

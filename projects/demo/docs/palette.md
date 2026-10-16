@@ -14,29 +14,32 @@
 
 ## Design colours
 
-| Token                   | Base          | Value   | Used for                       |
-| ----------------------- | ------------- | ------- | ------------------------------ |
-| `--color-page`          | `--gray-100`  | #f4f4f4 | Page background                |
-| `--color-rail`          | `--gray-200`  | #e6e6e6 | Side rail and bottom bar       |
-| `--color-surface`       | `--white`     | #ffffff | Cards, pills, outline buttons  |
-| `--color-border`        | `--slate-200` | #dfe4e8 | Outline button border          |
-| `--color-text`          | `--gray-900`  | #2e2e2e | Headings and body text         |
-| `--color-text-muted`    | `--slate-600` | #727886 | Secondary text (coach line)    |
-| `--color-text-subtle`   | `--slate-400` | #989aa2 | Eyebrow labels ("Daily focus") |
-| `--color-icon`          | `--slate-500` | #88909d | Icons                          |
-| `--color-primary`       | `--gray-800`  | #373737 | Primary button fill            |
-| `--color-accent`        | `--red-600`   | #f31f23 | Accent text                    |
-| `--color-accent-icon`   | `--red-300`   | #fa8486 | Accent icons                   |
-| `--color-focus`         | `--blue-500`  | #0f6dff | Keyboard focus outline         |
-| `--color-ring-steps`    | `--blue-500`  | #0f6dff | Steps ring                     |
-| `--color-ring-move`     | `--red-500`   | #fd2b4a | Move ring and badge            |
-| `--color-ring-exercise` | `--green-500` | #26c444 | Exercise ring                  |
-| `--color-ring-track`    | `--slate-100` | #e2e6ef | Unfilled ring track            |
-
-## Contrast
-
-Three colours are below WCAG AA (4.5:1) on white and are kept to match the reference:
-
-- `--color-text-subtle` 2.8:1
-- `--color-text-muted` 4.4:1
-- `--color-accent` 4.2:1 (passes only as large bold text)
+| Token | Base | Value | Used for |
+| ----- | ---- | ----- | -------- |
+| `--color-window-bg` | `--slate-200` | #e3e6eb | Window shell frosted background |
+| `--color-window-border` | `--slate-400` | #d6eaf6 | Glassmorphic window border |
+| `--color-sidebar-bg` | `--slate-100` | #ebecf0 | Left navigation sidebar background |
+| `--color-panel-bg` | `--slate-50` | #f5f6fa | Main content panel background |
+| `--color-card-bg` | `--white` | #ffffff | Cards and white surfaces |
+| `--color-card-border` | `--gray-200` | #eaeaec | Card borders and icon box outlines |
+| `--color-search-bg` | `--slate-300` | #dfe3e4 | Search input background |
+| `--color-search-badge` | `--gray-300` | #dadada | Hotkey shortcut pill background |
+| `--color-nav-active-bg` | `--slate-250` | #dfe0e4 | Active navigation link background |
+| `--color-dropdown-bg` | `--gray-100` | #f6f6f6 | Dropdown selectors and header pills |
+| `--color-manage-btn-bg` | `--gray-100` | #f6f6f6 | Manage button fill |
+| `--color-badge-free-bg` | `--gray-200` | #eaeaec | Free plan badge background |
+| `--color-logo-bg` | `--dark-squircle` | #161d20 | Neon logo squircle fill |
+| `--color-text` | `--gray-900` | #0a0b0f | Standard body and label text |
+| `--color-text-heading` | `--gray-900` | #0a0b0f | H1/H2 card titles |
+| `--color-text-subheading`| `--gray-700` | #454648 | Secondary descriptions |
+| `--color-text-section` | `--gray-800` | #404145 | Section header labels |
+| `--color-text-nav` | `--gray-600` | #636469 | Inactive navigation links |
+| `--color-text-nav-active`| `--gray-900` | #0a0b0f | Active navigation link text |
+| `--color-text-badge` | `--gray-500` | #707173 | Free badge text |
+| `--color-text-hotkey` | `--gray-500` | #707173 | Hotkey badge text |
+| `--color-text-placeholder`| `--gray-600` | #636469 | Search input placeholder |
+| `--color-status-live` | `--green-300` | #aee790 | Online status dot indicator |
+| `--color-chart-bar` | `--blue-500` | #3b6cdb | Chart bar primary blue segment |
+| `--color-chart-bar-light`| `--blue-200` | #cdd7f2 | Chart bar secondary light segment |
+| `--color-chart-grid` | `--gray-200` | #eaeaec | Chart horizontal gridlines |
+| `--color-star-icon` | `--blue-600` | #0f62fe | Scale banner star icon |

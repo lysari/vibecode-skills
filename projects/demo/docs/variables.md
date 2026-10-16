@@ -1,10 +1,10 @@
 # Variables
 
-`src/styles/_variables.scss` — layout, spacing, control, radius, border and shadow values, and the `$compact` breakpoint.
+`src/styles/_variables.scss` — layout, spacing, control, radius, border and shadow values, and the `$compact` (760px) and `$tablet` (1080px) breakpoints.
 
-## Using the breakpoint
+## Using the breakpoints
 
-Media queries cannot read custom properties, so the breakpoint is the Sass variable `$compact` (480px). Load it in a component without re-emitting the `:root` block:
+Media queries cannot read custom properties, so the breakpoints are Sass variables `$compact` (760px) and `$tablet` (1080px). Load them in a component without re-emitting the `:root` block:
 
 ```scss
 @use 'styles/variables' as v with (
@@ -12,34 +12,37 @@ Media queries cannot read custom properties, so the breakpoint is the Sass varia
 );
 
 .thing {
-  @media (max-width: v.$compact) { … }
+  @media (max-width: v.$tablet) { … }
 }
 ```
 
-`angular.json` adds `src` to `stylePreprocessorOptions.includePaths`, so `styles/variables` resolves from any component.
-
 ## Values and where they come from
 
-All values were measured in the reference at 3× and confirmed by rendering the page and comparing the same edges.
+All values were measured from the reference screenshot and scaled to a full desktop web-size layout (`1440×1024`).
 
-| Token                              | Value                              | Reference measurement                          |
-| ---------------------------------- | ---------------------------------- | ---------------------------------------------- |
-| `--rail-width`                     | 56px                               | Side rail, including its 1px white edge        |
-| `--page-gutter`                    | 24px (16px compact)                | Rail edge to card and pills                    |
-| `--page-top`                       | 16px                               | Top of page to the "Today" line box            |
-| `--space-10`                       | 10px                               | Between buttons, between pills, label to title |
-| `--space-16`                       | 16px                               | Section heading to its content                 |
-| `--space-20`                       | 20px                               | "Today" to card, card to quick actions         |
-| `--space-26`                       | 26px                               | Card padding; meta line to buttons             |
-| `--space-34`                       | 34px                               | Quick actions to section heading               |
-| `--control-height`                 | 46px                               | Buttons and pills                              |
-| `--control-padding-x`              | 17.5px                             | Button side padding                            |
-| `--control-padding-start` / `-end` | 16px / 24px                        | Pill padding before the icon / after the text  |
-| `--control-icon-gap`               | 8px                                | Pill icon to text                              |
-| `--icon-size` / `--icon-stroke`    | 24px / 2.2                         | Pill icons                                     |
-| `--radius-card`                    | 35px                               | Card corner                                    |
-| `--radius-pill`                    | 999px                              | Buttons and pills (fully round)                |
-| `--shadow-card`                    | bluish 1px line + flat soft shadow | Pixel column under the card                    |
-| `--shadow-pill`                    | tight neutral 1px shadow           | Pixel column under a pill                      |
+| Token | Value | Reference measurement |
+| ----- | ----- | --------------------- |
+| `--window-max-width` | 100% | Fluid full-screen desktop web dashboard container width |
+| `--window-radius` | 28px | Outer window rounded corner |
+| `--window-padding` | 11px | Margin between window frame and inner panels |
+| `--panel-radius` | `calc(var(--window-radius) - var(--window-padding))` (17px) | Inner panel radius (`inner_radius = outer_radius - padding`) |
+| `--card-radius` | 18px | Dashboard card corners |
+| `--well-padding` | 8px | Padding around nested inner well inside cards |
+| `--well-radius` | `calc(var(--card-radius) - var(--well-padding))` (10px) | Nested well radius (`inner_radius = outer_radius - padding`) |
+| `--item-icon-radius` | 10px | Resource item icon container corner radius |
+| `--item-icon-size` | 38px | Resource item icon container dimensions (38×38px) |
+| `--control-radius` | 11px | Search input, nav items, and branch dropdown button radius |
+| `--pill-radius` | 999px | Compute status selector pill and manage button radius |
+| `--sidebar-width` | 304px | Left navigation sidebar width |
+| `--header-height` | 40px | Window top bar height |
+| `--search-height` | 40px | Search input height |
+| `--nav-item-height` | 38px | Sidebar navigation item height |
+| `--branch-btn-height` | 42px | Branch dropdown button height |
+| `--manage-btn-height` | 38px | Manage button height |
 
-`--rail-item-size`, `--rail-bar-height`, `--radius-item` and `--page-width` are not visible in the reference and were chosen to fit the measured values.
+## Corner radius calculation
+
+Corner radii strictly follow the nested container rule:
+`inner_radius = outer_radius - padding`
+- Outer window radius = `28px`, window padding = `11px` → Inner panel radius = `28px - 11px = 17px`
+- Outer card radius = `18px`, card well padding = `8px` → Inner well radius = `18px - 8px = 10px`
