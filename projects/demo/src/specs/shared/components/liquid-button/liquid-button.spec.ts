@@ -11,12 +11,24 @@ import { LiquidButton, type LiquidButtonVariant } from '@app/shared/components/l
       Save
     </button>
     <a id="help" liquidButton variant="tinted" href="/help" [disabled]="disabled()">Get help</a>
+    <button
+      id="icon-only"
+      type="button"
+      liquidButton
+      [iconOnly]="iconOnly()"
+      [variant]="variant()"
+      [disabled]="disabled()"
+      aria-label="Star"
+    >
+      <span id="star">★</span>
+    </button>
   `,
 })
 class Host {
   // Signals: components are OnPush by default, so a plain field change would never render.
   readonly variant = signal<LiquidButtonVariant>('filled');
   readonly disabled = signal(false);
+  readonly iconOnly = signal(true);
 }
 
 describe('LiquidButton', () => {
@@ -61,6 +73,14 @@ describe('LiquidButton', () => {
     await settle();
     expect(q('#save').classList).not.toContain('is-filled');
     expect(q('#save').classList).toContain('is-plain');
+  });
+
+  it('carries the icon-only class when iconOnly is true', async () => {
+    expect(q('#icon-only').classList).toContain('is-icon-only');
+
+    host.iconOnly.set(false);
+    await settle();
+    expect(q('#icon-only').classList).not.toContain('is-icon-only');
   });
 
   it('disables each element the way that element is disabled', async () => {
@@ -120,6 +140,14 @@ describe('LiquidButton', () => {
       // layers get it, so the colour and the text answer the tap as one thing.
       expect(framesFor('#save .liquid-button-fill')).toEqual([[{ scale: '1.08 0.9' }]]);
       expect(framesFor('#save .liquid-button-content')).toEqual([[{ scale: '1.08 0.9' }]]);
+    });
+
+    it('squashes an icon-only button under a tap', async () => {
+      point('#icon-only', 'pointerdown');
+      await settle();
+
+      expect(framesFor('#icon-only .liquid-button-fill')).toEqual([[{ scale: '1.08 0.9' }]]);
+      expect(framesFor('#icon-only .liquid-button-content')).toEqual([[{ scale: '1.08 0.9' }]]);
     });
 
     it('springs back through the other shape on release', async () => {

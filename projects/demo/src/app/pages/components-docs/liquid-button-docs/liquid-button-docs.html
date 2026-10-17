@@ -12,6 +12,9 @@
         <button type="button" liquidButton>Filled</button>
         <button type="button" liquidButton variant="tinted">Tinted</button>
         <button type="button" liquidButton variant="plain">Plain</button>
+        <button type="button" liquidButton iconOnly aria-label="Add item">
+          <ng-icon name="ionAddOutline" aria-hidden="true" />
+        </button>
       </div>
     </header>
 
@@ -40,6 +43,10 @@
           block
         </label>
         <label class="docs-flag">
+          <input type="checkbox" [checked]="iconOnly()" (change)="toggle('iconOnly', $event)" />
+          iconOnly
+        </label>
+        <label class="docs-flag">
           <input type="checkbox" [checked]="disabled()" (change)="toggle('disabled', $event)" />
           disabled
         </label>
@@ -51,11 +58,15 @@
           liquidButton
           [variant]="variant()"
           [block]="block()"
+          [iconOnly]="iconOnly()"
           [disabled]="disabled()"
           [style.--liquid-button-hue]="hue()"
+          aria-label="Continue"
           (click)="clicks.set(clicks() + 1)"
         >
-          Continue
+          @if (!iconOnly()) {
+            Continue
+          }
           <ng-icon name="ionArrowForwardOutline" aria-hidden="true" />
         </button>
       </div>
@@ -78,9 +89,21 @@
           <ng-icon name="ionCheckmarkOutline" aria-hidden="true" />
           Button
         </button>
+        <button type="button" liquidButton iconOnly aria-label="Add item">
+          <ng-icon name="ionAddOutline" aria-hidden="true" />
+        </button>
+        <button type="button" liquidButton variant="tinted" iconOnly aria-label="Approve">
+          <ng-icon name="ionCheckmarkOutline" aria-hidden="true" />
+        </button>
+        <button type="button" liquidButton variant="plain" iconOnly aria-label="Continue">
+          <ng-icon name="ionArrowForwardOutline" aria-hidden="true" />
+        </button>
         <a liquidButton variant="tinted" routerLink="../liquid-tabs">Link to tabs</a>
         <a liquidButton variant="plain" routerLink="../liquid-tabs" disabled>Disabled link</a>
         <button type="button" liquidButton disabled>Disabled button</button>
+        <button type="button" liquidButton iconOnly disabled aria-label="Disabled add">
+          <ng-icon name="ionAddOutline" aria-hidden="true" />
+        </button>
       </div>
       <div class="button-block">
         <button type="button" liquidButton block>Block — fills its container</button>

@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { ionArrowForwardOutline, ionCheckmarkOutline } from '@ng-icons/ionicons';
+import { ionAddOutline, ionArrowForwardOutline, ionCheckmarkOutline } from '@ng-icons/ionicons';
 import {
   LiquidButton,
   LiquidButtonVariant,
@@ -17,11 +17,10 @@ import {
   BUTTON_SETUP,
 } from './liquid-button-docs.reference';
 
-/** The documentation for `liquidButton`, on the real component. */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [LiquidButton, LiquidPressable, NgIcon, RouterLink],
-  providers: [provideIcons({ ionArrowForwardOutline, ionCheckmarkOutline })],
+  providers: [provideIcons({ ionAddOutline, ionArrowForwardOutline, ionCheckmarkOutline })],
   selector: 'app-liquid-button-docs',
   styleUrls: ['../liquid-input-docs/liquid-input-docs.scss', './liquid-button-docs.scss'],
   templateUrl: './liquid-button-docs.html',
@@ -40,6 +39,7 @@ export class LiquidButtonDocs {
 
   protected readonly variant = signal<LiquidButtonVariant>('filled');
   protected readonly block = signal(false);
+  protected readonly iconOnly = signal(false);
   protected readonly disabled = signal(false);
   protected readonly hue = signal(262);
   protected readonly clicks = signal(0);
@@ -48,11 +48,13 @@ export class LiquidButtonDocs {
     const attrs = [
       this.variant() === 'filled' ? '' : ` variant="${this.variant()}"`,
       this.block() ? ' block' : '',
+      this.iconOnly() ? ' iconOnly' : '',
       this.disabled() ? ' disabled' : '',
     ].join('');
-    return `<button type="button" liquidButton${attrs} style="--liquid-button-hue: ${this.hue()}">
-  Continue
-</button>`;
+    const content = this.iconOnly()
+      ? '\n  <ng-icon name="ionArrowForwardOutline" aria-hidden="true" />\n'
+      : '\n  Continue\n  <ng-icon name="ionArrowForwardOutline" aria-hidden="true" />\n';
+    return `<button type="button" liquidButton${attrs}${this.iconOnly() ? ' aria-label="Continue"' : ''} style="--liquid-button-hue: ${this.hue()}">${content}</button>`;
   });
 
   protected readonly sections: Section[] = [
@@ -68,7 +70,7 @@ export class LiquidButtonDocs {
     this.variant.set((event.target as HTMLSelectElement).value as LiquidButtonVariant);
   }
 
-  protected toggle(flag: 'block' | 'disabled', event: Event): void {
+  protected toggle(flag: 'block' | 'disabled' | 'iconOnly', event: Event): void {
     this[flag].set((event.target as HTMLInputElement).checked);
   }
 

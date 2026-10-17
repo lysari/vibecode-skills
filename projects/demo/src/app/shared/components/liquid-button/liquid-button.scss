@@ -38,6 +38,35 @@
         width  : 100%;
     }
 
+    &.is-icon-only {
+        --_liquid-button-size: var(--liquid-button-size, 36px);
+
+        width      : var(--_liquid-button-size);
+        height     : var(--_liquid-button-size);
+        min-width  : var(--_liquid-button-size);
+        min-height : var(--_liquid-button-size);
+        padding    : var(--liquid-button-padding, 0);
+        flex-shrink: 0;
+
+        .liquid-button-content {
+            width      : 100%;
+            height     : 100%;
+            gap        : 0;
+            font-size  : var(--liquid-button-icon-size, calc(var(--_liquid-button-size) * 0.5));
+            line-height: 1;
+
+            ng-icon {
+                display  : inline-flex;
+                font-size: inherit;
+            }
+
+            svg {
+                width : var(--liquid-button-icon-size, calc(var(--_liquid-button-size) * 0.5));
+                height: var(--liquid-button-icon-size, calc(var(--_liquid-button-size) * 0.5));
+            }
+        }
+    }
+
     &.is-disabled {
         opacity       : 0.45;
         cursor        : default;

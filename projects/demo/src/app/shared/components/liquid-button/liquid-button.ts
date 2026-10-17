@@ -56,6 +56,9 @@ export type LiquidButtonVariant = 'filled' | 'tinted' | 'plain';
  * {@link LiquidPressable} — `liquidPress` — rather than this. That is the press
  * on its own, with no template and no paint; this component is that press plus
  * the portal's button around it.
+ *
+ * An icon-only button sets `iconOnly` to true, locking the button to equal
+ * width and height (driven by `--liquid-button-size`) with centered icon content.
  */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -67,6 +70,7 @@ export type LiquidButtonVariant = 'filled' | 'tinted' | 'plain';
     '[class.is-tinted]': "variant() === 'tinted'",
     '[class.is-plain]': "variant() === 'plain'",
     '[class.is-block]': 'block()',
+    '[class.is-icon-only]': 'iconOnly()',
     '[class.is-disabled]': 'disabled()',
     // Written back onto the element, because an input named `disabled` takes the
     // binding the native property would otherwise have had: `[disabled]="busy()"`
@@ -94,6 +98,8 @@ export class LiquidButton {
   readonly variant = input<LiquidButtonVariant>('filled');
   /** Fills the width it is given instead of hugging its label. */
   readonly block = input(false, { transform: booleanAttribute });
+  /** Sized to frame an icon alone with equal width and height. */
+  readonly iconOnly = input(false, { transform: booleanAttribute });
   readonly disabled = input(false, { transform: booleanAttribute });
 
   constructor() {

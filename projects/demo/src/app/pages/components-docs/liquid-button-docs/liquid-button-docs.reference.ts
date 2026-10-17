@@ -11,6 +11,11 @@ export const BUTTON_SETUP = `import { LiquidButton } from '@app/shared/component
 export const BUTTON_ELEMENTS = `<!-- An action: a <button>, with its type -->
 <button type="submit" liquidButton>Submit</button>
 
+<!-- An icon-only button: square or circular, with an accessible name -->
+<button type="button" liquidButton iconOnly aria-label="Add item">
+  <ng-icon name="ionAddOutline" />
+</button>
+
 <!-- A destination: an <a>, still announced as a link -->
 <a liquidButton variant="tinted" routerLink="/help">Get help</a>
 
@@ -45,6 +50,12 @@ export const BUTTON_API: ApiRow[] = [
     does: 'Fills the width it is given instead of hugging its label.',
   },
   {
+    name: 'iconOnly',
+    type: 'boolean',
+    value: 'false',
+    does: 'Square or circular button sized to frame an icon alone, with equal width and height.',
+  },
+  {
     name: 'disabled',
     type: 'boolean',
     value: 'false',
@@ -61,6 +72,13 @@ export const BUTTON_CSS: ApiRow[] = [
   },
   { name: '--liquid-button-radius', type: 'length', value: '999px', does: 'Corner radius.' },
   { name: '--liquid-button-padding', type: 'length', value: '9px 18px', does: 'Inner padding.' },
+  { name: '--liquid-button-size', type: 'length', value: '36px', does: 'Width and height of an icon-only button.' },
+  {
+    name: '--liquid-button-icon-size',
+    type: 'length',
+    value: 'calc(size * 0.5)',
+    does: 'Icon font size or SVG dimensions within an icon-only button.',
+  },
   { name: '--liquid-button-gap', type: 'length', value: '8px', does: 'Space between an icon and the label.' },
   { name: '--liquid-button-font-size', type: 'length', value: '14px', does: 'Label size.' },
   { name: '--liquid-button-color', type: 'color', value: 'per variant', does: 'Label colour.' },
