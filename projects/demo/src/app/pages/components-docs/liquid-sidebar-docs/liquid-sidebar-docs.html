@@ -1,0 +1,717 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid Sidebar</h1>
+      <p class="docs-lede">
+        A fluid application sidebar container with smooth icon-rail collapse, glassmorphic surface
+        styling, expandable sub-menus, and branch dropdown menus with tactile liquid response.
+      </p>
+      <p class="docs-lede">
+        Matches the platform sidebar design tokens 1:1 with crisp native vector glyphs, search trigger,
+        expandable navigation branches, and automatic concentric inner radii:
+        <code>inner_radius = outer_radius - padding</code>.
+      </p>
+    </header>
+
+    <section class="docs-case" id="playground">
+      <h2>Playground</h2>
+      <p class="docs-note">
+        Live instance driven by controls for every input, output event, and CSS custom property.
+      </p>
+
+      <div class="docs-controls">
+        <label class="docs-control">
+          Variant
+          <select (change)="setVariant($event)">
+            <option value="docked" [selected]="play.variant() === 'docked'">docked</option>
+            <option value="floating" [selected]="play.variant() === 'floating'">floating</option>
+            <option value="ghost" [selected]="play.variant() === 'ghost'">ghost</option>
+          </select>
+        </label>
+
+        <label class="docs-control">
+          Position
+          <select (change)="setPosition($event)">
+            <option value="left" [selected]="play.position() === 'left'">left</option>
+            <option value="right" [selected]="play.position() === 'right'">right</option>
+          </select>
+        </label>
+
+        <label class="docs-control">
+          Item Badge
+          <input
+            type="text"
+            [value]="play.customBadge()"
+            (input)="play.customBadge.set($any($event.target).value)"
+            placeholder="e.g. Live"
+          />
+        </label>
+      </div>
+
+      <div class="docs-flags">
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.collapsed()"
+            (change)="setCollapsed($any($event.target).checked)"
+          />
+          collapsed
+        </label>
+
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.collapsible()"
+            (change)="play.collapsible.set($any($event.target).checked)"
+          />
+          collapsible
+        </label>
+
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.bordered()"
+            (change)="play.bordered.set($any($event.target).checked)"
+          />
+          bordered
+        </label>
+
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.showToggle()"
+            (change)="play.showToggle.set($any($event.target).checked)"
+          />
+          showToggle
+        </label>
+
+        <label class="docs-flag">
+          <input
+            type="checkbox"
+            [checked]="play.disabledItem()"
+            (change)="play.disabledItem.set($any($event.target).checked)"
+          />
+          disabledItem
+        </label>
+      </div>
+
+      <div class="docs-tunes">
+        @for (tune of tunes; track tune.name) {
+          <label class="docs-tune">
+            <span class="docs-tune-label">
+              <code>{{ tune.name }}</code>
+              <span>{{ play.tuned()[tune.name] ?? tune.default }}{{ tune.unit }}</span>
+            </span>
+            <input
+              type="range"
+              [min]="tune.min"
+              [max]="tune.max"
+              [step]="tune.step"
+              [value]="play.tuned()[tune.name] ?? tune.default"
+              (input)="setTune(tune.name, $event)"
+            />
+          </label>
+        }
+      </div>
+
+      <div class="docs-actions">
+        <button type="button" class="docs-btn" liquidPress (click)="toggleCollapse()">
+          Toggle Collapse
+        </button>
+        <button type="button" class="docs-btn" liquidPress (click)="applyCompactPreset()">
+          Set Compact Size
+        </button>
+        <button type="button" class="docs-btn" liquidPress (click)="applyLargePreset()">
+          Set Large Size
+        </button>
+        <button type="button" class="docs-btn" liquidPress (click)="resetTunes()">
+          Reset Default Size
+        </button>
+      </div>
+
+      <div class="docs-status-line">
+        <span class="status-badge">Status</span>
+        <span class="status-text">{{ playLog() }}</span>
+      </div>
+
+      <div class="docs-preview-frame">
+        <x-liquid-sidebar
+          [(collapsed)]="play.collapsed"
+          [collapsible]="play.collapsible()"
+          [variant]="play.variant()"
+          [position]="play.position()"
+          [bordered]="play.bordered()"
+          [showToggle]="play.showToggle()"
+          [style]="playStyle()"
+          (toggle)="onToggle($event)"
+        >
+          <div slot="search" class="search-box">
+            <button
+              type="button"
+              class="search-trigger"
+              liquidPress
+              [liquidMenuTriggerFor]="searchMenu"
+              aria-label="Search navigation"
+            >
+              <x-liquid-sidebar-icon name="search" class="search-icon" />
+              <span class="search-placeholder">Search...</span>
+              <kbd class="hotkey">/</kbd>
+            </button>
+          </div>
+
+          <x-liquid-menu-popup #searchMenu="liquidMenu" role="dialog" title="Quick Search">
+            <ng-template liquidMenuContent>
+              <div style="padding: 12px; font-size: 13.5px; color: var(--color-text-nav);">
+                Type to search pages, metrics, and resources...
+              </div>
+            </ng-template>
+          </x-liquid-menu-popup>
+
+          <div class="nav-section">
+            <div class="section-title">Project</div>
+
+            <a
+              liquidSidebarItem
+              [active]="activePlayItem() === 'overview'"
+              (click)="activePlayItem.set('overview')"
+            >
+              <x-liquid-sidebar-icon name="home" />
+              <span class="liquid-sidebar-item-label">Overview</span>
+            </a>
+
+            <x-liquid-sidebar-submenu
+              title="Environments"
+              icon="environments"
+              [(expanded)]="envExpanded"
+            >
+              <a
+                liquidSidebarItem
+                [subItem]="true"
+                [active]="subActiveItem() === 'prod'"
+                (click)="subActiveItem.set('prod')"
+              >
+                <span>Production</span>
+              </a>
+              <a
+                liquidSidebarItem
+                [subItem]="true"
+                [active]="subActiveItem() === 'staging'"
+                (click)="subActiveItem.set('staging')"
+              >
+                <span>Staging</span>
+              </a>
+              <a
+                liquidSidebarItem
+                [subItem]="true"
+                [active]="subActiveItem() === 'dev'"
+                (click)="subActiveItem.set('dev')"
+              >
+                <span>Development</span>
+              </a>
+            </x-liquid-sidebar-submenu>
+
+            <a
+              liquidSidebarItem
+              [active]="activePlayItem() === 'integrations'"
+              (click)="activePlayItem.set('integrations')"
+            >
+              <x-liquid-sidebar-icon name="integrations" />
+              <span class="liquid-sidebar-item-label">Integrations</span>
+            </a>
+
+            <a
+              liquidSidebarItem
+              [active]="activePlayItem() === 'settings'"
+              [disabled]="play.disabledItem()"
+              (click)="activePlayItem.set('settings')"
+            >
+              <x-liquid-sidebar-icon name="settings" />
+              <span class="liquid-sidebar-item-label">Settings</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <div class="section-title">Branch</div>
+
+            <button
+              type="button"
+              class="branch-selector"
+              liquidPress
+              [liquidMenuTriggerFor]="branchMenu"
+              aria-label="Select branch"
+            >
+              <x-liquid-sidebar-icon name="branch" class="branch-icon" />
+              <span class="branch-label">{{ currentBranch() }}</span>
+              <x-liquid-sidebar-icon name="chevron" class="chevron-duo" />
+            </button>
+
+            <x-liquid-menu-popup #branchMenu="liquidMenu" role="menu" title="Branches">
+              @for (branch of branches; track branch) {
+                <button
+                  liquidMenuItem
+                  type="button"
+                  [class.is-active]="branch === currentBranch()"
+                  (click)="selectBranch(branch)"
+                >
+                  {{ branch }}
+                </button>
+              }
+            </x-liquid-menu-popup>
+
+            <a
+              liquidSidebarItem
+              [active]="activePlayItem() === 'monitoring'"
+              (click)="activePlayItem.set('monitoring')"
+            >
+              <x-liquid-sidebar-icon name="monitoring" />
+              <span class="liquid-sidebar-item-label">Monitoring</span>
+              @if (play.customBadge()) {
+                <span class="liquid-sidebar-item-badge">{{ play.customBadge() }}</span>
+              }
+            </a>
+
+            <a
+              liquidSidebarItem
+              [active]="activePlayItem() === 'sql-editor'"
+              (click)="activePlayItem.set('sql-editor')"
+            >
+              <x-liquid-sidebar-icon name="star" />
+              <span class="liquid-sidebar-item-label">SQL Editor</span>
+            </a>
+
+            <a
+              liquidSidebarItem
+              [active]="activePlayItem() === 'configuration'"
+              (click)="activePlayItem.set('configuration')"
+            >
+              <x-liquid-sidebar-icon name="cube" />
+              <span class="liquid-sidebar-item-label">Configuration</span>
+            </a>
+          </div>
+
+          <div slot="footer" class="banner-box">
+            <div class="star-badge">
+              <x-liquid-sidebar-icon name="star" />
+            </div>
+            <span class="banner-label">Scale your infrastructure</span>
+          </div>
+        </x-liquid-sidebar>
+      </div>
+
+      <pre class="docs-code">{{ playMarkup() }}</pre>
+    </section>
+
+    <section class="docs-case" id="expand-menu">
+      <h2>Expand Menu</h2>
+      <p class="docs-note">
+        Two distinct expand menu paradigms are supported: nested accordion navigation branches
+        (<code>&lt;x-liquid-sidebar-submenu&gt;</code>) and floating popup dropdown selectors
+        (<code>[liquidMenuTriggerFor]</code>).
+      </p>
+
+      <div class="docs-preview-frame">
+        <x-liquid-sidebar style="height: 400px;">
+          <x-liquid-sidebar-group title="Collapsible Navigation Tree" [collapsible]="true">
+            <x-liquid-sidebar-submenu
+              title="Deployment Environments"
+              icon="environments"
+              [(expanded)]="demoSubExpanded"
+            >
+              <a liquidSidebarItem [subItem]="true" [active]="true">
+                <span>us-east-2 (Primary Production)</span>
+              </a>
+              <a liquidSidebarItem [subItem]="true">
+                <span>eu-central-1 (Replica Staging)</span>
+              </a>
+              <a liquidSidebarItem [subItem]="true">
+                <span>ap-southeast-1 (Edge Preview)</span>
+              </a>
+            </x-liquid-sidebar-submenu>
+
+            <x-liquid-sidebar-submenu
+              title="Data Masking Rules"
+              icon="mask"
+              [expanded]="false"
+            >
+              <a liquidSidebarItem [subItem]="true">
+                <span>PII Redaction</span>
+              </a>
+              <a liquidSidebarItem [subItem]="true">
+                <span>Credit Card Tokenization</span>
+              </a>
+            </x-liquid-sidebar-submenu>
+          </x-liquid-sidebar-group>
+
+          <div class="nav-section">
+            <div class="section-title">Popup Dropdown Menu</div>
+
+            <button
+              type="button"
+              class="branch-selector"
+              liquidPress
+              [liquidMenuTriggerFor]="demoBranchMenu"
+              aria-label="Switch environment"
+            >
+              <x-liquid-sidebar-icon name="branch" class="branch-icon" />
+              <span class="branch-label">Active: {{ currentBranch() }}</span>
+              <x-liquid-sidebar-icon name="chevron" class="chevron-duo" />
+            </button>
+
+            <x-liquid-menu-popup #demoBranchMenu="liquidMenu" role="menu" title="Select Branch">
+              @for (b of branches; track b) {
+                <button
+                  liquidMenuItem
+                  type="button"
+                  [class.is-active]="b === currentBranch()"
+                  (click)="selectBranch(b)"
+                >
+                  {{ b }}
+                </button>
+              }
+            </x-liquid-menu-popup>
+          </div>
+        </x-liquid-sidebar>
+      </div>
+    </section>
+
+    <section class="docs-case" id="sizes">
+      <h2>Sizes</h2>
+      <p class="docs-note">
+        Comparison of compact, default, large, and narrow instances. All nested paddings, gaps, and
+        corner radii scale proportionally from component custom properties.
+      </p>
+
+      <div class="docs-sizes-grid">
+        <div class="size-col">
+          <h3>Compact (220px)</h3>
+          <div class="size-preview">
+            <x-liquid-sidebar
+              style="--liquid-sidebar-width: 220px; --liquid-sidebar-item-height: 30px; --liquid-sidebar-padding: 10px; --liquid-sidebar-radius: 12px; height: 380px;"
+            >
+              <div class="nav-section">
+                <div class="section-title">Project</div>
+                <a liquidSidebarItem [active]="true">
+                  <x-liquid-sidebar-icon name="home" />
+                  <span class="liquid-sidebar-item-label">Overview</span>
+                </a>
+                <a liquidSidebarItem>
+                  <x-liquid-sidebar-icon name="monitoring" />
+                  <span class="liquid-sidebar-item-label">Metrics</span>
+                  <span class="liquid-sidebar-item-badge">2</span>
+                </a>
+              </div>
+            </x-liquid-sidebar>
+          </div>
+        </div>
+
+        <div class="size-col">
+          <h3>Default (280px)</h3>
+          <div class="size-preview">
+            <x-liquid-sidebar style="height: 380px;">
+              <div class="nav-section">
+                <div class="section-title">Project</div>
+                <a liquidSidebarItem [active]="true">
+                  <x-liquid-sidebar-icon name="home" />
+                  <span class="liquid-sidebar-item-label">Overview</span>
+                </a>
+                <a liquidSidebarItem>
+                  <x-liquid-sidebar-icon name="monitoring" />
+                  <span class="liquid-sidebar-item-label">Metrics</span>
+                  <span class="liquid-sidebar-item-badge">2</span>
+                </a>
+              </div>
+            </x-liquid-sidebar>
+          </div>
+        </div>
+
+        <div class="size-col">
+          <h3>Large (320px)</h3>
+          <div class="size-preview">
+            <x-liquid-sidebar
+              style="--liquid-sidebar-width: 320px; --liquid-sidebar-item-height: 42px; --liquid-sidebar-padding: 18px; --liquid-sidebar-radius: 24px; height: 380px;"
+            >
+              <div class="nav-section">
+                <div class="section-title">Project</div>
+                <a liquidSidebarItem [active]="true">
+                  <x-liquid-sidebar-icon name="home" />
+                  <span class="liquid-sidebar-item-label">Overview</span>
+                </a>
+                <a liquidSidebarItem>
+                  <x-liquid-sidebar-icon name="monitoring" />
+                  <span class="liquid-sidebar-item-label">Metrics</span>
+                  <span class="liquid-sidebar-item-badge">2</span>
+                </a>
+              </div>
+            </x-liquid-sidebar>
+          </div>
+        </div>
+
+        <div class="size-col">
+          <h3>Narrow Rail (68px)</h3>
+          <div class="size-preview">
+            <x-liquid-sidebar
+              [collapsed]="true"
+              style="height: 380px;"
+            >
+              <div class="nav-section">
+                <a liquidSidebarItem [active]="true" tooltip="Overview">
+                  <x-liquid-sidebar-icon name="home" />
+                </a>
+                <a liquidSidebarItem tooltip="Environments">
+                  <x-liquid-sidebar-icon name="environments" />
+                </a>
+                <a liquidSidebarItem tooltip="Monitoring">
+                  <x-liquid-sidebar-icon name="monitoring" />
+                </a>
+                <a liquidSidebarItem tooltip="Settings">
+                  <x-liquid-sidebar-icon name="settings" />
+                </a>
+              </div>
+            </x-liquid-sidebar>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="variants">
+      <h2>Variants</h2>
+      <p class="docs-note">
+        Select between <code>docked</code>, <code>floating</code> card island, and
+        <code>ghost</code> transparent sidebar styles.
+      </p>
+
+      <div class="docs-variants-row">
+        <div class="variant-card">
+          <span class="variant-label">Docked</span>
+          <x-liquid-sidebar variant="docked" style="height: 320px;">
+            <div class="nav-section">
+              <div class="section-title">Docked Surface</div>
+              <a liquidSidebarItem [active]="true">
+                <x-liquid-sidebar-icon name="home" />
+                <span class="liquid-sidebar-item-label">Overview</span>
+              </a>
+              <a liquidSidebarItem>
+                <x-liquid-sidebar-icon name="monitoring" />
+                <span class="liquid-sidebar-item-label">Monitoring</span>
+              </a>
+            </div>
+          </x-liquid-sidebar>
+        </div>
+
+        <div class="variant-card">
+          <span class="variant-label">Floating</span>
+          <x-liquid-sidebar variant="floating" style="height: 320px;">
+            <div class="nav-section">
+              <div class="section-title">Island Surface</div>
+              <a liquidSidebarItem [active]="true">
+                <x-liquid-sidebar-icon name="home" />
+                <span class="liquid-sidebar-item-label">Overview</span>
+              </a>
+              <a liquidSidebarItem>
+                <x-liquid-sidebar-icon name="monitoring" />
+                <span class="liquid-sidebar-item-label">Monitoring</span>
+              </a>
+            </div>
+          </x-liquid-sidebar>
+        </div>
+
+        <div class="variant-card">
+          <span class="variant-label">Ghost</span>
+          <x-liquid-sidebar variant="ghost" style="height: 320px;">
+            <div class="nav-section">
+              <div class="section-title">Pure Navigation</div>
+              <a liquidSidebarItem [active]="true">
+                <x-liquid-sidebar-icon name="home" />
+                <span class="liquid-sidebar-item-label">Overview</span>
+              </a>
+              <a liquidSidebarItem>
+                <x-liquid-sidebar-icon name="monitoring" />
+                <span class="liquid-sidebar-item-label">Monitoring</span>
+              </a>
+            </div>
+          </x-liquid-sidebar>
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="rail">
+      <h2>Rail Collapse</h2>
+      <p class="docs-note">
+        In collapsed mode, labels, section titles, and badges smoothly fold away while icons remain centered.
+        Hovering or focusing an item displays its title tooltip.
+      </p>
+
+      <div class="docs-preview-frame">
+        <x-liquid-sidebar [collapsed]="true" style="height: 340px;">
+          <div slot="search" class="search-box">
+            <button type="button" class="search-trigger" liquidPress aria-label="Search">
+              <x-liquid-sidebar-icon name="search" class="search-icon" />
+            </button>
+          </div>
+
+          <div class="nav-section">
+            <a liquidSidebarItem [active]="true" tooltip="Overview">
+              <x-liquid-sidebar-icon name="home" />
+            </a>
+            <a liquidSidebarItem tooltip="Environments">
+              <x-liquid-sidebar-icon name="environments" />
+            </a>
+            <a liquidSidebarItem tooltip="Monitoring">
+              <x-liquid-sidebar-icon name="monitoring" />
+            </a>
+            <a liquidSidebarItem tooltip="Settings">
+              <x-liquid-sidebar-icon name="settings" />
+            </a>
+          </div>
+
+          <div slot="footer" class="banner-box">
+            <div class="star-badge">
+              <x-liquid-sidebar-icon name="star" />
+            </div>
+          </div>
+        </x-liquid-sidebar>
+      </div>
+    </section>
+
+    <section class="docs-case" id="setup">
+      <h2>Setup</h2>
+      <p class="docs-note">Import the components into your standalone template or component:</p>
+      <pre class="docs-code">{{ setupCode }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API Reference</h2>
+
+      <h3>x-liquid-sidebar Inputs</h3>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of sidebarApi; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td><code>{{ row.value }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3>x-liquid-sidebar Outputs</h3>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of sidebarOutputs; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3>x-liquid-sidebar-submenu Inputs</h3>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of submenuApi; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td><code>{{ row.value }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3>LiquidSidebarItem Inputs</h3>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of itemApi; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td><code>{{ row.value }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3>CSS Custom Properties</h3>
+      <div class="docs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Default</th>
+              <th>Does</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of cssApi; track row.name) {
+              <tr>
+                <td><code>{{ row.name }}</code></td>
+                <td><code>{{ row.type }}</code></td>
+                <td>{{ row.does }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </article>
+
+  <nav class="docs-toc" aria-label="On this page">
+    <div class="docs-toc-card">
+      <h2>On this page</h2>
+      <ul>
+        @for (section of sections; track section.id) {
+          <li>
+            <a [href]="'#' + section.id" liquidPress (click)="jumpTo($event, section.id)">
+              {{ section.title }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</div>

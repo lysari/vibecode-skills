@@ -1,0 +1,47 @@
+<div class="liquid-sidebar-inner">
+  <div class="liquid-sidebar-header">
+    <ng-content select="[liquidSidebarHeader], [slot=header]" />
+  </div>
+
+  <div class="liquid-sidebar-search">
+    <ng-content select="[liquidSidebarSearch], [slot=search]" />
+  </div>
+
+  <div class="liquid-sidebar-content">
+    <ng-content />
+  </div>
+
+  <div class="liquid-sidebar-footer">
+    <ng-content select="[liquidSidebarFooter], [slot=footer]" />
+
+    @if (showToggle() && collapsible()) {
+      <button
+        type="button"
+        class="liquid-sidebar-toggle-btn"
+        [attr.aria-label]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+        [attr.title]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+        liquidPress
+        (click)="toggleCollapse()"
+      >
+        <svg
+          class="liquid-sidebar-toggle-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M15 18L9 12L15 6"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span class="liquid-sidebar-toggle-label liquid-sidebar-hide-collapsed">
+          {{ collapsed() ? 'Expand' : 'Collapse' }}
+        </span>
+      </button>
+    }
+  </div>
+</div>
+

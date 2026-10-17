@@ -121,6 +121,12 @@ export class DocsSidebar {
           category: 'overlays',
         },
         {
+          path: '/components-docs/liquid-sidebar',
+          title: 'Liquid Sidebar',
+          caption: 'Fluid application sidebar with smooth rail collapse',
+          category: 'overlays',
+        },
+        {
           path: '/components-docs/search',
           title: 'Search Palette',
           caption: 'Command palette with category filtering and hotkeys',

@@ -8,6 +8,7 @@ import { LiquidInputDocs } from './liquid-input-docs/liquid-input-docs';
 import { LiquidInputGroupDocs } from './liquid-input-group-docs/liquid-input-group-docs';
 import { LiquidMenuPopupDocs } from './liquid-menu-popup-docs/liquid-menu-popup-docs';
 import { LiquidMorphMenuDocs } from './liquid-morph-menu-docs/liquid-morph-menu-docs';
+import { LiquidSidebarDocs } from './liquid-sidebar-docs/liquid-sidebar-docs';
 import { LiquidSliderDocs } from './liquid-slider-docs/liquid-slider-docs';
 import { LiquidStepperDocs } from './liquid-stepper-docs/liquid-stepper-docs';
 import { LiquidTabsDocs } from './liquid-tabs-docs/liquid-tabs-docs';
@@ -79,6 +80,11 @@ export const DOCS_ROUTES: Routes = [
         path: 'liquid-morph-menu',
         component: LiquidMorphMenuDocs,
         title: 'Liquid Morph Menu · Components Workshop',
+      },
+      {
+        path: 'liquid-sidebar',
+        component: LiquidSidebarDocs,
+        title: 'Liquid Sidebar · Components Workshop',
       },
       {
         path: 'search',
