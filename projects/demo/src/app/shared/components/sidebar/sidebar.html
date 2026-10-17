@@ -1,18 +1,27 @@
 <aside class="sidebar" aria-label="Sidebar navigation">
   <div class="search-box">
-    <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M11.2754 2.71423C16.003 2.71423 19.8364 6.54661 19.8364 11.2752C19.8364 16.0038 16.003 19.8361 11.2754 19.8361C6.54686 19.8361 2.71448 16.0038 2.71448 11.2752C2.71448 6.54661 6.54686 2.71423 11.2754 2.71423Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M19.899 18.4875C20.678 18.4875 21.3095 19.1199 21.3095 19.898C21.3095 20.678 20.678 21.3095 19.899 21.3095C19.1199 21.3095 18.4875 20.678 18.4875 19.898C18.4875 19.1199 19.1199 18.4875 19.899 18.4875Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <input
-      id="sidebar-search"
-      name="search"
-      type="search"
-      placeholder="Search..."
-      aria-label="Search"
-    />
-    <kbd class="hotkey">/</kbd>
+    <button
+      #searchTrigger
+      type="button"
+      class="search-trigger"
+      liquidPress
+      [liquidMenuTriggerFor]="searchMenu"
+      aria-label="Search navigation"
+    >
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.2754 2.71423C16.003 2.71423 19.8364 6.54661 19.8364 11.2752C19.8364 16.0038 16.003 19.8361 11.2754 19.8361C6.54686 19.8361 2.71448 16.0038 2.71448 11.2752C2.71448 6.54661 6.54686 2.71423 11.2754 2.71423Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.899 18.4875C20.678 18.4875 21.3095 19.1199 21.3095 19.898C21.3095 20.678 20.678 21.3095 19.899 21.3095C19.1199 21.3095 18.4875 20.678 18.4875 19.898C18.4875 19.1199 19.1199 18.4875 19.899 18.4875Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="search-placeholder">Search...</span>
+      <kbd class="hotkey">/</kbd>
+    </button>
   </div>
+
+  <x-liquid-menu-popup #searchMenu="liquidMenu" role="dialog" title="Search">
+    <ng-template liquidMenuContent>
+      <app-search [items]="searchItems" />
+    </ng-template>
+  </x-liquid-menu-popup>
 
   <nav class="nav-groups">
     @for (section of sections(); track section.title) {
@@ -20,16 +29,38 @@
         <div class="section-title">{{ section.title }}</div>
 
         @if (section.branch) {
-          <button type="button" class="branch-selector">
+          <button
+            type="button"
+            class="branch-selector"
+            liquidPress
+            [liquidMenuTriggerFor]="branchMenu"
+            aria-label="Select branch"
+          >
             <svg class="branch-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M21.0004 6.6738C21.0004 8.7024 19.3552 10.3476 17.3266 10.3476C15.298 10.3476 13.6537 8.7024 13.6537 6.6738C13.6537 4.6452 15.298 3 17.3266 3C19.3552 3 21.0004 4.6452 21.0004 6.6738Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path fill-rule="evenodd" clip-rule="evenodd" d="M10.3467 17.2619C10.3467 19.2905 8.7024 20.9348 6.6729 20.9348C4.6452 20.9348 3 19.2905 3 17.2619C3 15.2333 4.6452 13.5881 6.6729 13.5881C8.7024 13.5881 10.3467 15.2333 10.3467 17.2619Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span class="branch-label">{{ section.branch }}</span>
+            <span class="branch-label">{{ currentBranch() }}</span>
             <svg class="chevron-duo" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M19 8.5C19 8.5 14.856 15.5 12 15.5C9.145 15.5 5 8.5 5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
+
+          <x-liquid-menu-popup #branchMenu="liquidMenu" role="menu" title="Branches">
+            @for (branch of branches; track branch) {
+              <button
+                liquidMenuItem
+                type="button"
+                [class.is-active]="branch === currentBranch()"
+                (click)="selectBranch(branch)"
+              >
+                {{ branch }}
+              </button>
+            }
+            <button liquidMenuItem type="button" (click)="createBranch()">
+              + Create Branch
+            </button>
+          </x-liquid-menu-popup>
         }
 
         @for (item of section.items; track item.id) {
@@ -39,6 +70,7 @@
               [routerLink]="item.route"
               routerLinkActive="is-active"
               ariaCurrentWhenActive="page"
+              liquidPress
             >
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M6.91711 14.8539L9.91011 10.9649L13.3241 13.6449L16.2531 9.86487" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -48,7 +80,7 @@
               {{ item.label }}
             </a>
           } @else {
-            <a class="nav-item" aria-disabled="true">
+            <a class="nav-item" liquidPress (click)="onNavClick(item.label)">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 @switch (item.icon) {
                   @case ('home') {

@@ -23,42 +23,49 @@
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    gap: var(--space-inline-gap);
     height: var(--search-height);
-    padding: 0 8px 0 var(--space-item-gap);
     border-radius: var(--control-radius);
     background: var(--color-search-bg);
 
-    .search-icon {
-      width: 16px;
-      height: 16px;
-      fill: none;
-      stroke: var(--color-text-placeholder);
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
+    .search-trigger {
+      display: flex;
+      align-items: center;
+      gap: var(--space-inline-gap);
+      width: 100%;
+      height: 100%;
+      padding: 0 8px 0 var(--space-item-gap);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
 
-    input {
-      flex: 1;
-      font-size: var(--text-nav-size);
-      color: var(--color-text);
+      .search-icon {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: var(--color-text-placeholder);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
 
-      &::placeholder {
+      .search-placeholder {
+        flex: 1;
+        font-size: var(--text-nav-size);
         color: var(--color-text-placeholder);
       }
-    }
 
-    .hotkey {
-      display: grid;
-      place-items: center;
-      width: 24px;
-      height: 24px;
-      border-radius: var(--badge-radius);
-      background: var(--color-search-badge);
-      font-family: inherit;
-      font-size: var(--text-badge-size);
-      color: var(--color-text-hotkey);
+      .hotkey {
+        display: grid;
+        place-items: center;
+        width: 24px;
+        height: 24px;
+        border-radius: var(--badge-radius);
+        background: var(--color-search-badge);
+        font-family: inherit;
+        font-size: var(--text-badge-size);
+        color: var(--color-text-hotkey);
+      }
     }
   }
 

@@ -150,3 +150,25 @@ export const METRIC_CARDS: MetricCardConfig[] = [
     ],
   },
 ];
+
+export const SIDEBAR_SEARCH_ITEMS = [
+  { title: 'Monitoring & Insights', path: '/', section: 'Branch', icon: 'ionSearchOutline' },
+  { title: 'Overview', path: '/', section: 'Project', icon: 'ionSearchOutline' },
+  { title: 'Environments', path: '/', section: 'Project', icon: 'ionSearchOutline' },
+  { title: 'Integrations', path: '/', section: 'Project', icon: 'ionSearchOutline' },
+  { title: 'Settings', path: '/', section: 'Project', icon: 'ionSearchOutline' },
+  { title: 'SQL Editor', path: '/', section: 'Branch', icon: 'ionSearchOutline' },
+  { title: 'Configuration', path: '/', section: 'Branch', icon: 'ionSearchOutline' },
+  { title: 'Backup & Restore', path: '/', section: 'Branch', icon: 'ionSearchOutline' },
+  { title: 'Data Masking', path: '/', section: 'Branch', icon: 'ionSearchOutline' },
+  { title: 'API Access', path: '/', section: 'Platform Services', icon: 'ionSearchOutline' },
+  { title: 'Authentication', path: '/', section: 'Platform Services', icon: 'ionSearchOutline' },
+  { title: 'Component Docs', path: '/components-docs', section: 'Design System', icon: 'ionSearchOutline' },
+  { title: 'Liquid Button Docs', path: '/components-docs/liquid-button', section: 'Design System', icon: 'ionSearchOutline' },
+  { title: 'Liquid Input Docs', path: '/components-docs/liquid-input', section: 'Design System', icon: 'ionSearchOutline' },
+  { title: 'Liquid Slider Docs', path: '/components-docs/liquid-slider', section: 'Design System', icon: 'ionSearchOutline' },
+  { title: 'Liquid Toggle Docs', path: '/components-docs/liquid-toggle', section: 'Design System', icon: 'ionSearchOutline' },
+  { title: 'Liquid Menu Popup Docs', path: '/components-docs/liquid-menu-popup', section: 'Design System', icon: 'ionSearchOutline' },
+  { title: 'Liquid Tabs Docs', path: '/components-docs/liquid-tabs', section: 'Design System', icon: 'ionSearchOutline' },
+  { title: 'Liquid Toast Docs', path: '/components-docs/liquid-toast', section: 'Design System', icon: 'ionSearchOutline' },
+];

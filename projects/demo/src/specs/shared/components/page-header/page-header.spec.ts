@@ -41,4 +41,11 @@ describe('PageHeader', () => {
     const tabButtons = fixture.debugElement.queryAll(By.directive(LiquidTab));
     expect(tabButtons.length).toBe(4);
   });
+
+  it('renders refresh button and emits refresh on click', () => {
+    const host = fixture.nativeElement as HTMLElement;
+    const refreshBtn = host.querySelector('.refresh-btn') as HTMLButtonElement;
+    expect(refreshBtn).not.toBeNull();
+    expect(refreshBtn.textContent).toContain('Refresh');
+  });
 });

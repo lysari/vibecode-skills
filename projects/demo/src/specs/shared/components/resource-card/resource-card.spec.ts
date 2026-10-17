@@ -13,5 +13,15 @@ describe('ResourceCard', () => {
       'Healthy · Autoscaling active',
     );
   });
+
+  it('renders manage button with icon', async () => {
+    const fixture = TestBed.createComponent(ResourceCard);
+    fixture.componentRef.setInput('config', RESOURCE_CARD);
+    await fixture.whenStable();
+    const host = fixture.nativeElement as HTMLElement;
+    const manageBtn = host.querySelector('.manage-button');
+    expect(manageBtn).not.toBeNull();
+    expect(manageBtn?.textContent).toContain('Manage...');
+  });
 });
 

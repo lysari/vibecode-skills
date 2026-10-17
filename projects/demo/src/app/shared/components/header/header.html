@@ -11,7 +11,13 @@
 
     <span class="divider" aria-hidden="true">/</span>
 
-    <button type="button" class="account-button" liquidPress>
+    <button
+      type="button"
+      class="account-button"
+      liquidPress
+      [liquidMenuTriggerFor]="accountMenu"
+      aria-label="Account menu"
+    >
       <span class="avatar-circle" aria-hidden="true">
         <svg class="icon-user" viewBox="0 0 24 24" fill="none">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M11.8445 21.6619C8.15273 21.6619 5 21.0874 5 18.7867C5 16.4859 8.13273 14.3619 11.8445 14.3619C15.5364 14.3619 18.6891 16.4653 18.6891 18.7661C18.6891 21.0659 15.5564 21.6619 11.8445 21.6619Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -25,23 +31,100 @@
       </svg>
     </button>
 
+    <x-liquid-menu-popup #accountMenu="liquidMenu" role="menu" title="Account">
+      <button liquidMenuItem type="button" (click)="onAccountAction('profile')">
+        Profile ({{ config().accountEmail }})
+      </button>
+      <button liquidMenuItem type="button" (click)="onAccountAction('billing')">
+        Plan & Usage ({{ config().accountPlan }})
+      </button>
+      <button liquidMenuItem type="button" (click)="onAccountAction('settings')">
+        User Settings
+      </button>
+      <button liquidMenuItem type="button" (click)="onAccountAction('signout')">
+        Sign Out
+      </button>
+    </x-liquid-menu-popup>
+
     <span class="divider" aria-hidden="true">/</span>
 
-    <button type="button" class="project-button" liquidPress>
+    <button
+      type="button"
+      class="project-button"
+      liquidPress
+      [liquidMenuTriggerFor]="projectMenu"
+      aria-label="Project switcher"
+    >
       <svg class="icon-project" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M21.0004 6.6738C21.0004 8.7024 19.3552 10.3476 17.3266 10.3476C15.298 10.3476 13.6537 8.7024 13.6537 6.6738C13.6537 4.6452 15.298 3 17.3266 3C19.3552 3 21.0004 4.6452 21.0004 6.6738Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         <path fill-rule="evenodd" clip-rule="evenodd" d="M10.3467 6.6738C10.3467 8.7024 8.7024 10.3476 6.6729 10.3476C4.6452 10.3476 3 8.7024 3 6.6738C3 4.6452 4.6452 3 6.6729 3C8.7024 3 10.3467 4.6452 10.3467 6.6738Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         <path fill-rule="evenodd" clip-rule="evenodd" d="M21.0004 17.2619C21.0004 19.2905 19.3552 20.9348 17.3266 20.9348C15.298 20.9348 13.6537 19.2905 13.6537 17.2619C13.6537 15.2333 15.298 13.5881 17.3266 13.5881C19.3552 13.5881 21.0004 15.2333 21.0004 17.2619Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         <path fill-rule="evenodd" clip-rule="evenodd" d="M10.3467 17.2619C10.3467 19.2905 8.7024 20.9348 6.6729 20.9348C4.6452 20.9348 3 19.2905 3 17.2619C3 15.2333 4.6452 13.5881 6.6729 13.5881C8.7024 13.5881 10.3467 15.2333 10.3467 17.2619Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <span class="project-name">{{ config().projectName }}</span>
+      <span class="project-name">{{ selectedProject() }}</span>
       <svg class="icon-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M19 8.5C19 8.5 14.856 15.5 12 15.5C9.145 15.5 5 8.5 5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
+
+    <x-liquid-menu-popup #projectMenu="liquidMenu" role="menu" title="Projects">
+      @for (project of projects; track project) {
+        <button
+          liquidMenuItem
+          type="button"
+          [class.is-active]="project === selectedProject()"
+          (click)="selectProject(project)"
+        >
+          {{ project }}
+        </button>
+      }
+      <button liquidMenuItem type="button" (click)="createProject()">
+        + Create Project
+      </button>
+    </x-liquid-menu-popup>
   </div>
 
   <div class="header-actions">
+    <button
+      type="button"
+      class="header-icon-pill"
+      liquidPress
+      [liquidMenuTriggerFor]="notifMenu"
+      aria-label="Notifications"
+    >
+      <svg class="icon-action" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" fill="currentColor"/>
+      </svg>
+      @if (notificationStore.unreadCount() > 0) {
+        <span class="notif-badge">{{ notificationStore.unreadCount() }}</span>
+      }
+    </button>
+
+    <x-liquid-menu-popup #notifMenu="liquidMenu" role="dialog" title="Notifications">
+      <ng-template liquidMenuContent>
+        <app-notification />
+      </ng-template>
+    </x-liquid-menu-popup>
+
+    <button
+      type="button"
+      class="header-icon-pill is-assistant"
+      liquidPress
+      [liquidMenuTriggerFor]="chatMenu"
+      aria-label="Neon AI Assistant"
+      title="Ask AI"
+    >
+      <svg class="icon-sparkle" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"/>
+        <path d="M19 16L20.2 18.8L23 20L20.2 21.2L19 24L17.8 21.2L15 20L17.8 18.8L19 16Z"/>
+      </svg>
+      <span class="assistant-label">Ask AI</span>
+    </button>
+
+    <x-liquid-menu-popup #chatMenu="liquidMenu" role="dialog" title="Neon Assistant">
+      <app-chatbot />
+    </x-liquid-menu-popup>
+
     <a routerLink="/components-docs" class="header-pill" liquidPress>
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M15.5957 15.6964H8.37573" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -51,7 +134,7 @@
       </svg>
       Docs
     </a>
-    <button type="button" class="header-pill is-connect" liquidPress>
+    <button type="button" class="header-pill is-connect" liquidPress (click)="onConnect()">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M6.979 4.60132V17.2193" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M2.8999 8.69998C2.8999 8.69998 5.0689 4.59998 6.9779 4.59998C8.8859 4.59998 11.0559 8.69998 11.0559 8.69998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

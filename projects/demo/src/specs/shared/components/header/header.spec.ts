@@ -18,5 +18,14 @@ describe('Header', () => {
     expect(host.querySelector('.project-name')?.textContent).toContain('Monalisa');
     expect(host.querySelector('a.header-pill')?.getAttribute('href')).toBe('/components-docs');
   });
+
+  it('renders notification and chatbot assistant buttons', async () => {
+    const fixture = TestBed.createComponent(Header);
+    await fixture.whenStable();
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('button[aria-label="Notifications"]')).not.toBeNull();
+    expect(host.querySelector('button[aria-label="Neon AI Assistant"]')).not.toBeNull();
+    expect(host.querySelector('.assistant-label')?.textContent).toContain('Ask AI');
+  });
 });
 

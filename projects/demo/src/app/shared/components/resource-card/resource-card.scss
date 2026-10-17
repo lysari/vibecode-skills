@@ -150,6 +150,8 @@
       font-size: var(--text-nav-size);
       font-weight: var(--font-weight-medium);
       color: var(--color-text-subheading);
+      border: none;
+      cursor: pointer;
 
       svg {
         width: 16px;
@@ -157,6 +159,37 @@
         fill: var(--color-text);
         stroke: none;
       }
+    }
+  }
+
+  .manage-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 320px;
+    padding: 6px 2px;
+
+    .manage-hint {
+      margin: 0;
+      font-size: var(--text-section-size);
+      color: var(--color-text-subheading);
+      line-height: 1.4;
+    }
+
+    .manage-control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .manage-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 4px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-window-border);
     }
   }
 }

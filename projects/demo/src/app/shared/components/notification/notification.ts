@@ -105,10 +105,6 @@ export class Notification {
     month: 'short',
   });
 
-  constructor() {
-    console.log("Notification")
-  }
-
   protected setFilter(filter: NotificationFilter | null): void {
     if (!filter) return;
     if (filter === 'unread') {
