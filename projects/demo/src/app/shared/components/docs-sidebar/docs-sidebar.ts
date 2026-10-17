@@ -49,6 +49,12 @@ export class DocsSidebar {
           category: 'primitives',
         },
         {
+          path: '/components-docs/liquid-expand',
+          title: 'Liquid Expand',
+          caption: 'Accordion panels with spring overshoot physics',
+          category: 'primitives',
+        },
+        {
           path: '/components-docs/number-slot',
           title: 'Number Slot',
           caption: 'Digits that spin like a reel',

@@ -1,0 +1,190 @@
+<div class="docs-page">
+  <article>
+    <header class="docs-hero" id="overview">
+      <h1>Liquid Expand &amp; Accordion</h1>
+      <p class="docs-lede">
+        An expandable accordion component lifted directly from the <strong>Khmer eID</strong> homepage FAQ.
+        Each row is animated with spring overshoot on open, squeeze compression on collapse, a pop-and-recolor
+        glyph plate, 180° spring rotating chevron, and a <code>0fr → 1fr</code> liquid height reveal with blurred
+        content arrival.
+      </p>
+
+      <div class="docs-hero-field">
+        <x-liquid-accordion
+          [items]="faqs"
+          [(value)]="activeFaq"
+        />
+        <pre class="docs-log">active: {{ activeFaq() || 'none' }}</pre>
+      </div>
+    </header>
+
+    <section class="docs-case" id="khmer-eid-faq">
+      <h2>Khmer eID Homepage FAQ Layout</h2>
+      <p class="docs-note">
+        The complete questions &amp; answers section from the Khmer eID portal, featuring a sticky
+        introductory column with an assistive support card beside the expanding accordion list.
+      </p>
+
+      <div class="docs-stage">
+        <div class="faq-demo-container">
+          <div class="faq-demo-intro">
+            <span class="faq-demo-eyebrow">
+              <ng-icon name="ionHelpCircleOutline" aria-hidden="true"></ng-icon>
+              <span>Questions &amp; answers</span>
+            </span>
+
+            <h3 class="faq-demo-title">Before you start</h3>
+
+            <p class="faq-demo-lead">
+              The things people ask most often about the eID account, the app and what happens to your records.
+            </p>
+
+            <div class="liquid-accordion-support">
+              <span class="liquid-accordion-support-glyph" aria-hidden="true">
+                <ng-icon name="ionChatbubbleEllipsesOutline"></ng-icon>
+              </span>
+              <p class="liquid-accordion-support-copy">
+                <strong>Still need help?</strong>
+                <span>Open Help &amp; support in the app menu, or ask at any registration office with your identity card.</span>
+              </p>
+            </div>
+          </div>
+
+          <x-liquid-accordion
+            [items]="faqs.slice(0, 4)"
+            [(value)]="activePortalFaq"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-case" id="standalone">
+      <h2>Standalone Expandable Card</h2>
+      <p class="docs-note">
+        <code>&lt;x-liquid-expand&gt;</code> can also be used standalone for isolated collapsible sections,
+        feature drawers, or toggleable inspection panels without an accordion container.
+      </p>
+
+      <div class="docs-stage">
+        <x-liquid-expand
+          title="Account security settings"
+          icon="ionLockClosed"
+          [(expanded)]="standaloneOpen"
+        >
+          <p style="margin: 0; line-height: 1.7;">
+            Your cryptographic keys stay on your physical device. Approvals require biometric authentication
+            or your device PIN code. You can view all linked hardware in your security dashboard.
+          </p>
+        </x-liquid-expand>
+      </div>
+      <pre class="docs-log">expanded: {{ standaloneOpen() }}</pre>
+    </section>
+
+    <section class="docs-case" id="multiple">
+      <h2>Multiple Open Items</h2>
+      <p class="docs-note">
+        Set <code>multiple</code> on <code>&lt;x-liquid-accordion&gt;</code> to allow multiple items
+        to remain expanded simultaneously, bound to <code>[(values)]</code>.
+      </p>
+
+      <div class="docs-stage">
+        <x-liquid-accordion
+          [items]="faqs.slice(4, 7)"
+          multiple
+          [(values)]="multiOpenKeys"
+        />
+      </div>
+      <pre class="docs-log">open items: {{ multiOpenKeys().join(', ') || 'none' }}</pre>
+    </section>
+
+    <section class="docs-case" id="api">
+      <h2>API Reference</h2>
+      <p class="docs-note">
+        Components and interfaces exported from <code>&#64;app/shared/components/liquid-expand</code>.
+      </p>
+
+      <h3>&lt;x-liquid-accordion&gt;</h3>
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>items</code></td>
+            <td><code>LiquidAccordionItem[]</code></td>
+            <td><code>[]</code></td>
+            <td>List of items to render directly. Supports <code>IFaqItem</code> properties.</td>
+          </tr>
+          <tr>
+            <td><code>value</code></td>
+            <td><code>string | null</code></td>
+            <td><code>null</code></td>
+            <td>Currently open key in single mode. Two-way: <code>[(value)]</code>.</td>
+          </tr>
+          <tr>
+            <td><code>values</code></td>
+            <td><code>string[]</code></td>
+            <td><code>[]</code></td>
+            <td>Currently open keys in multi mode. Two-way: <code>[(values)]</code>.</td>
+          </tr>
+          <tr>
+            <td><code>multiple</code></td>
+            <td><code>boolean</code></td>
+            <td><code>false</code></td>
+            <td>Whether multiple items may be expanded at the same time.</td>
+          </tr>
+          <tr>
+            <td><code>collapsible</code></td>
+            <td><code>boolean</code></td>
+            <td><code>true</code></td>
+            <td>Whether an active item can be toggled closed in single mode.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>&lt;x-liquid-expand&gt;</h3>
+      <table class="docs-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>title</code></td>
+            <td><code>string</code></td>
+            <td><code>''</code></td>
+            <td>Title or question text shown on the trigger.</td>
+          </tr>
+          <tr>
+            <td><code>icon</code></td>
+            <td><code>string | null</code></td>
+            <td><code>null</code></td>
+            <td>Optional ionicon name rendered in the spring squircle plate.</td>
+          </tr>
+          <tr>
+            <td><code>expanded</code></td>
+            <td><code>boolean</code></td>
+            <td><code>false</code></td>
+            <td>Whether this panel is expanded. Two-way: <code>[(expanded)]</code>.</td>
+          </tr>
+          <tr>
+            <td><code>disabled</code></td>
+            <td><code>boolean</code></td>
+            <td><code>false</code></td>
+            <td>Disables user interaction and dims the trigger.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </article>
+</div>
+

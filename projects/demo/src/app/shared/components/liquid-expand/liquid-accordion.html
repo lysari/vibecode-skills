@@ -1,0 +1,51 @@
+<ul class="liquid-accordion-list" role="list">
+  @for (item of items(); track item.key) {
+    <li
+      class="liquid-expand-item"
+      [class.is-open]="isOpen(item.key)"
+      [class.is-settling]="settling() === item.key"
+      [class.is-squashing]="squashing() === item.key"
+      [class.is-disabled]="item.disabled"
+      (animationend)="onSettled(item.key, $event)"
+    >
+      <h3 class="liquid-expand-heading">
+        <button
+          class="liquid-expand-trigger"
+          type="button"
+          [id]="'expand-q-' + item.key"
+          [attr.aria-expanded]="isOpen(item.key)"
+          [attr.aria-controls]="'expand-a-' + item.key"
+          [disabled]="item.disabled"
+          (click)="toggle(item.key)"
+          (animationend)="onSquashed(item.key, $event)"
+        >
+          @if (item.icon) {
+            <span class="liquid-expand-glyph" aria-hidden="true">
+              <ng-icon [name]="item.icon"></ng-icon>
+            </span>
+          }
+          <span class="liquid-expand-question">{{ item.title || item.question }}</span>
+          <span class="liquid-expand-chevron" aria-hidden="true">
+            <ng-icon name="ionChevronDownOutline"></ng-icon>
+          </span>
+        </button>
+      </h3>
+
+      <div
+        class="liquid-expand-panel"
+        [id]="'expand-a-' + item.key"
+        role="region"
+        [attr.aria-labelledby]="'expand-q-' + item.key"
+        [attr.inert]="isOpen(item.key) ? null : ''"
+      >
+        <div class="liquid-expand-panel-inner">
+          <p class="liquid-expand-answer" [class.no-glyph]="!item.icon">
+            {{ item.content || item.answer }}
+          </p>
+        </div>
+      </div>
+    </li>
+  }
+  <ng-content />
+</ul>
+

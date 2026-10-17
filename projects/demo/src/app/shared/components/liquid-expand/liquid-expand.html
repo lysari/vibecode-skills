@@ -1,0 +1,46 @@
+<div
+  class="liquid-expand-item"
+  [class.is-open]="isOpen()"
+  [class.is-settling]="isSettling()"
+  [class.is-squashing]="isSquashing()"
+  [class.is-disabled]="disabled()"
+  (animationend)="onSettled($event)"
+>
+  <h3 class="liquid-expand-heading">
+    <button
+      class="liquid-expand-trigger"
+      type="button"
+      [id]="headerId()"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-controls]="panelId()"
+      [disabled]="disabled()"
+      (click)="toggle()"
+      (animationend)="onSquashed($event)"
+    >
+      @if (icon()) {
+        <span class="liquid-expand-glyph" aria-hidden="true">
+          <ng-icon [name]="icon()!"></ng-icon>
+        </span>
+      }
+      <span class="liquid-expand-question">{{ title() }}</span>
+      <span class="liquid-expand-chevron" aria-hidden="true">
+        <ng-icon name="ionChevronDownOutline"></ng-icon>
+      </span>
+    </button>
+  </h3>
+
+  <div
+    class="liquid-expand-panel"
+    [id]="panelId()"
+    role="region"
+    [attr.aria-labelledby]="headerId()"
+    [attr.inert]="isOpen() ? null : ''"
+  >
+    <div class="liquid-expand-panel-inner">
+      <div class="liquid-expand-answer" [class.no-glyph]="!icon()">
+        <ng-content />
+      </div>
+    </div>
+  </div>
+</div>
+

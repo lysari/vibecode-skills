@@ -1,0 +1,358 @@
+@use 'variables' as var;
+@use 'surface' as sf;
+
+// ── Timing & physics ─────────────────────────────────────────────────────────
+// Timing lifted from `khmer-eid`'s FAQ expand and `liquid-menu-popup.scss`:
+// a long, overshooting open and a shorter, flatter close.
+// Panel, answer, glyph, and chevron are all driven by one cohesive set of physics.
+
+:host {
+  display: block;
+  font-family: var.$fontFamilySans;
+
+  --liquid-expand-open-duration : 250ms;
+  --liquid-expand-close-duration: 220ms;
+  --liquid-expand-spring        : cubic-bezier(0.34, 1.32, 0.4, 1);
+  --liquid-expand-collapse      : cubic-bezier(0.4, 0, 0.9, 0.5);
+  --liquid-expand-grow          : cubic-bezier(0.25, 1, 0.5, 1);
+  --liquid-expand-shrink        : cubic-bezier(0.6, 0.45, 0.35, 1);
+  --liquid-expand-bounce        : 10px;
+  --liquid-expand-squash        : 5px;
+  --liquid-expand-pad-y         : 16px;
+}
+
+// ── Item Container ───────────────────────────────────────────────────────────
+
+.liquid-expand-item {
+  border-radius: var(--card-radius, 18px);
+  background   : var(--color-manage-btn-bg, #f4f5f7);
+  transition   : background var(--liquid-expand-close-duration) var(--liquid-expand-collapse),
+                 box-shadow var(--liquid-expand-close-duration) var(--liquid-expand-collapse);
+
+  &.is-open {
+    background: var(--surface, #ffffff);
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.08);
+    transition: background var(--liquid-expand-open-duration) var(--liquid-expand-spring),
+                box-shadow var(--liquid-expand-open-duration) var(--liquid-expand-spring);
+  }
+
+  &.is-disabled {
+    opacity       : 0.5;
+    pointer-events: none;
+  }
+
+  &.is-settling {
+    animation: liquid-expand-settle calc(var(--liquid-expand-open-duration) + 90ms) ease-out;
+  }
+}
+
+// ── Spring Keyframes ─────────────────────────────────────────────────────────
+
+@keyframes liquid-expand-settle {
+  0% {
+    padding-bottom: 0;
+  }
+  40% {
+    padding-bottom: calc(var(--liquid-expand-bounce) * 0.5);
+  }
+  62% {
+    padding-bottom: var(--liquid-expand-bounce);
+  }
+  100% {
+    padding-bottom: 0;
+  }
+}
+
+@keyframes liquid-expand-squash {
+  0% {
+    padding-block: var(--liquid-expand-pad-y);
+  }
+  45% {
+    padding-block: calc(var(--liquid-expand-pad-y) - var(--liquid-expand-squash) * 0.3);
+  }
+  68% {
+    padding-block: calc(var(--liquid-expand-pad-y) - var(--liquid-expand-squash) * 0.5);
+  }
+  100% {
+    padding-block: var(--liquid-expand-pad-y);
+  }
+}
+
+@keyframes liquid-glyph-pop {
+  0% {
+    scale: 1;
+  }
+  40% {
+    scale: 1.16;
+  }
+  70% {
+    scale: 0.98;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes liquid-glyph-squeeze {
+  0% {
+    scale: 1;
+  }
+  45% {
+    scale: 0.94;
+  }
+  72% {
+    scale: 1.01;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes liquid-text-settle {
+  0% {
+    translate: 0 0;
+  }
+  40% {
+    translate: 0 3px;
+  }
+  70% {
+    translate: 0 -1px;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes liquid-text-squash {
+  0% {
+    translate: 0 0;
+  }
+  45% {
+    translate: 0 -1.5px;
+  }
+  72% {
+    translate: 0 0.5px;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+// ── Header & Trigger ─────────────────────────────────────────────────────────
+
+.liquid-expand-heading {
+  margin     : 0;
+  font-size  : inherit;
+  font-weight: inherit;
+}
+
+.liquid-expand-trigger {
+  display        : flex;
+  align-items    : center;
+  gap            : 14px;
+  width          : 100%;
+  padding        : var(--liquid-expand-pad-y) 18px;
+  border         : 0;
+  border-radius  : var(--card-radius, 18px);
+  background     : none;
+  text-align     : start;
+  cursor         : pointer;
+  appearance     : none;
+  font-family    : inherit;
+  color          : inherit;
+
+  &:focus-visible {
+    outline   : none !important;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.35);
+  }
+
+  .is-squashing & {
+    animation: liquid-expand-squash calc(var(--liquid-expand-close-duration) + 120ms) ease-in-out;
+  }
+}
+
+// ── Glyph Icon Badge ─────────────────────────────────────────────────────────
+
+.liquid-expand-glyph {
+  position       : relative;
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  flex           : none;
+  width          : 42px;
+  height         : 42px;
+  border-radius  : 12px;
+  background     : var(--surface, #ffffff);
+  color          : var(--color-text, #1d1d1f);
+  font-size      : 22px;
+  box-shadow     : 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition     : color var(--liquid-expand-close-duration) var(--liquid-expand-collapse),
+                   background var(--liquid-expand-close-duration) var(--liquid-expand-collapse),
+                   box-shadow var(--liquid-expand-close-duration) var(--liquid-expand-collapse);
+
+  .is-open & {
+    color     : #ffffff;
+    background: var(--color-primary, #1a73e8);
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.35);
+    transition: color var(--liquid-expand-open-duration) var(--liquid-expand-spring),
+                background var(--liquid-expand-open-duration) var(--liquid-expand-spring),
+                box-shadow var(--liquid-expand-open-duration) var(--liquid-expand-spring);
+  }
+
+  .is-settling & {
+    animation: liquid-glyph-pop calc(var(--liquid-expand-open-duration) + 90ms) ease-out;
+  }
+
+  .is-squashing:not(.is-settling) & {
+    animation: liquid-glyph-squeeze calc(var(--liquid-expand-close-duration) + 120ms) ease-in-out;
+  }
+}
+
+// ── Title & Question Text ────────────────────────────────────────────────────
+
+.liquid-expand-question {
+  flex       : 1 1 auto;
+  min-width  : 0;
+  font-family: inherit;
+  font-size  : clamp(14px, 1.15vw, 16px);
+  font-weight: 600;
+  line-height: 1.6;
+  color      : var(--ink, #1d1d1f);
+
+  .is-settling & {
+    animation: liquid-text-settle calc(var(--liquid-expand-open-duration) + 60ms) ease-out 30ms both;
+  }
+
+  .is-squashing:not(.is-settling) & {
+    animation: liquid-text-squash calc(var(--liquid-expand-close-duration) + 90ms) ease-in-out 30ms both;
+  }
+}
+
+// ── Rotating Chevron ─────────────────────────────────────────────────────────
+
+.liquid-expand-chevron {
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  flex           : none;
+  font-size      : 18px;
+  color          : var(--ink-soft, #6e6e73);
+  transition     : rotate var(--liquid-expand-close-duration) var(--liquid-expand-collapse),
+                   color var(--liquid-expand-close-duration) var(--liquid-expand-collapse);
+
+  .is-open & {
+    rotate    : 180deg;
+    color     : var(--color-primary, #1a73e8);
+    transition: rotate var(--liquid-expand-open-duration) var(--liquid-expand-spring),
+                color var(--liquid-expand-open-duration) var(--liquid-expand-spring);
+  }
+}
+
+// ── Panel & Answer Reveal ────────────────────────────────────────────────────
+
+.liquid-expand-panel {
+  display           : grid;
+  grid-template-rows: 0fr;
+  transition        : grid-template-rows var(--liquid-expand-close-duration) var(--liquid-expand-shrink);
+
+  .is-open & {
+    grid-template-rows: 1fr;
+    transition        : grid-template-rows var(--liquid-expand-open-duration) var(--liquid-expand-grow);
+  }
+}
+
+.liquid-expand-panel-inner {
+  overflow: hidden;
+}
+
+.liquid-expand-answer {
+  margin     : 0;
+  padding    : 0 18px 18px 74px;
+  font-family: inherit;
+  font-size  : clamp(13px, 1.05vw, 15px);
+  line-height: 1.85;
+  color      : var(--ink-soft, #6e6e73);
+  opacity    : 0;
+  filter     : blur(8px);
+  scale      : 0.96;
+  translate  : 0 -12px;
+  transition : opacity calc(var(--liquid-expand-close-duration) - 60ms) ease-in,
+               filter calc(var(--liquid-expand-close-duration) - 60ms) ease-in,
+               scale var(--liquid-expand-close-duration) var(--liquid-expand-shrink),
+               translate var(--liquid-expand-close-duration) var(--liquid-expand-shrink);
+
+  .is-open & {
+    opacity   : 1;
+    filter    : blur(0);
+    scale     : 1;
+    translate : 0 0;
+    transition: opacity calc(var(--liquid-expand-open-duration) * 0.6) ease-out 40ms,
+                filter calc(var(--liquid-expand-open-duration) - 40ms) ease-out 40ms,
+                scale calc(var(--liquid-expand-open-duration) - 40ms) var(--liquid-expand-spring) 40ms,
+                translate calc(var(--liquid-expand-open-duration) - 40ms) var(--liquid-expand-spring) 40ms;
+  }
+
+  &.no-glyph {
+    padding-left: 18px;
+  }
+}
+
+// ── Responsive Design ────────────────────────────────────────────────────────
+
+@media (max-width: 600px) {
+  :host {
+    --liquid-expand-pad-y: 14px;
+  }
+
+  .liquid-expand-trigger {
+    gap           : 12px;
+    padding-inline: 14px;
+  }
+
+  .liquid-expand-glyph {
+    width    : 34px;
+    height   : 34px;
+    font-size: 18px;
+  }
+
+  .liquid-expand-answer {
+    padding: 0 14px 14px;
+  }
+}
+
+// ── Reduced Motion ───────────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-expand-item,
+  .liquid-expand-glyph,
+  .liquid-expand-chevron,
+  .liquid-expand-panel,
+  .liquid-expand-answer,
+  .is-open .liquid-expand-glyph,
+  .is-open .liquid-expand-chevron,
+  .is-open .liquid-expand-panel,
+  .is-open .liquid-expand-answer {
+    transition: none !important;
+  }
+
+  .liquid-expand-item.is-settling,
+  .liquid-expand-item.is-squashing .liquid-expand-trigger,
+  .is-settling .liquid-expand-glyph,
+  .is-squashing .liquid-expand-glyph,
+  .is-settling .liquid-expand-question,
+  .is-squashing .liquid-expand-question {
+    animation: none !important;
+  }
+
+  .liquid-expand-glyph,
+  .is-open .liquid-expand-glyph {
+    scale: 1 !important;
+  }
+
+  .liquid-expand-answer {
+    filter   : none !important;
+    scale    : 1 !important;
+    translate: 0 0 !important;
+  }
+}
+

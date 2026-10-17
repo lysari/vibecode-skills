@@ -3,6 +3,7 @@ import { ComponentsDocs } from './components-docs';
 import { ChatbotDocs } from './chatbot-docs/chatbot-docs';
 import { LiquidAutocompleteDocs } from './liquid-autocomplete-docs/liquid-autocomplete-docs';
 import { LiquidButtonDocs } from './liquid-button-docs/liquid-button-docs';
+import { LiquidExpandDocs } from './liquid-expand-docs/liquid-expand-docs';
 import { LiquidGlassWrapperDocs } from './liquid-glass-wrapper-docs/liquid-glass-wrapper-docs';
 import { LiquidInputDocs } from './liquid-input-docs/liquid-input-docs';
 import { LiquidInputGroupDocs } from './liquid-input-group-docs/liquid-input-group-docs';
@@ -40,6 +41,11 @@ export const DOCS_ROUTES: Routes = [
         path: 'liquid-glass',
         component: LiquidGlassWrapperDocs,
         title: 'Liquid Glass · Components Workshop',
+      },
+      {
+        path: 'liquid-expand',
+        component: LiquidExpandDocs,
+        title: 'Liquid Expand · Components Workshop',
       },
       {
         path: 'liquid-toggle',
