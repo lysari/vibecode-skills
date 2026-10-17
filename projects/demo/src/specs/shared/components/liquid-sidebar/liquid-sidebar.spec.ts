@@ -249,15 +249,25 @@ describe('LiquidSidebar', () => {
     const submenuEl = q('#test-submenu');
     expect(submenuEl).not.toBeNull();
     expect(submenuEl.classList).not.toContain('is-expanded');
-    expect(q('#subitem-prod')).toBeNull();
+
+    const panel = submenuEl.querySelector<HTMLElement>('.liquid-sidebar-submenu-panel')!;
+    expect(panel).not.toBeNull();
+    expect(panel.hasAttribute('inert')).toBe(true);
+    expect(panel.classList).not.toContain('is-open');
 
     const triggerBtn = q<HTMLButtonElement>('.liquid-sidebar-submenu-trigger');
     expect(triggerBtn).not.toBeNull();
+    expect(triggerBtn.getAttribute('aria-expanded')).toBe('false');
+    expect(triggerBtn.getAttribute('aria-controls')).toBe(panel.id);
+
     triggerBtn.click();
     await settle();
 
     expect(submenuEl.classList).toContain('is-expanded');
     expect(host.submenuExpanded()).toBe(true);
+    expect(triggerBtn.getAttribute('aria-expanded')).toBe('true');
+    expect(panel.hasAttribute('inert')).toBe(false);
+    expect(panel.classList).toContain('is-open');
 
     const subitemProd = q('#subitem-prod');
     expect(subitemProd).not.toBeNull();
@@ -269,7 +279,9 @@ describe('LiquidSidebar', () => {
 
     expect(submenuEl.classList).not.toContain('is-expanded');
     expect(host.submenuExpanded()).toBe(false);
-    expect(q('#subitem-prod')).toBeNull();
+    expect(triggerBtn.getAttribute('aria-expanded')).toBe('false');
+    expect(panel.hasAttribute('inert')).toBe(true);
+    expect(panel.classList).not.toContain('is-open');
   });
 
   it('renders native vector SVG icons without external font dependencies', () => {

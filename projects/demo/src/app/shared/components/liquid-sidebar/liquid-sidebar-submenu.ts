@@ -12,6 +12,8 @@ import { LiquidPressable } from '@app/shared/directives/liquid-press.directive';
 import { LiquidSidebar } from './liquid-sidebar';
 import { LiquidSidebarIcon } from './liquid-sidebar-icon';
 
+let submenuUid = 0;
+
 /**
  * An expandable navigation branch inside an `<x-liquid-sidebar>`.
  *
@@ -23,7 +25,7 @@ import { LiquidSidebarIcon } from './liquid-sidebar-icon';
  * </x-liquid-sidebar-submenu>
  * ```
  *
- * Provides a click-to-expand menu item with rotating chevron indicator and nested items container.
+ * Provides a click-to-expand menu item with rotating chevron indicator and fluid grid-row animation.
  * When the parent sidebar collapses into an icon rail, nested items tuck away and the trigger
  * behaves as a centered icon.
  */
@@ -33,7 +35,7 @@ import { LiquidSidebarIcon } from './liquid-sidebar-icon';
   exportAs: 'liquidSidebarSubmenu',
   host: {
     class: 'liquid-sidebar-submenu',
-    '[class.is-expanded]': 'expanded()',
+    '[class.is-expanded]': 'isOpen()',
     '[class.is-parent-collapsed]': 'isParentCollapsed()',
   },
   imports: [LiquidSidebarIcon, LiquidPressable],
@@ -42,11 +44,12 @@ import { LiquidSidebarIcon } from './liquid-sidebar-icon';
     <button
       type="button"
       class="liquid-sidebar-item liquid-sidebar-submenu-trigger"
-      [class.is-expanded]="expanded()"
+      [class.is-expanded]="isOpen()"
       [class.is-disabled]="disabled()"
       liquidPress
       (click)="toggle()"
-      [attr.aria-expanded]="expanded()"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-controls]="panelId()"
       [attr.aria-label]="title()"
     >
       @if (icon()) {
@@ -60,7 +63,7 @@ import { LiquidSidebarIcon } from './liquid-sidebar-icon';
       }
       <svg
         class="liquid-sidebar-submenu-chevron liquid-sidebar-hide-collapsed"
-        [class.is-open]="expanded()"
+        [class.is-open]="isOpen()"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
@@ -75,15 +78,27 @@ import { LiquidSidebarIcon } from './liquid-sidebar-icon';
       </svg>
     </button>
 
-    @if (expanded() && !isParentCollapsed()) {
-      <div class="liquid-sidebar-submenu-items" role="group">
-        <ng-content />
+    <div
+      class="liquid-sidebar-submenu-panel"
+      [id]="panelId()"
+      role="region"
+      [class.is-open]="isOpen()"
+      [attr.aria-label]="title() + ' submenu'"
+      [attr.inert]="isOpen() ? null : ''"
+    >
+      <div class="liquid-sidebar-submenu-inner">
+        <div class="liquid-sidebar-submenu-items" role="group">
+          <ng-content />
+        </div>
       </div>
-    }
+    </div>
   `,
 })
 export class LiquidSidebarSubmenu {
+  private readonly uniqueId = ++submenuUid;
   private readonly sidebar = inject(LiquidSidebar, { optional: true });
+
+  readonly panelId = computed(() => `liquid-sidebar-sub-${this.uniqueId}`);
 
   /** Section label displayed on the trigger item. */
   readonly title = input<string>('');
@@ -102,6 +117,9 @@ export class LiquidSidebarSubmenu {
 
   /** Whether the parent sidebar is collapsed into an icon rail. */
   readonly isParentCollapsed = computed(() => this.sidebar?.collapsed() ?? false);
+
+  /** Effective open state considering both expanded state and parent collapsed state. */
+  readonly isOpen = computed(() => this.expanded() && !this.isParentCollapsed());
 
   /** Toggles submenu expanded state. */
   toggle(): void {
