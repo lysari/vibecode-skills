@@ -10,13 +10,12 @@ import { toast } from '@app/shared/components/liquid-toast/toast';
 import { Notification } from '@app/shared/components/notification/notification';
 import { NotificationStore } from '@app/shared/components/notification/notification.store';
 import { WORKSPACE_HEADER } from '@app/shared/constants/dashboard';
-import { LiquidPressable } from '@app/shared/directives/liquid-press.directive';
 import { WorkspaceHeaderConfig } from '@app/shared/interfaces/dashboard.interface';
 
 @Component({
   imports: [
     RouterLink,
-    LiquidPressable,
+    LiquidButton,
     LiquidMenuPopup,
     LiquidMenuTrigger,
     LiquidMenuItem,

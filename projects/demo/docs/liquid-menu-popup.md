@@ -17,6 +17,8 @@ The `LiquidMenuPopup` (`<x-liquid-menu-popup>`) component and companion `[liquid
   - `LiquidMenuContent`: `[liquidMenuContent]` template lazily instantiated only while open.
 - **Top Layer Promotion**:
   - Calls native Popover API (`element.showPopover()`) so nested transforms, frosted glass parents, and ancestor overflow clips never crop the panel.
+- **Layout Neutrality**:
+  - Host element uses `:host { display: contents; }` so popups declared inline between sibling triggers or buttons never participate as flex/grid items or create phantom gaps in parent containers.
 - **Derived Radii**:
   - Outer panel radius: `var(--menu-radius, 20px)`.
   - Inner body radius: `calc(var(--menu-radius, 20px) - var(--menu-padding, 6px))` = `14px`.

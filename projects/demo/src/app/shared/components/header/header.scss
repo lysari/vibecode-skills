@@ -42,14 +42,15 @@
 
     .account-button,
     .project-button {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-inline-gap);
+      --liquid-button-fill: var(--color-dropdown-bg);
+      --liquid-button-fill-hover: var(--color-dropdown-bg);
+      --liquid-button-shadow: var(--shadow-pill);
+      --liquid-button-shadow-hover: var(--shadow-pill);
+      --liquid-button-radius: var(--pill-radius);
+      --liquid-button-padding: 0 16px 0 10px;
+      --liquid-button-gap: var(--space-inline-gap);
+      --liquid-button-color: var(--color-text);
       height: var(--top-pill-height);
-      padding: 0 16px 0 10px;
-      border-radius: var(--pill-radius);
-      background: var(--color-dropdown-bg);
-      box-shadow: var(--shadow-pill);
 
       .avatar-circle {
         display: grid;
@@ -112,34 +113,38 @@
     gap: var(--space-inline-gap);
 
     .header-icon-pill {
+      --liquid-button-fill: var(--color-dropdown-bg);
+      --liquid-button-fill-hover: var(--color-dropdown-bg);
+      --liquid-button-shadow: var(--shadow-pill);
+      --liquid-button-shadow-hover: var(--shadow-pill);
+      --liquid-button-radius: var(--pill-radius);
+      --liquid-button-size: var(--top-pill-height);
+      --liquid-button-color: var(--color-text);
+
       position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      height: var(--top-pill-height);
-      padding: 0 14px;
-      border-radius: var(--pill-radius);
-      background: var(--color-dropdown-bg);
-      box-shadow: var(--shadow-pill);
-      color: var(--color-text);
-      border: none;
-      cursor: pointer;
 
       .icon-action {
         width: 17px;
         height: 17px;
       }
 
-      .icon-sparkle {
-        width: 16px;
-        height: 16px;
-        color: var(--color-primary);
-      }
+      &.is-assistant {
+        --liquid-button-padding: 0 14px;
+        --liquid-button-gap: 8px;
+        width: auto;
+        min-width: auto;
+        height: var(--top-pill-height);
 
-      .assistant-label {
-        font-size: var(--text-nav-size);
-        font-weight: var(--font-weight-medium);
+        .icon-sparkle {
+          width: 16px;
+          height: 16px;
+          color: var(--color-primary);
+        }
+
+        .assistant-label {
+          font-size: var(--text-nav-size);
+          font-weight: var(--font-weight-medium);
+        }
       }
 
       .notif-badge {
@@ -162,17 +167,17 @@
     }
 
     .header-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      --liquid-button-fill: var(--color-dropdown-bg);
+      --liquid-button-fill-hover: var(--color-dropdown-bg);
+      --liquid-button-shadow: var(--shadow-pill);
+      --liquid-button-shadow-hover: var(--shadow-pill);
+      --liquid-button-radius: var(--pill-radius);
+      --liquid-button-padding: 0 16px;
+      --liquid-button-gap: 8px;
+      --liquid-button-font-size: var(--text-nav-size);
+      --liquid-button-color: var(--color-text);
       height: var(--top-pill-height);
-      padding: 0 16px;
-      border-radius: var(--pill-radius);
-      background: var(--color-dropdown-bg);
-      box-shadow: var(--shadow-pill);
-      font-size: var(--text-nav-size);
       font-weight: var(--font-weight-medium);
-      color: var(--color-text);
 
       svg {
         width: 16px;
@@ -185,8 +190,11 @@
       }
 
       &.is-connect {
-        background: var(--color-logo-bg);
-        color: var(--color-card-bg);
+        --liquid-button-fill: var(--color-logo-bg);
+        --liquid-button-fill-hover: var(--color-logo-bg);
+        --liquid-button-shadow: var(--shadow-pill);
+        --liquid-button-shadow-hover: var(--shadow-pill);
+        --liquid-button-color: var(--color-card-bg);
       }
     }
   }

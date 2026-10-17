@@ -1,5 +1,9 @@
 @use 'variables'as var;
 
+:host {
+    display: contents;
+}
+
 .liquid-menu-popup-overlay {
     position: fixed;
     width   : 100vw;

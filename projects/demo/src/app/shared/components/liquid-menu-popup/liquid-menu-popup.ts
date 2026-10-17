@@ -99,7 +99,7 @@ export class LiquidMenuPopup<TData = any> {
    * The invisible overlay that takes a click outside the panel. Off, the page
    * behind stays live: hover, scroll and clicks all reach it while the panel is up.
    */
-  readonly overlay = input(false, { transform: booleanAttribute });
+  readonly overlay = input(true, { transform: booleanAttribute });
   /** Closes on a click outside the panel — on the overlay, or anywhere else when there is none. */
   readonly closeOnOutsideClick = input(true, { transform: booleanAttribute });
 
