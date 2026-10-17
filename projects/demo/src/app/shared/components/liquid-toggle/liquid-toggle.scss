@@ -14,6 +14,7 @@ $spring: field.$spring;
     --_i-h: calc(var(--_height) * 0.34);
     --_o: calc(var(--_height) * 0.32);
     --_o-stroke: calc(var(--_height) * 0.045);
+    --_icon: calc(var(--_thumb) * 0.62);
 }
 
 :host(.is-disabled) {
@@ -105,6 +106,9 @@ $spring: field.$spring;
     left: 0;
     top: 0;
     z-index: 1;
+    // Both glyphs share one cell and crossfade, so the one leaving shrinks as the other grows.
+    display: grid;
+    place-items: center;
     width: var(--_thumb);
     height: var(--_thumb);
     border-radius: calc(var(--_thumb) / 2);
@@ -115,6 +119,35 @@ $spring: field.$spring;
 
     :host(.is-on) & {
         translate: calc(var(--_width) - var(--_inset) - var(--_thumb)) var(--_inset);
+    }
+
+    .liquid-toggle-icon {
+        grid-area: 1 / 1;
+        display: flex;
+        font-size: var(--_icon);
+        // In the glyph's 512-unit viewBox, so the stroke scales with the icon.
+        --ng-icon__stroke-width: 64px;
+        transition: opacity var(--_settle) $spring, scale var(--_settle) $spring;
+    }
+
+    .is-check {
+        color: var(--liquid-toggle-fill, #4cc417);
+        opacity: 0;
+        scale: 0.4;
+
+        :host(.is-on) & {
+            opacity: 1;
+            scale: 1;
+        }
+    }
+
+    .is-dash {
+        color: var(--muted);
+
+        :host(.is-on) & {
+            opacity: 0;
+            scale: 0.4;
+        }
     }
 }
 
@@ -167,7 +200,8 @@ $spring: field.$spring;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .liquid-toggle-track {
+    .liquid-toggle-track,
+    .liquid-toggle-icon {
         transition: none;
     }
 

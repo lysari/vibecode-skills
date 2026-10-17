@@ -19,7 +19,12 @@
         }
       </div>
     </div>
-    <span #thumb class="liquid-toggle-thumb" aria-hidden="true"></span>
+    <span #thumb class="liquid-toggle-thumb" aria-hidden="true">
+      @if (icons()) {
+        <ng-icon class="liquid-toggle-icon is-check" name="ionCheckmark" />
+        <ng-icon class="liquid-toggle-icon is-dash" name="ionRemove" />
+      }
+    </span>
     <input
       #control
       class="liquid-toggle-control"

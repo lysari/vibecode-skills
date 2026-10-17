@@ -6,7 +6,8 @@
         A boolean chosen by sliding a thumb across a pill. The thumb pours to the other end and the
         on-color fills the track from the left edge. <code>fill="thumb"</code> grows that color out
         from behind the thumb instead. <code>io</code> adds an I on the color and an O on the empty
-        track. Click the track, its label, or focus it and press Space.
+        track. <code>icons</code> puts a check or a dash on the thumb. Click the track, its label, or
+        focus it and press Space.
       </p>
       <div class="toggle-panel">
         <p class="toggle-panel-title">Connection</p>
@@ -14,7 +15,8 @@
         <x-liquid-toggle label="Alerts" hint="Banners while the app is open" [(value)]="alerts" />
         <x-liquid-toggle label="From the thumb" fill="thumb" [(value)]="fromThumb" />
         <x-liquid-toggle label="Power" io [(value)]="power" />
-        <pre class="docs-log">wi-fi: {{ wifi() ? 'on' : 'off' }} · alerts: {{ alerts() ? 'on' : 'off' }} · from the thumb: {{ fromThumb() ? 'on' : 'off' }} · power: {{ power() ? 'on' : 'off' }}</pre>
+        <x-liquid-toggle label="Bluetooth" icons [(value)]="bluetooth" />
+        <pre class="docs-log">wi-fi: {{ wifi() ? 'on' : 'off' }} · alerts: {{ alerts() ? 'on' : 'off' }} · from the thumb: {{ fromThumb() ? 'on' : 'off' }} · power: {{ power() ? 'on' : 'off' }} · bluetooth: {{ bluetooth() ? 'on' : 'off' }}</pre>
       </div>
     </header>
 
@@ -62,6 +64,10 @@
         <label class="docs-flag">
           <input type="checkbox" [checked]="play.io()" (change)="setFlag('io', $event)" />
           io
+        </label>
+        <label class="docs-flag">
+          <input type="checkbox" [checked]="play.icons()" (change)="setFlag('icons', $event)" />
+          icons
         </label>
       </div>
 
@@ -134,6 +140,7 @@
           [error]="play.error() || null"
           [fill]="play.fill()"
           [io]="play.io()"
+          [icons]="play.icons()"
           [style]="play.style()"
           [value]="playValue()"
           (valueChange)="onPlayChange($event)"

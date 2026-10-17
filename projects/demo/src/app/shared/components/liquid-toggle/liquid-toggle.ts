@@ -17,7 +17,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { ionAlertCircleOutline } from '@ng-icons/ionicons';
+import { ionAlertCircleOutline, ionCheckmark, ionRemove } from '@ng-icons/ionicons';
 import {
   Box,
   animatedBox,
@@ -94,7 +94,7 @@ function fillFrames(from: number, to: number, pull: number): Keyframe[] {
   },
   imports: [NgIcon],
   providers: [
-    provideIcons({ ionAlertCircleOutline }),
+    provideIcons({ ionAlertCircleOutline, ionCheckmark, ionRemove }),
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => LiquidToggle), multi: true },
   ],
   selector: 'x-liquid-toggle',
@@ -115,6 +115,8 @@ export class LiquidToggle implements ControlValueAccessor {
   /** `track` grows from the left edge. `thumb` grows out from behind the thumb. */
   readonly fill = input<'track' | 'thumb'>('track');
   readonly io = input(false, { transform: booleanAttribute });
+  /** A check on the thumb while on, a dash while off. */
+  readonly icons = input(false, { transform: booleanAttribute });
 
   private readonly press = viewChild.required<ElementRef<HTMLElement>>('press');
   private readonly track = viewChild<ElementRef<HTMLElement>>('track');

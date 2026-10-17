@@ -32,6 +32,7 @@ export class LiquidToggleDocs {
   protected readonly alerts = signal(false);
   protected readonly fromThumb = signal(true);
   protected readonly power = signal(true);
+  protected readonly bluetooth = signal(true);
   protected alertsOn = false;
   protected readonly sync = new FormControl(false, { nonNullable: true, validators: Validators.requiredTrue });
 
@@ -44,6 +45,7 @@ export class LiquidToggleDocs {
     error: signal(''),
     fill: signal<'track' | 'thumb'>('track'),
     io: signal(false),
+    icons: signal(false),
     style: signal<Record<string, string>>({}),
   };
   protected readonly playValue = signal(false);
@@ -64,6 +66,7 @@ export class LiquidToggleDocs {
       play.error() ? `  error="${play.error()}"` : '',
       play.fill() === 'thumb' ? '  fill="thumb"' : '',
       play.io() ? '  io' : '',
+      play.icons() ? '  icons' : '',
       style ? `  style="${style}"` : '',
       '  [(value)]="on"',
       '/>',
@@ -86,7 +89,7 @@ export class LiquidToggleDocs {
     this.play[control].set((event.target as HTMLInputElement).value);
   }
 
-  protected setFlag(control: 'disabled' | 'invalid' | 'io', event: Event): void {
+  protected setFlag(control: 'disabled' | 'invalid' | 'io' | 'icons', event: Event): void {
     this.play[control].set((event.target as HTMLInputElement).checked);
   }
 

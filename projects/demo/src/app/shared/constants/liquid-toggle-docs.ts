@@ -59,6 +59,12 @@ export const TOGGLE_API: ApiRow[] = [
     value: 'false',
     does: 'An I in the on-color, and an O in the empty track. The thumb covers the other one.',
   },
+  {
+    name: 'icons',
+    type: 'boolean',
+    value: 'false',
+    does: 'A check in the on-color on the thumb while on, a muted dash while off.',
+  },
 ];
 
 export const TOGGLE_MEMBERS: ApiRow[] = [
