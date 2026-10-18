@@ -2,7 +2,7 @@
 name: vibecode-design
 description: Use when building or changing user interface screens, components, layouts, or styles, so the UI reuses the project's existing components and design values, looks consistent across screens, and stays accessible
 metadata:
-  version: "0.0.1-20261016.2"
+  version: "0.0.1-20261018.1"
 ---
 
 # Vibecode design
@@ -30,6 +30,7 @@ Build UI that looks as if one careful designer and developer made every screen: 
 ## Navigation and controls
 
 - Never squeeze a horizontal tab strip or segmented control into a narrow column or sidebar where tab labels cannot fit without clipping or overlapping; use a vertical navigation list, a dropdown selector, or horizontally scrollable pills instead, e.g. a vertical list of category links in a narrow sidebar, never five horizontal tab buttons stretched across a 240px column.
+- Never wrap a toolbar, header bar, or breadcrumb row of individual pill buttons or badges inside an enclosing pill-shaped container or bordered box; keep the container transparent and let the individual control pills define the interactive surfaces, e.g. a row of pill buttons on a transparent header strip, never an outer pill box enclosing pill buttons.
 
 ## Corner radius
 
