@@ -145,19 +145,14 @@ Ensure `AGENTS.md` at the project root contains the top-level directive to use `
 - **Preservation Rule**: If `AGENTS.md` already exists, append or merge the `/vibecode-workflow` directive without overwriting or deleting any existing owner notes or rules. If it does not exist, create it with the standard directives.
 
 ### 9. Point Auxiliary Agent Files (`CLAUDE.md`, `GEMINI.md`)
-Different AI tools look for specific root instruction files. Unify them by pointing to `AGENTS.md`:
+Different AI tools look for specific root instruction files. Unify them by referencing `@AGENTS.md`:
 - **If the file already exists (`CLAUDE.md` or `GEMINI.md`)**:
   - **Do NOT overwrite or delete existing content.**
-  - Check if it already references `AGENTS.md`. If not, prepend or append:
-    ```markdown
-    > See [AGENTS.md](./AGENTS.md) for unified project instructions, architecture, and workflow rules.
-    ```
+  - Check if it already includes `@AGENTS.md`. If not, append `@AGENTS.md` on a new line.
 - **If the file does NOT exist**:
-  - Create the file with a clean pointer to `AGENTS.md`:
+  - Create the file containing only:
     ```markdown
-    # Instructions
-
-    See [AGENTS.md](./AGENTS.md) for unified project instructions, architecture, and workflow rules.
+    @AGENTS.md
     ```
 
 ---
@@ -169,6 +164,6 @@ Different AI tools look for specific root instruction files. Unify them by point
 3. **Present to the user**: Show the detected profile, proposed `.claude/project-rules.md`, and planned `AGENTS.md` directives to the user for review.
 4. **Write `.claude/project-rules.md`**: Create `.claude/` if needed and write the project rules.
 5. **Update or create `AGENTS.md`**: Add the `/vibecode-workflow` directive.
-6. **Link auxiliary files (`CLAUDE.md`, `GEMINI.md`)**: Safely point them to `AGENTS.md` without clobbering existing content.
+6. **Link auxiliary files (`CLAUDE.md`, `GEMINI.md`)**: Safely reference `@AGENTS.md` without clobbering existing content.
 7. **Verify with Git**: Run `git status -s` to confirm only the intended instruction and rule files were touched.
 
