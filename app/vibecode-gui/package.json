@@ -1,7 +1,7 @@
 {
-	"name": "electrobun-react-tailwind-vite",
+	"name": "vibecode-gui",
 	"version": "1.0.0",
-	"description": "Electrobun app with React, Tailwind CSS, and Vite HMR",
+	"description": "Vibecode Skills: a desktop app for browsing and managing agent skills",
 	"dependencies": {
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1"

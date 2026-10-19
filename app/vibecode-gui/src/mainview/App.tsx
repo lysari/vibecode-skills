@@ -172,10 +172,10 @@ function App() {
 		setDialog(null);
 	}
 
-	async function renameSkill(name: string) {
+	async function renameSkill(name: string, shouldRenameMentions: boolean) {
 		if (!skill) return;
 		const renamedDir = skill.dir.replace(/[^/]+$/, name);
-		const next = await skillsApi.renameSkill({ dir: skill.dir, name });
+		const next = await skillsApi.renameSkill({ dir: skill.dir, name, shouldRenameMentions });
 		if (favourites.has(skill.dir)) {
 			const nextFavourites = new Set(favourites);
 			nextFavourites.delete(skill.dir);
@@ -281,10 +281,11 @@ function App() {
 				/>
 			)}
 			{dialog?.kind === "delete" && skill && (
-				<Dialog title={`Delete ${skill.name}?`} confirmLabel="Delete skill" isDanger onConfirm={deleteSkill} onCancel={() => setDialog(null)}>
+				<Dialog title={`Move ${skill.name} to the Trash?`} confirmLabel="Move to Trash" isDanger onConfirm={deleteSkill} onCancel={() => setDialog(null)}>
 					<p>
-						This permanently deletes <span className="font-mono text-code text-ink">{skill.dir}</span> with its SKILL.md
-						and {skill.files.length} supporting {skill.files.length === 1 ? "file" : "files"}.
+						This moves <span className="font-mono text-code text-ink">{skill.dir}</span> with its SKILL.md and{" "}
+						{skill.files.length} supporting {skill.files.length === 1 ? "file" : "files"} to the Trash. You can restore
+						the folder from the Trash.
 					</p>
 				</Dialog>
 			)}

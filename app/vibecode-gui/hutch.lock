@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "electrobun-react-tailwind-vite",
+      "name": "vibecode-gui",
       "dependencies": {
         "react": "^18.3.1",
         "react-dom": "^18.3.1",

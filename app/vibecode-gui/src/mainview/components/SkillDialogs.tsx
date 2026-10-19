@@ -57,22 +57,22 @@ export function NewSkillDialog({ sources, onCreate, onCancel }: NewSkillDialogPr
 interface RenameSkillDialogProps {
 	skill: Skill;
 	mentionCount: number;
-	onRename: (name: string) => Promise<void>;
+	onRename: (name: string, shouldRenameMentions: boolean) => Promise<void>;
 	onCancel: () => void;
 }
 
 export function RenameSkillDialog({ skill, mentionCount, onRename, onCancel }: RenameSkillDialogProps) {
 	const [name, setName] = useState(skill.name);
+	const [shouldRenameMentions, setShouldRenameMentions] = useState(true);
 
 	return (
-		<Dialog title={`Rename ${skill.name}`} confirmLabel="Rename" onConfirm={() => onRename(name)} onCancel={onCancel}>
+		<Dialog
+			title={`Rename ${skill.name}`}
+			confirmLabel="Rename"
+			onConfirm={() => onRename(name, mentionCount > 0 && shouldRenameMentions)}
+			onCancel={onCancel}
+		>
 			<p>Renames the skill folder and the name in its frontmatter.</p>
-			{mentionCount > 0 && (
-				<p className="bg-warning-soft px-stack py-rail-gap text-meta text-warning-text">
-					{mentionCount} other {mentionCount === 1 ? "skill mentions" : "skills mention"} this name. Their text is
-					not changed.
-				</p>
-			)}
 			<label className="flex flex-col gap-rail-gap text-meta text-muted">
 				New name
 				<input
@@ -82,6 +82,20 @@ export function RenameSkillDialog({ skill, mentionCount, onRename, onCancel }: R
 					className={FIELD_CLASS}
 				/>
 			</label>
+			{mentionCount > 0 && (
+				<label className="flex items-start gap-stack bg-warning-soft px-stack py-rail-gap text-meta text-warning-text">
+					<input
+						type="checkbox"
+						checked={shouldRenameMentions}
+						onChange={(event) => setShouldRenameMentions(event.target.checked)}
+						className="mt-rail-gap shrink-0 accent-accent"
+					/>
+					<span>
+						Also rename the mentions in the {mentionCount} other {mentionCount === 1 ? "skill" : "skills"} that
+						link to this name (code spans, slash commands and paths in their SKILL.md).
+					</span>
+				</label>
+			)}
 		</Dialog>
 	);
 }

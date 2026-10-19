@@ -1,7 +1,8 @@
 import { existsSync, realpathSync } from "node:fs";
-import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rename, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import type { Skill, SkillCreate, SkillFile, SkillForm, SkillLibrary } from "../shared/skill.interface";
+import type { Skill, SkillCreate, SkillFile, SkillForm, SkillLibrary, SkillRename } from "../shared/skill.interface";
+import { mentionsSkill, renameSkillMentions } from "../shared/skill-links";
 
 const SKILL_FILE = "SKILL.md";
 const DEFAULT_SOURCE = join(".claude", "skills");
@@ -140,11 +141,6 @@ async function readSkill(skillDir: string): Promise<Skill> {
 	};
 }
 
-function mentionsSkill(text: string, name: string): boolean {
-	const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-	return new RegExp(`(?<![\\w-])${escaped}(?![\\w-])`).test(text);
-}
-
 export async function listSkills(): Promise<SkillLibrary> {
 	const dirs: string[] = [];
 	await findSkillDirs(repoRoot, dirs);
@@ -205,21 +201,32 @@ export async function createSkill(create: SkillCreate): Promise<SkillLibrary> {
 	return listSkills();
 }
 
-export async function renameSkill({ dir, name }: { dir: string; name: string }): Promise<SkillLibrary> {
+export async function renameSkill({ dir, name, shouldRenameMentions }: SkillRename): Promise<SkillLibrary> {
 	assertSkillName(name);
 	const skillDir = resolveSkillDir(dir);
 	const target = join(dirname(skillDir), name);
 	if (existsSync(target)) throw new Error(`A folder named ${name} already exists.`);
+	const { skills } = await listSkills();
+	const skillPath = relative(repoRoot, skillDir);
+	const oldName = skills.find((skill) => skill.dir === skillPath)?.name ?? "";
+	const mentioning = shouldRenameMentions && oldName ? skills.filter((skill) => skill.references.includes(skillPath)) : [];
 	await rename(skillDir, target);
 	const { frontmatter, body } = splitSkillFile(await readFile(join(target, SKILL_FILE), "utf8"));
 	const renamed = /^name:.*$/m.test(frontmatter)
 		? frontmatter.replace(/^name:.*$/m, `name: ${name}`)
 		: `name: ${name}\n${frontmatter}`;
 	await writeFile(join(target, SKILL_FILE), joinSkillFile({ frontmatter: renamed, body }));
+	for (const other of mentioning) {
+		const path = join(resolveSkillDir(other.dir), SKILL_FILE);
+		await writeFile(path, renameSkillMentions(await readFile(path, "utf8"), oldName, name));
+	}
 	return listSkills();
 }
 
-export async function deleteSkill({ dir }: { dir: string }): Promise<SkillLibrary> {
-	await rm(resolveSkillDir(dir), { recursive: true });
+export async function deleteSkill(
+	{ dir }: { dir: string },
+	moveToTrash: (path: string) => boolean,
+): Promise<SkillLibrary> {
+	if (!moveToTrash(resolveSkillDir(dir))) throw new Error(`Could not move ${dir} to the Trash.`);
 	return listSkills();
 }

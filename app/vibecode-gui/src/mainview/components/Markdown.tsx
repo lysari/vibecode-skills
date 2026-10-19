@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { codeMentionsSkill } from "../../shared/skill-links";
 
 type RenderInline = (text: string) => ReactNode[];
 
@@ -138,9 +139,9 @@ export function Markdown({ source, skillNames, onOpenSkill }: MarkdownProps) {
 			if (key > last) nodes.push(text.slice(last, key));
 			if (match[1]) {
 				const code = token.slice(1, -1);
-				const skillName = code.replace(/^\//, "").replace(/\/SKILL\.md$/, "");
+				const skillName = [...skillNames].find((name) => codeMentionsSkill(code, name));
 				nodes.push(
-					skillNames.has(skillName) ? (
+					skillName ? (
 						<button
 							key={key}
 							type="button"

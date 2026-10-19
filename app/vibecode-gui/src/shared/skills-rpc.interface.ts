@@ -1,5 +1,5 @@
 import type { RPCSchema } from "electrobun/rpc";
-import type { SkillCreate, SkillForm, SkillLibrary } from "./skill.interface";
+import type { SkillCreate, SkillForm, SkillLibrary, SkillRename } from "./skill.interface";
 
 export interface SkillsRPC {
 	bun: RPCSchema<{
@@ -8,7 +8,7 @@ export interface SkillsRPC {
 			readSkillFile: { params: { dir: string; path: string }; response: string };
 			saveSkill: { params: { dir: string; form: SkillForm }; response: SkillLibrary };
 			createSkill: { params: SkillCreate; response: SkillLibrary };
-			renameSkill: { params: { dir: string; name: string }; response: SkillLibrary };
+			renameSkill: { params: SkillRename; response: SkillLibrary };
 			deleteSkill: { params: { dir: string }; response: SkillLibrary };
 		};
 	}>;

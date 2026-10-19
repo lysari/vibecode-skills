@@ -1,4 +1,4 @@
-import { BrowserView, BrowserWindow, Updater } from "electrobun/main";
+import { BrowserView, BrowserWindow, Updater, Utils } from "electrobun/main";
 import type { SkillsRPC } from "../shared/skills-rpc.interface";
 import {
 	createSkill,
@@ -37,7 +37,7 @@ const rpc = BrowserView.defineRPC<SkillsRPC>({
 			saveSkill,
 			createSkill,
 			renameSkill,
-			deleteSkill,
+			deleteSkill: (params) => deleteSkill(params, Utils.moveToTrash),
 		},
 	},
 });

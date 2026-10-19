@@ -29,6 +29,12 @@ export interface SkillCreate {
 	description: string;
 }
 
+export interface SkillRename {
+	dir: string;
+	name: string;
+	shouldRenameMentions: boolean;
+}
+
 export interface SkillLibrary {
 	root: string;
 	sources: string[];

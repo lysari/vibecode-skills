@@ -6,6 +6,11 @@ import { Icon } from "./Icon";
 const MINUTE_MS = 60_000;
 const HOUR_MINUTES = 60;
 const DAY_HOURS = 24;
+const PERCENT = 100;
+const ZOOM_BUTTON_CLASS =
+	"inline-flex h-pill-h items-center justify-center rounded-full border border-line-control bg-card text-ink hover:bg-field disabled:opacity-40";
+
+export type MapZoomChange = "in" | "out" | "fit";
 
 interface MapToolbarProps {
 	skill: Skill;
@@ -16,6 +21,11 @@ interface MapToolbarProps {
 	onSelect: (dir: string, view?: SkillView) => void;
 	onSave: () => void;
 	onDiscard: () => void;
+	scale: number;
+	isFitted: boolean;
+	canZoomIn: boolean;
+	canZoomOut: boolean;
+	onZoom: (change: MapZoomChange) => void;
 }
 
 function formatEdited(modifiedAt: number): string {
@@ -27,7 +37,8 @@ function formatEdited(modifiedAt: number): string {
 	return `${Math.round(hours / DAY_HOURS)} d ago`;
 }
 
-export function MapToolbar({ skill, skills, skillCount, linkCount, isDirty, onSelect, onSave, onDiscard }: MapToolbarProps) {
+export function MapToolbar(props: MapToolbarProps) {
+	const { skill, skills, skillCount, linkCount, isDirty, onSelect, onSave, onDiscard, onZoom } = props;
 	const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 	const [openPopover, setOpenPopover] = useState<"issues" | "unsaved" | null>(null);
 	const popoverRef = useRef<HTMLDivElement>(null);
@@ -149,6 +160,38 @@ export function MapToolbar({ skill, skills, skillCount, linkCount, isDirty, onSe
 						)}
 					</div>
 				)}
+				<span className="flex items-center gap-rail-gap">
+					<button
+						type="button"
+						onClick={() => onZoom("out")}
+						disabled={!props.canZoomOut}
+						aria-label="Zoom out"
+						className={`${ZOOM_BUTTON_CLASS} w-pill-h`}
+					>
+						<Icon name="minus" className="size-icon-sm" />
+					</button>
+					<span aria-live="polite" className="w-control text-center tabular-nums text-chip">
+						{Math.round(props.scale * PERCENT)}%
+					</span>
+					<button
+						type="button"
+						onClick={() => onZoom("in")}
+						disabled={!props.canZoomIn}
+						aria-label="Zoom in"
+						className={`${ZOOM_BUTTON_CLASS} w-pill-h`}
+					>
+						<Icon name="plus" className="size-icon-sm" />
+					</button>
+					<button
+						type="button"
+						onClick={() => onZoom("fit")}
+						disabled={props.isFitted}
+						aria-label="Fit map to view"
+						className={`${ZOOM_BUTTON_CLASS} px-stack`}
+					>
+						Fit
+					</button>
+				</span>
 			</div>
 		</div>
 	);

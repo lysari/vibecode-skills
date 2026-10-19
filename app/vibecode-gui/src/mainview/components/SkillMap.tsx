@@ -2,8 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import type { Skill } from "../../shared/skill.interface";
 import type { SkillView } from "../skill-view";
 import { Icon } from "./Icon";
-import { MapToolbar } from "./MapToolbar";
+import { MapToolbar, type MapZoomChange } from "./MapToolbar";
 import { StatusPill } from "./StatusPill";
+
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 2;
+const ZOOM_STEP = 1.25;
 
 interface MapNode {
 	key: string;
@@ -158,14 +162,46 @@ function MapEntry({ node, collapsed, onToggle, onSelect }: MapEntryProps) {
 
 export function SkillMap({ skill, skills, isDirty, onSelect, onSave, onDiscard }: SkillMapProps) {
 	const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+	const [zoom, setZoom] = useState<{ dir: string; scale: number } | null>(null);
+	const [size, setSize] = useState({ viewportWidth: 0, contentWidth: 0, contentHeight: 0 });
 	const scrollRef = useRef<HTMLDivElement>(null);
+	const contentRef = useRef<HTMLDivElement>(null);
 	const { tree, skillCount, linkCount } = buildMap(skill, skills);
 	const isRootCollapsed = collapsed.has(tree.key);
+	const zoomScale = zoom?.dir === skill.dir ? zoom.scale : null;
+	const fitScale = size.contentWidth > 0 ? Math.min(1, size.viewportWidth / size.contentWidth) : 1;
+	const scale = zoomScale ?? fitScale;
+
+	useEffect(() => {
+		const scroller = scrollRef.current;
+		const content = contentRef.current;
+		if (!scroller || !content) return;
+		const observer = new ResizeObserver(() => {
+			const { paddingLeft, paddingRight } = getComputedStyle(scroller);
+			setSize({
+				viewportWidth: scroller.clientWidth - parseFloat(paddingLeft) - parseFloat(paddingRight),
+				contentWidth: content.offsetWidth,
+				contentHeight: content.offsetHeight,
+			});
+		});
+		observer.observe(scroller);
+		observer.observe(content);
+		return () => observer.disconnect();
+	}, []);
 
 	useEffect(() => {
 		const scroller = scrollRef.current;
 		if (scroller) scroller.scrollLeft = (scroller.scrollWidth - scroller.clientWidth) / 2;
-	}, [skill.dir]);
+	}, [skill.dir, scale]);
+
+	function changeZoom(change: MapZoomChange) {
+		if (change === "fit") {
+			setZoom(null);
+			return;
+		}
+		const next = change === "in" ? Math.min(MAX_ZOOM, scale * ZOOM_STEP) : Math.max(MIN_ZOOM, scale / ZOOM_STEP);
+		setZoom({ dir: skill.dir, scale: next });
+	}
 
 	function toggle(key: string) {
 		const next = new Set(collapsed);
@@ -185,30 +221,44 @@ export function SkillMap({ skill, skills, isDirty, onSelect, onSave, onDiscard }
 				onSelect={onSelect}
 				onSave={onSave}
 				onDiscard={onDiscard}
+				scale={scale}
+				isFitted={zoomScale === null}
+				canZoomIn={scale < MAX_ZOOM}
+				canZoomOut={scale > MIN_ZOOM}
+				onZoom={changeZoom}
 			/>
-			<div ref={scrollRef} className="min-h-0 flex-1 overflow-auto">
-				<div className="flex w-max min-w-full flex-col items-center p-header-x">
-					<NodeCard
-						key={tree.key}
-						node={tree}
-						isRoot
-						isDirty={isDirty}
-						isCollapsed={isRootCollapsed}
-						onToggle={() => toggle(tree.key)}
-						onSelect={onSelect}
-					/>
-					{!isRootCollapsed && tree.children.length > 0 && (
-						<div className="map-row">
-							{tree.children.map((child) => (
-								<div key={child.key} className="map-column">
-									<MapEntry node={child} collapsed={collapsed} onToggle={toggle} onSelect={onSelect} />
-								</div>
-							))}
-						</div>
-					)}
-					{tree.children.length === 0 && (
-						<p className="mt-level text-body text-muted">This skill does not mention any other skill.</p>
-					)}
+			<div ref={scrollRef} className="min-h-0 flex-1 overflow-auto p-header-x">
+				<div
+					className="mx-auto"
+					style={{ width: size.contentWidth * scale, height: size.contentHeight * scale }}
+				>
+					<div
+						ref={contentRef}
+						className="flex w-max origin-top-left flex-col items-center"
+						style={{ transform: `scale(${scale})` }}
+					>
+						<NodeCard
+							key={tree.key}
+							node={tree}
+							isRoot
+							isDirty={isDirty}
+							isCollapsed={isRootCollapsed}
+							onToggle={() => toggle(tree.key)}
+							onSelect={onSelect}
+						/>
+						{!isRootCollapsed && tree.children.length > 0 && (
+							<div className="map-row">
+								{tree.children.map((child) => (
+									<div key={child.key} className="map-column">
+										<MapEntry node={child} collapsed={collapsed} onToggle={toggle} onSelect={onSelect} />
+									</div>
+								))}
+							</div>
+						)}
+						{tree.children.length === 0 && (
+							<p className="mt-level text-body text-muted">This skill does not mention any other skill.</p>
+						)}
+					</div>
 				</div>
 			</div>
 		</section>

@@ -14,6 +14,7 @@ const ICON_PATHS = {
 		</>
 	),
 	plus: <path d="M12 5v14M5 12h14" />,
+	minus: <path d="M5 12h14" />,
 	refresh: (
 		<>
 			<path d="M21 12a9 9 0 0 1-15.5 6.2L3 16" />
