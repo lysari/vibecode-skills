@@ -59,7 +59,7 @@ When developers "vibe code" with AI, two big problems usually happen:
   - [Link a Single Skill](#link-a-single-skill)
   - [Verification](#verification)
   - [Unlinking](#unlinking)
-- [Project Onboarding Quickstart](#-project-onboarding-quickstart)
+- [Usage Guide: How It Works & Ways to Use](#-usage-guide-how-it-works--ways-to-use)
 - [Repository Structure](#-repository-structure)
 
 ---
@@ -316,38 +316,87 @@ rm ~/.cursor/skills/<skill-name>
 
 ---
 
-## 🛠 Project Onboarding Quickstart
+## 🛠 Usage Guide: How It Works & Ways to Use
 
-When onboarding a new or existing repository to the Vibecode ecosystem:
+### Step 1: Onboard Your Repository (One-Time Setup)
 
-1. **Initialize the Project**:
-   Open your agent in the target project and run:
-   ```text
-   /vibecode-init
-   ```
-   This performs an architectural scan and creates:
-   - `.claude/project-rules.md`: Captures project structure, path aliases, test tooling, and local idioms.
-   - `AGENTS.md`: Directs all AI agents to use `/vibecode-workflow` and abide by `.claude/project-rules.md`.
-   - `CLAUDE.md` and `GEMINI.md`: Symlinks or pointers directly to `AGENTS.md` to guarantee cross-client consistency.
+Before developing in any new or existing repository, run:
+```text
+/vibecode-init
+```
+- **How it works**:
+  1. Scans your codebase for directory structure, framework conventions, test frameworks, path aliases, and build setups.
+  2. Generates `.claude/project-rules.md` capturing project-specific conventions.
+  3. Creates `AGENTS.md` (and links `CLAUDE.md` and `GEMINI.md`) directing all AI tools to abide by `.claude/project-rules.md` and execute tasks using the Vibecode lifecycle.
 
-2. **Execute Tasks**:
-   Start developing with:
-   ```text
-   /vibecode-workflow implement the user authentication modal using liquid design tokens
-   ```
+---
 
-3. **Verify Compliance**:
-   Before delivering work or merging, verify against the rules:
-   ```text
-   /vibecode-review
-   ```
+### Step 2: Choose Your Execution Mode (3 Ways to Use)
 
-4. **Teach the Agent**:
-   Whenever you correct the agent's code or UI style, save it permanently:
-   ```text
-   /vibecode-update always use named exports instead of default exports
-   /vibecode-design-update always use 8px grid spacing for card headers
-   ```
+Depending on your task scope, there are **3 distinct ways** to execute work:
+
+| Way | Command | Best For | Review Gate Included? |
+|---|---|---|---|
+| **Way 1: Autonomous Workflow** *(Recommended)* | `/vibecode-workflow <task>` | Complex features, refactors, multi-step tasks | ✅ **Yes, built-in**. Every sub-agent automatically audits and passes `vibecode-review` before exit. |
+| **Way 2: Direct Single-Task** | `/use-vibecode <task>` | Quick, single-turn tasks in the active chat session | ✅ **Yes, built-in**. Runs Stage 1 (Prep) → Stage 2 (Impl) → Stage 3 (`vibecode-review`). |
+| **Way 3: Standalone Audit** | `/vibecode-review [skill]` | Pre-PR verification, manual code audits, diff sanity checks | 🔍 **Audit only**. Evaluates disk rules against current `git diff` without writing new code. |
+
+#### Way 1: Autonomous Multi-Task Workflow (`/vibecode-workflow`) — *Recommended*
+Use this for any non-trivial task or multi-file feature:
+```text
+/vibecode-workflow implement the user authentication modal using liquid design tokens
+```
+- **How it works**:
+  1. **Orchestrator Planning**: The main agent acts strictly as an orchestrator. It maintains a live progress dashboard (`task-progress.md`) and decomposes the request into sequential sub-tasks. It does not read massive source files or edit code directly.
+  2. **Fresh Ephemeral Sub-Agents**: Spawns a dedicated sub-agent per task with an isolated, clean context window (eliminating context rot and rule degradation).
+  3. **Automated 3-Stage Lifecycle (`use-vibecode`)**: Each sub-agent runs:
+     - **Stage 1 (Preparation)**: Discovers local rules in `.claude/project-rules.md` and checks for existing helpers.
+     - **Stage 2 (Implementation)**: Writes clean, minimal code using `vibecode` and measured UI tokens using `vibecode-design`.
+     - **Stage 3 (Mandatory Review Gate)**: Executes `vibecode-review` directly against rule files on disk, inspects its own diffs, and remediates any rule violations until the checklist achieves a `[PASS]`.
+  4. **Deliver & Terminate**: The sub-agent reports diffs and audit results to the orchestrator, and is terminated immediately to keep context clean.
+- **Do you need to run `/vibecode-review` afterward?**
+  **No.** `vibecode-review` is executed automatically inside each sub-agent as part of Stage 3.
+
+#### Way 2: Direct In-Session Task Execution (`/use-vibecode`)
+Use this when you want the active agent in your current chat to complete a single task directly without spawning sub-agents:
+```text
+/use-vibecode add email validation helper with unit tests
+```
+- **How it works**:
+  - Executes the complete 3-stage lifecycle in place within the current conversation thread.
+  - Automatically runs the Stage 3 `vibecode-review` audit gate before marking the task complete.
+
+#### Way 3: Standalone Compliance Audit (`/vibecode-review`)
+Use this to audit code that was **already written**, or as a final gate before merging/pushing:
+```text
+/vibecode-review
+```
+*Or target a specific skill discipline:*
+```text
+/vibecode-review vibecode-design
+```
+- **How it works**:
+  - Does **not** write new feature code.
+  - Re-reads every active skill and rule file **directly from disk** (never relies on conversation memory or cached summaries).
+  - Collects session diffs via `git status` and `git diff`.
+  - Audits against every explicit rule (naming conventions, dead code, leftover logs, missing types, eyeballed tokens) and outputs a pass/fail matrix.
+- **When to run this manually**:
+  - When you or an agent wrote code directly outside of `/vibecode-workflow`.
+  - Before opening a PR or merging to verify cumulative session changes across multiple commits.
+
+---
+
+### Step 3: Teach the Agent Permanently (Continuous Learning)
+
+Whenever you correct the agent's code style or UI choices, save it to permanent memory so future sessions and review gates enforce it:
+```text
+# For code hygiene, architecture, or TypeScript rules:
+/vibecode-update always use named exports instead of default exports
+
+# For UI spacing, design tokens, layout, or accessibility:
+/vibecode-design-update always use 8px grid spacing for card headers
+```
+- **How it works**: Distills your feedback into a clean, checkable rule written directly to disk (`vibecode/SKILL.md` or `vibecode-design/SKILL.md`).
 
 ---
 
