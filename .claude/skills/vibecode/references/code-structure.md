@@ -39,6 +39,10 @@
 - Validate input at the boundary (user input, network, files), not on every internal call.
 - When code decides whether a character in user-visible or user-entered text is a digit or a letter, accept every script the app displays, never ASCII alone, e.g. `/\p{Nd}/u` instead of `/[0-9]/`. Test it with a sample in each script, such as `១២៣` beside `123`.
 
+## Resources and cleanup
+- Clean up what you start: remove event listeners, cancel timers, and close subscriptions when a component, screen, or service is destroyed, so memory does not leak.
+- Fetch large data in pages or chunks; never pull an unbounded list of records into memory at once.
+
 ## Data and constants
 - Define each piece of data once, in one file, with one fully written type that lists every field.
 - Type data you read separately from data you send or collect in a form. Each entity has 2 to 3 types, one per use, kept in the same file.

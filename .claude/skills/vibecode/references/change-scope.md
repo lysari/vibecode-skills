@@ -6,6 +6,7 @@ Make the smallest change that fully solves the request. Every changed line shoul
 ## Before editing
 - Read the file and its neighbours first, then match their style, formatting, and idiom.
 - Identify the exact lines that need to change.
+- Spot edge cases before writing code: think of empty lists, missing values, network errors, or boundary values, and make sure the change handles them.
 
 ## While editing
 - Edit in place. Do not rewrite or reformat a whole file to change a few lines.

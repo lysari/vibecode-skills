@@ -9,6 +9,8 @@
 ## Safeguards
 - Keep auth guards, input validation, permission rules, and tests switched on. When one blocks your change, tell the user instead of commenting it out.
 - Write access rules as narrow as the feature needs. Never add a blanket allow.
+- Check user permissions on the record or resource itself (such as verifying who owns it), not just on the page or route.
+- Never paste raw, untrusted user input directly into database queries, system commands, or HTML templates. Use safe parameters or built-in escaping instead.
 
 ## Logging
 - Fix logging where it happens. Do not mute the global logger or console to hide output.
