@@ -1,33 +1,41 @@
+<div align="center">
+
+<img src="assets/Cute%20Vibecode%20Developer%20Diorama.png" alt="Cute Vibecode Developer Diorama" width="280" />
+
 # 🧠 Agent Skills Suite (Vibecode Ecosystem)
 
-> **"Transforming AI coding assistants from superficial 'vibe coders' into disciplined, architecture-first software engineers."**
+> **"Vibe coding that writes code like a thoughtful human—simple, clean, and effortless to read and maintain with AI."**
 
-A production-grade collection of modular agent skills engineered for **Claude Code**, **Google Antigravity**, and **Cursor**.
+A collection of modular agent skills engineered for **Claude Code**, **Google Antigravity**, and **Cursor**.
+
+</div>
 
 ---
 
 ## 🎯 What Our Skills Mean & What They Aim To Do
 
-### The Meaning Behind Our Skills
-The phrase **"Vibe Coding"** has popularized writing software by raw AI intuition and superficial prompting. While fast at first, unconstrained vibe coding quickly degrades into fragile codebases:
-- **Superficial fixes**: Patching symptoms with layers of helper wrappers rather than solving the root cause.
-- **Code bloat & duplicates**: Adding `_v2`, `_new`, or parallel models because the agent didn't search the existing codebase.
-- **UI by guesswork**: Eyeballing colors and margins instead of respecting existing design tokens, breaking consistency and accessibility.
-- **Context rot**: Degradation over long chat sessions where rules are forgotten, assumptions slip in, and quality decays.
+### The Meaning: Vibe Coding That Feels Human-Written
+When developers "vibe code" with AI, two big problems usually happen:
+1. **Sloppy AI Shortcuts**: The AI dumps duplicate functions, creates `_v2` files, patches symptoms with messy wrappers, or hallucinates styling.
+2. **Robotic Over-Engineering**: The AI gets "too professional"—adding 10 layers of unnecessary abstraction, cryptic boilerplate, and complex enterprise patterns that make the code impossible for a human to quickly read, understand, or maintain.
 
-**Our skills suite exists to replace unconstrained "vibe coding" with disciplined engineering.** It equips your AI agents with the mental models, architectural respect, self-review discipline, and modular workflows of a seasoned principal engineer.
+**Our skills aim for the sweet spot: Code that looks and feels like a careful human wrote it by hand.**
+- **Human-Readable First**: Code should be obvious, simple, and clean. A human should be able to open any file, understand what it does in 10 seconds, and edit it without fear.
+- **Easy to Co-Maintain with AI**: Built so humans and AI agents can collaborate smoothly without fighting overly complex architecture or untangling messy spaghetti.
+- **Minimal & In-Place**: Make the smallest, cleanest change in the files the project already uses. Delete what you replace. Don't add unnecessary layers.
 
 ### What Our Skills Aim To Achieve
 
-| Core Aim | What We Solve | How the Skills Enforce It | Key Skills |
+| Core Aim | What We Want to Avoid | How Our Skills Achieve It | Key Skills |
 |---|---|---|---|
-| 🎯 **Minimal, Root-Cause Engineering** | Stop code bloat, wrapper sprawl, and fragile hacks | Solves problems in-place using existing project utilities with the smallest possible diff; never leaves dead code. | `vibecode`, `use-vibecode` |
-| 🛡 **Zero Context Degradation** | Prevent agents from forgetting rules as conversations grow | Uses an ephemeral worker architecture where fresh sub-agents are spawned per task, audit their work, and terminate. | `vibecode-workflow` |
-| 🎨 **Pixel-Faithful Design Token Fidelity** | Stop agents from guessing colors and margins by eye | Samples exact colors, spacing, and typography from reference assets into formal design tokens; enforces accessibility and responsive grids. | `vibecode-design` |
-| 📋 **Enforced Pre-Completion Verification** | Stop agents from declaring "done" on broken or untested code | Enforces a mandatory post-implementation compliance review against disk-loaded rule files before returning to the user. | `vibecode-review` |
-| 🧠 **Continuous Compounding Memory** | Stop agents from repeating the same mistakes across sessions | Turns every user correction or critique into a permanent, reusable checkable rule for future sessions with zero prompt crafting. | `vibecode-update`, `vibecode-design-update` |
-| ⚖️ **Proportional Decision Intelligence** | Stop wasting heavy models on trivial tasks or under-powering architecture | Dynamically discovers active CLI models and routes tasks to the optimal provider and tier using TypeSafe's Jev model. | `auto-mode-workflow`, `jev-assistance` |
-| 👥 **Dual-Agent Operator / Coder Separation** | Free human and operator agents from watching code stream | The operator agent designs, briefs, and tests, while a headless external CLI agent writes code asynchronously. | `use-claude-code`, `use-antigravity`, `use-cursor` |
+| ✍️ **Human-Like, Readable Code** | Over-engineered abstractions, robotic boilerplate, or impenetrable patterns | Writes straightforward, natural code that reads like a human wrote it with care; keeps logic flat, obvious, and clean. | `vibecode`, `use-vibecode` |
+| 🤝 **Effortless Human + AI Co-Maintenance** | Codebases only the AI understands (or that break the moment a human edits them) | Reuses existing project functions, constants, and patterns so human devs and AI stay completely in sync. | `vibecode-init`, `vibecode` |
+| 🛡 **Zero Context Rot in Long Sessions** | AI forgetting rules, getting lazy, or degrading in quality over long chats | Breaks work into discrete tasks handled by fresh, ephemeral sub-agents that do one job cleanly and exit. | `vibecode-workflow` |
+| 🎨 **Natural, Consistent UI & Tokens** | Eyeballed colors, random margins, or bloated CSS that doesn't match the design | Pulls clean, reusable design tokens directly from references; keeps layouts consistent, accessible, and simple to tweak. | `vibecode-design` |
+| 📋 **No Guesswork: Automated Self-Checking** | AI claiming "done" without checking if the code actually follows project standards | Runs an automated checklist directly against project rules on disk before handing the work back to you. | `vibecode-review` |
+| 🧠 **Learns Your Personal Style** | Having to repeat the same corrections over and over across sessions | Distills your feedback into simple, permanent rules so the AI naturally adapts to how you like to write code. | `vibecode-update`, `vibecode-design-update` |
+| ⚖️ **Right Tool & Model for the Job** | Overkilling small edits with giant slow models or starving complex tasks | Automatically benchmarks and routes each task to the most proportional CLI tool and model tier. | `auto-mode-workflow`, `jev-assistance` |
+| 👥 **Dual-Agent Operator / Coder Flow** | Human getting stuck waiting and watching text stream in terminal | Operator agent plans and reviews while external headless CLI agents do the writing. | `use-claude-code`, `use-antigravity`, `use-cursor` |
 
 ---
 
@@ -41,7 +49,7 @@ The phrase **"Vibe Coding"** has popularized writing software by raw AI intuitio
   - [Decision Intelligence & Task Routing](#3-decision-intelligence--task-routing)
   - [Dual-Agent CLI Runners](#4-dual-agent-cli-runners)
 - [Core Workflows & Philosophies](#-core-workflows--philosophies)
-  - [The Vibecode Philosophy: Real Engineering vs "Vibe Coding"](#the-vibecode-philosophy-real-engineering-vs-vibe-coding)
+  - [The Vibecode Philosophy: Writing Code Like a Human, Not a Machine](#the-vibecode-philosophy-writing-code-like-a-human-not-a-machine)
   - [Ephemeral Sub-Agent Architecture](#ephemeral-sub-agent-architecture)
   - [Decision Layer: TypeSafe Jev Model](#decision-layer-typesafe-jev-model)
 - [Installation & Setup](#-installation--setup)
@@ -150,16 +158,19 @@ These skills split complex tasks between an **Operator** (who plans, builds, rev
 
 ## 💡 Core Workflows & Philosophies
 
-### The Vibecode Philosophy: Real Engineering vs "Vibe Coding"
+### The Vibecode Philosophy: Writing Code Like a Human, Not a Machine
 
-A superficial "vibe coder" patches bugs by adding more code—layering wrapper functions, duplicating types, swallowing errors, or slapping quick hacks on top of symptoms. Over time, the codebase becomes fragile, brittle, and impossible to reason about.
+When AI is asked to write code, it often swings between two extremes:
+- **Sloppy AI Hacks**: Writing quick patches, duplicating logic, leaving commented-out code, or adding `_v2` files.
+- **Robotic Over-Engineering**: Trying to be "too professional" by introducing 5 layers of abstraction, unnecessary factory patterns, verbose boilerplate, and convoluted architecture that make it painful for a human to read or maintain.
 
-**Vibecode demands disciplined engineering:**
-1. **Find Before Creating**: Search the repository for existing functions, constants, and utilities before introducing new ones.
-2. **In-Place Surgery**: Modify existing files in place and clean up deprecated code immediately. Never leave `_v2`, `_new`, or commented-out remnants.
-3. **Single Source of Truth**: Define each concept once. Never introduce translation layers that duplicate data under different names.
-4. **Never Bypass Guards**: Never disable validations, authentication checks, or test assertions to make a change pass.
-5. **Pixel Measurement over Intuition**: In UI design, measure colors, padding, and typography from real references rather than guessing by eye.
+**Vibecode demands code that reads as if a careful, thoughtful human developer wrote it by hand:**
+1. **Readable in 10 Seconds**: Logic should be flat, obvious, and natural. Any developer jumping in should understand it immediately.
+2. **Find Before Creating**: Search the codebase for existing functions and helpers before inventing new ones. Edit what exists instead of adding duplicate layers.
+3. **In-Place Surgery**: Change existing code directly and delete what it replaces. Never leave `_old`, `_new`, or commented-out ghosts beside it.
+4. **Single Source of Truth**: Define each concept once with one clear name. Never add translation wrappers that just rename variables across layers.
+5. **No Fake Fixes**: Never disable guards, types, validations, or tests just to make code run. Fix the real issue at the source.
+6. **Token-Driven UI**: Measure real design tokens (colors, padding, radii) from references instead of guessing margins and colors by eye.
 
 ---
 
@@ -376,6 +387,9 @@ skills/
 │       │   └── SKILL.md
 │       └── vibecode-workflow/      # Ephemeral sub-agent multi-task orchestrator
 │           └── SKILL.md
+├── assets/
+│   ├── Cute Vibecode Developer Diorama.png
+│   └── Vibecode AI Coding Mascot Logo.png
 ├── projects/
 │   └── demo/                       # Reference implementation & testbed project
 └── README.md                       # Repository documentation
