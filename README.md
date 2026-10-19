@@ -397,4 +397,4 @@ skills/
 
 ## 📄 License
 
-Internal developer tooling and agent skill library. Designed for rapid, reliable, and compliant AI-assisted software engineering.
+This project is licensed under the [MIT License](LICENSE) © 2026 SARI. Designed for rapid, reliable, and compliant AI-assisted software engineering.
