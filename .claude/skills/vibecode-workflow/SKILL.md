@@ -2,7 +2,7 @@
 name: vibecode-workflow
 description: Orchestrates multi-task development using dedicated, ephemeral sub-agents per task. Each sub-agent starts fresh by reading use-vibecode, executes clean implementation and compliance audit via vibecode-review, returns its report to the main agent, and terminates to prevent context dilution and skill forgetting.
 metadata:
-  version: "0.0.1-20261019.1"
+  version: "0.0.1-20261019.2"
 ---
 
 # Vibecode Workflow
@@ -56,7 +56,7 @@ In multi-turn conversations, agents suffer from **context dilution and recency d
 - **Maintains Live Progress Dashboard**: Creates and updates a rendered markdown artifact (`task-progress.md`) in the IDE's artifact panel so the user can observe live task milestones, touched files, and audit gates without conversation noise.
 - **Dispatches Immediately**: As soon as the task is understood from the user's prompt, dispatches a sub-agent with the brief. Do NOT investigate first.
 - **Does Not Write Code Directly**: Refrains from making file edits directly. All implementation happens inside sub-agents.
-- **Validates Deliverables**: Reviews the sub-agent's output report, verifies the `[PASS]` review verdict, and handles the transition to the next task.
+- **Validates Deliverables & Terminates Workers**: Reviews the sub-agent's output report, verifies the `[PASS]` review verdict, explicitly terminates the completed sub-agent (via `manage_subagents`), and handles the transition to the next task.
 
 ### 2. Ephemeral Sub-Agent (Worker)
 - **Starts Fresh**: Operates with a clean slate, free of unrelated conversation baggage.
@@ -136,9 +136,10 @@ The sub-agent executes independently:
 
 Upon receiving the message from the sub-agent:
 1. **Verify Verdict**: Ensure the sub-agent included a `[PASS]` verdict from `vibecode-review`. If violations remain unfixed, message the sub-agent or spawn a remediation task.
-2. **Update Progress**: Mark the completed task off the overall task list.
-3. **Next Task**: If tasks remain, spawn the next sub-agent for the subsequent task.
-4. **Final Delivery**: When all tasks are complete, summarize the full delivery for the user with file references and instructions to test.
+2. **Terminate Sub-Agent Immediately**: In Antigravity/agent environments, sub-agents cannot destroy their own session and stay in an `idle` state. The Main Agent must immediately terminate the sub-agent (e.g. `manage_subagents(Action: 'kill', ConversationIds: [subagent_id])`) so it does not linger or accept stray inputs.
+3. **Update Progress**: Mark the completed task off the overall task list.
+4. **Next Task**: If tasks remain, spawn the next sub-agent for the subsequent task.
+5. **Final Delivery**: When all tasks are complete, summarize the full delivery for the user with file references and instructions to test.
 
 ---
 
@@ -175,5 +176,5 @@ The Main Agent uses the `Agent` tool:
 | Spawning sub-agent without explicitly instructing it to read `use-vibecode` | Always use the standard brief template requiring `use-vibecode` as step 1 |
 | Sub-agent finishes without running `vibecode-review` | The sub-agent must run the full compliance audit gate and achieve `[PASS]` before exiting |
 | Running multiple sub-agents in parallel on the same files | Run sub-agents sequentially to avoid race conditions and merge conflicts |
-| Sub-agent stays alive waiting for new instructions | Sub-agents in this workflow are ephemeral: they deliver their report and terminate |
+| Sub-agent stays alive waiting for new instructions | Sub-agents in this workflow are ephemeral: the Main Agent must explicitly terminate/kill the sub-agent (`manage_subagents`) once the `[PASS]` report is received |
 

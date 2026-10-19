@@ -2,7 +2,7 @@
 name: vibecode-design
 description: Use when building or changing user interface screens, components, layouts, or styles, so the UI reuses the project's existing components and design values, looks consistent across screens, and stays accessible
 metadata:
-  version: "0.0.1-20261018.1"
+  version: "0.0.1-20261019.1"
 ---
 
 # Vibecode design
@@ -26,6 +26,9 @@ Build UI that looks as if one careful designer and developer made every screen: 
 - Stretch a full-screen application layout across `100%` of the viewport width and height; never cap the outer shell with a fixed pixel `max-width` that leaves dead margins on wider monitors, e.g. `width: 100%`, never `max-width: 1200px`.
 - Lock the outer application shell to the viewport height on desktop (`height: 100dvh; overflow: hidden`) and make the content pane and sidebar navigation list scroll independently (`min-height: 0; overflow-y: auto`); never let the document body scroll the header or sidebar off-screen.
 - Place subsection or directory navigation in a layout-level secondary sidebar or split pane within the window shell; never embed a navigation rail or column inside the scrollable content panel, e.g. a desktop shell grid with a secondary sidebar beside the content pane, never a sidebar inside the page body.
+- Never position content below application headers or toolbars using hardcoded pixel offsets or fixed positioning; use flexbox or grid parent containers with `flex: 1; min-height: 0; overflow-y: auto`, e.g. a flex column where the main panel fills remaining vertical space, never `margin-top: 86px` or `top: 69px`.
+- Wrap data tables and multi-column grids in a container with horizontal scroll (`overflow-x: auto`) and full width (`width: 100%`); never let a table with more columns than the viewport width force horizontal scroll on the outer page or clip its columns.
+- When creating a screen within an existing project or module, inherit the sibling views' layout container hierarchy and design structure; never invent detached wrapper markup or custom positioning that conflicts with the module's layout system.
 
 ## Navigation and controls
 
