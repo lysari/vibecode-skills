@@ -1,0 +1,60 @@
+{
+  "routing": {
+    "mode": "auto",
+    "confidence_threshold": 0.6,
+    "cost_preference": "prefer_fast_and_cheap",
+    "allow_interactive_prompts": false
+  },
+  "overrides": {
+    "force_provider": null,
+    "force_model": null
+  },
+  "providers": {
+    "native_subagent": {
+      "enabled": true,
+      "description": "In-harness ephemeral subagent via invoke_subagent",
+      "models": {
+        "light": "flash",
+        "heavy": "pro"
+      }
+    },
+    "antigravity": {
+      "enabled": true,
+      "cli_command": "agy",
+      "description": "Antigravity CLI in accept-edits mode",
+      "models": {
+        "light": "gemini-3.8-flash-medium",
+        "heavy": "claude-sonnet-5-5-medium"
+      }
+    },
+    "claude_code": {
+      "enabled": true,
+      "cli_command": "claude",
+      "description": "Claude Code CLI session",
+      "sandbox": true,
+      "models": {
+        "light": "haiku",
+        "heavy": "sonnet"
+      }
+    },
+    "cursor": {
+      "enabled": true,
+      "cli_command": "agent",
+      "description": "Cursor Agent CLI",
+      "models": {
+        "light": "default",
+        "heavy": "advanced"
+      }
+    }
+  },
+  "fallback": {
+    "auto_fallback_on_429": true,
+    "priority_order": [
+      "native_subagent",
+      "antigravity",
+      "claude_code",
+      "cursor"
+    ]
+  }
+}
+
