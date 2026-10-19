@@ -40,3 +40,4 @@ logs/
 
 # Local decision & execution logs
 .claude/skills/jev-assistance/logs/
+

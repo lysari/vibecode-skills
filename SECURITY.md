@@ -17,3 +17,4 @@ If you discover a security vulnerability, security issue, or accidentally commit
 3. Alternatively, you can email: `ly.sari1999@gmail.com`.
 
 We appreciate your responsible disclosure and will respond promptly to investigate and resolve reported issues.
+

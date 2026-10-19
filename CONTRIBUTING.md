@@ -45,3 +45,4 @@ Every skill must be located in `.claude/skills/<skill-name>/` and contain at lea
 ## 📬 Reporting Issues
 
 Found a bug or have a suggestion? Feel free to open an issue on GitHub!
+
