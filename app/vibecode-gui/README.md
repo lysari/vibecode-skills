@@ -1,6 +1,6 @@
 # Vibecode Skills
 
-An Electrobun desktop app (React, Tailwind CSS, Vite) for browsing and managing the agent skills in this repository.
+An Electrobun desktop app (React, Tailwind CSS, Sass, Vite) for browsing and managing the agent skills in this repository.
 
 - **Library**: every `SKILL.md` found under the repository root (skipping `app/`, `node_modules/` and build folders), grouped by name prefix, with search, a folder filter and favourites (stored in the app's local storage, never in skill files).
 - **Map**: the selected skill and the skills it links to, as a collapsible tree. Skills already shown appear as amber pills. Pills at the top list unsaved edits and skills with frontmatter issues. The linked skills wrap into rows that fit the panel width, so the tree shows at or near full size and is scaled down further only when a single branch is wider than the panel; the toolbar's zoom out, zoom in and Fit buttons change the scale.
@@ -63,7 +63,7 @@ When you run `hutch run dev` (without HMR):
 │       ├── styles/         # Palette (light/dark colours), fonts, global styles
 │       ├── main.tsx        # React entry point
 │       ├── index.html      # HTML template
-│       └── index.css       # Loads the styles and Tailwind
+│       └── index.scss      # Loads the styles and Tailwind
 ├── tests/                  # bun:test tests for the main process (bun/) and shared code (shared/)
 ├── electrobun.config.ts    # Electrobun configuration
 ├── vite.config.ts          # Vite configuration
@@ -74,7 +74,7 @@ When you run `hutch run dev` (without HMR):
 ## Customizing
 
 - **React components**: Edit files in `src/mainview/`
-- **Design tokens**: Sizes, type and radii live in `tailwind.config.js`; colours live in `src/mainview/styles/palette.css`
+- **Design tokens**: Sizes, type and radii live in `tailwind.config.js`; colours live in `src/mainview/styles/_palette.scss`
 - **Vite settings**: Edit `vite.config.ts`
 - **Window settings**: Edit `src/bun/index.ts`
 - **App metadata**: Edit `electrobun.config.ts` (display name "Vibecode Skills", identifier `io.github.lysari.vibecode-skills`)

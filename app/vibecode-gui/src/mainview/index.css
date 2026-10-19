@@ -1,7 +1,0 @@
-@import "./styles/palette.css";
-@import "./styles/fonts.css";
-@import "./styles/global.css";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
