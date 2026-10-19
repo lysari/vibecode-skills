@@ -4,12 +4,12 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+	assertRecentProject,
 	openProject,
 	readRoots,
 	readStore,
 	readWorkspace,
 	removeProject,
-	saveFavourites,
 	setLibraryRoot,
 } from "../../src/bun/workspace";
 
@@ -46,7 +46,7 @@ describe("projects store", () => {
 		expect(await readStore(storePath)).toEqual({
 			libraryRoot: null,
 			openRoot: "/x",
-			projects: [{ root: "/a", openedAt: 1, favourites: [] }],
+			projects: [{ root: "/a", openedAt: 1 }],
 		});
 	});
 
@@ -58,17 +58,10 @@ describe("projects store", () => {
 		expect(workspace.projects.map((project) => project.root)).toEqual([second, first]);
 		expect(workspace.project?.root).toBe(second);
 		const reopened = await openProject(storePath, first);
-		expect(reopened.projects.map((project) => [project.name, project.skillCount])).toEqual([
-			["first", 2],
-			["second", 0],
-		]);
+		expect(reopened.projects.map((project) => project.name)).toEqual(["first", "second"]);
 		const launch = await readWorkspace(storePath);
 		expect(launch.project?.name).toBe("first");
-		expect(launch.project?.skills.map((skill) => `${skill.scope}:${skill.name}`)).toEqual([
-			"project:alpha",
-			"project:beta",
-			"library:ours",
-		]);
+		expect(launch.project?.skills.map((skill) => `${skill.name}:${skill.install}`)).toEqual(["ours:available"]);
 		expect(launch.libraryRoot).toBe(libraryRoot);
 		expect(JSON.parse(await readFile(storePath, "utf8")).openRoot).toBe(first);
 	});
@@ -79,7 +72,7 @@ describe("projects store", () => {
 		await rm(gone, { recursive: true });
 		const workspace = await readWorkspace(storePath);
 		expect(workspace.project).toBeNull();
-		expect(workspace.projects).toEqual([expect.objectContaining({ root: gone, isAvailable: false, skillCount: 0 })]);
+		expect(workspace.projects).toEqual([expect.objectContaining({ root: gone, isAvailable: false })]);
 		await expect(readRoots(storePath)).rejects.toThrow("Open a project folder first");
 		await expect(openProject(storePath, gone)).rejects.toThrow("Folder not found");
 	});
@@ -93,13 +86,11 @@ describe("projects store", () => {
 		expect(existsSync(join(project, ".claude/skills/alpha/SKILL.md"))).toBe(true);
 	});
 
-	test("keeps favourites per project", async () => {
-		const first = await makeProject("first", ["alpha"]);
-		const second = await makeProject("second");
-		await openProject(storePath, first);
-		await saveFavourites(storePath, [join(first, ".claude/skills/alpha")]);
-		expect((await openProject(storePath, second)).project?.favourites).toEqual([]);
-		expect((await openProject(storePath, first)).project?.favourites).toEqual([join(first, ".claude/skills/alpha")]);
+	test("accepts sessions only for projects in the recent list", async () => {
+		const project = await makeProject("project");
+		await expect(assertRecentProject(storePath, project)).rejects.toThrow("Not a recent project");
+		await openProject(storePath, project);
+		await assertRecentProject(storePath, project);
 	});
 
 	test("stores the library folder and falls back to the default", async () => {

@@ -20,8 +20,8 @@
 }
 
 @layer components {
-	/* Skill map: a card's port drops a trunk, and its linked skills hang off the trunk on elbow connectors.
-	   The port sits inside the card's border, so the trunk is offset by that border too: the default border on a linked card, the selected border on the root. */
+	/* Agent tree: a card's port drops a trunk, and its sub-agents hang off the trunk on elbow connectors.
+	   The port sits inside the card's border, so the trunk is offset by that border too: the default border on a sub-agent card, the selected border on the orchestrator. */
 	.map-branch {
 		margin-left: calc(
 			theme("borderWidth.DEFAULT") + theme("spacing.port-x") + theme("spacing.port") / 2 - theme("borderWidth.selected") / 2
@@ -54,7 +54,7 @@
 			}
 		}
 
-		/* The selected skill's links, wrapped into rows that share column widths. */
+		/* The orchestrator's sub-agents, wrapped into rows that share column widths. */
 		&.map-rows {
 			margin-left: calc(theme("spacing.port-x") + theme("spacing.port") / 2 + theme("borderWidth.selected") / 2);
 			display: grid;
@@ -104,6 +104,20 @@
 					}
 				}
 			}
+		}
+	}
+
+	/* The caret after assistant text that is still streaming in. */
+	.streaming {
+		.markdown > :last-child::after {
+			content: "";
+			display: inline-block;
+			width: theme("spacing.rail-gap");
+			height: theme("fontSize.body.0");
+			margin-left: theme("spacing.rail-gap");
+			vertical-align: text-bottom;
+			background: var(--accent);
+			@apply motion-safe:animate-pulse;
 		}
 	}
 

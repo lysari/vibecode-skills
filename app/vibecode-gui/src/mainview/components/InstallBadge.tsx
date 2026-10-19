@@ -1,16 +1,12 @@
 import type { Skill } from "../../shared/skill.interface";
 import { Icon } from "./Icon";
 
-const ACTION_CLASS =
-	"inline-flex h-chip-h shrink-0 items-center gap-rail-gap rounded-full border border-line-control bg-card px-stack text-meta text-ink hover:bg-field";
-
 interface InstallBadgeProps {
 	skill: Skill;
-	onInstall: (skill: Skill) => void;
+	onUpdate: (skill: Skill) => void;
 }
 
-/** How a library skill relates to the open project, with the action that adds or updates its copy there. */
-export function InstallBadge({ skill, onInstall }: InstallBadgeProps) {
+export function InstallBadge({ skill, onUpdate }: InstallBadgeProps) {
 	if (skill.install === "installed") {
 		return (
 			<span className="inline-flex h-chip-h shrink-0 items-center gap-rail-gap rounded-full bg-valid px-stack text-meta text-valid-text">
@@ -21,31 +17,24 @@ export function InstallBadge({ skill, onInstall }: InstallBadgeProps) {
 	}
 	if (skill.install === "outdated") {
 		return (
-			<span className="flex shrink-0 items-center gap-stack">
-				<span className="inline-flex h-chip-h items-center gap-rail-gap rounded-full bg-unsaved px-stack text-meta text-unsaved-text">
-					<Icon name="refresh" className="size-icon-sm" />
-					Update available
-				</span>
-				<button
-					type="button"
-					onClick={() => onInstall(skill)}
-					aria-label={`Update ${skill.name} in the project`}
-					className={ACTION_CLASS}
-				>
-					Update
-				</button>
-			</span>
+			<button
+				type="button"
+				onClick={() => onUpdate(skill)}
+				aria-label={`Update ${skill.name} in the project`}
+				title="The project's copy differs from the library"
+				className="inline-flex h-chip-h shrink-0 items-center gap-rail-gap rounded-full bg-unsaved px-stack text-meta text-unsaved-text hover:underline"
+			>
+				<Icon name="refresh" className="size-icon-sm" />
+				Update
+			</button>
 		);
 	}
 	return (
-		<button
-			type="button"
-			onClick={() => onInstall(skill)}
-			aria-label={`Add ${skill.name} to the project`}
-			className={ACTION_CLASS}
+		<span
+			title="Installed into .claude/skills when you send"
+			className="inline-flex h-chip-h shrink-0 items-center rounded-full border border-line-control px-stack text-meta text-muted"
 		>
-			<Icon name="plus" className="size-icon-sm" />
-			Add to project
-		</button>
+			Not installed
+		</span>
 	);
 }

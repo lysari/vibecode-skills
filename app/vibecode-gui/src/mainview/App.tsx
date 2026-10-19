@@ -1,28 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Workspace } from "../shared/project.interface";
-import type { Skill, SkillCreate, SkillForm } from "../shared/skill.interface";
+import { AGENT_CLIS, type RunEvent } from "../shared/run.interface";
+import type { Session, SessionChoices, SessionSummary } from "../shared/session.interface";
+import type { Skill } from "../shared/skill.interface";
+import { AgentDrawer } from "./components/AgentDrawer";
+import { AgentTree } from "./components/AgentTree";
+import { ChatView } from "./components/ChatView";
+import { Composer } from "./components/Composer";
 import { Dialog } from "./components/Dialog";
 import { Header } from "./components/Header";
-import { Library } from "./components/Library";
+import { Icon } from "./components/Icon";
 import { Projects } from "./components/Projects";
 import { Rail } from "./components/Rail";
 import { SettingsDialog } from "./components/SettingsDialog";
-import { NewSkillDialog, RenameSkillDialog } from "./components/SkillDialogs";
-import { SkillDocument } from "./components/SkillDocument";
-import { SkillEditor } from "./components/SkillEditor";
-import { SkillMap } from "./components/SkillMap";
-import { skillsApi } from "./rpc";
-import type { SkillView } from "./skill-view";
+import { onRunEvent, skillsApi } from "./rpc";
+import { buildRunView, buildThread } from "./run-view";
+import type { SessionView } from "./session-view";
 
 const THEME_KEY = "vibecode-gui:theme";
+const STATUS_EVENTS = new Set<RunEvent["type"]>(["run.started", "run.finished", "agent.status"]);
 
 type DialogState =
-	| { kind: "new" }
-	| { kind: "rename" }
-	| { kind: "delete" }
 	| { kind: "update"; skill: Skill }
+	| { kind: "delete"; session: SessionSummary }
 	| { kind: "settings" }
-	| { kind: "discard"; next: () => void }
 	| null;
 
 function readStored(key: string): string | null {
@@ -36,9 +37,7 @@ function readStored(key: string): string | null {
 function writeStored(key: string, value: string): void {
 	try {
 		localStorage.setItem(key, value);
-	} catch {
-		// Storage can be unavailable in private or sandboxed webviews; the app still works without it.
-	}
+	} catch {}
 }
 
 function errorMessage(cause: unknown): string {
@@ -47,40 +46,33 @@ function errorMessage(cause: unknown): string {
 
 function App() {
 	const [workspace, setWorkspace] = useState<Workspace | null>(null);
-	const [isProjectsOpen, setIsProjectsOpen] = useState(false);
-	const [selectedDir, setSelectedDir] = useState<string | null>(null);
-	const [history, setHistory] = useState<string[]>([]);
-	const [view, setView] = useState<SkillView>("map");
-	const [draft, setDraft] = useState<SkillForm | null>(null);
+	const [sessions, setSessions] = useState<Record<string, SessionSummary[]>>({});
+	const [expanded, setExpanded] = useState<Set<string>>(new Set());
+	const [session, setSession] = useState<Session | null>(null);
+	const [view, setView] = useState<SessionView>("chat");
+	const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+	const [replyToId, setReplyToId] = useState<string | null>(null);
+	const [focusKey, setFocusKey] = useState(0);
+	const [isPanelOpen, setIsPanelOpen] = useState(true);
 	const [isDark, setIsDark] = useState(
 		() => (readStored(THEME_KEY) ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark",
 	);
 	const [dialog, setDialog] = useState<DialogState>(null);
-	const [isScanning, setIsScanning] = useState(false);
-	const [isSaving, setIsSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	const project = workspace?.project ?? null;
-	const skills = project?.skills ?? [];
-	const favourites = new Set(project?.favourites);
-	const skill = skills.find((candidate) => candidate.dir === selectedDir) ?? null;
-	// Library skills are read-only, so they open in Read where a project skill would open in Edit.
-	const shownView = skill?.scope === "library" && view === "edit" ? "read" : view;
-	const form = draft ?? (skill && { frontmatter: skill.frontmatter, body: skill.body });
-	const isDirty = Boolean(skill && draft && (draft.frontmatter !== skill.frontmatter || draft.body !== skill.body));
-	const skillNames = new Set(skills.map((candidate) => candidate.name).filter(Boolean));
-
-	function applyWorkspace(next: Workspace, nextDir?: string) {
-		setWorkspace(next);
-		setDraft(null);
-		const nextSkills = next.project?.skills ?? [];
-		const dirs = new Set(nextSkills.map((candidate) => candidate.dir));
-		setHistory((previous) => previous.filter((dir) => dirs.has(dir)));
-		setSelectedDir((current) => {
-			const wanted = nextDir ?? current;
-			return wanted && dirs.has(wanted) ? wanted : (nextSkills[0]?.dir ?? null);
-		});
-	}
+	const librarySkills = project?.skills ?? [];
+	const agentSkills = librarySkills.filter((skill) => AGENT_CLIS[skill.name]);
+	const pickableSkills = librarySkills.filter((skill) => !AGENT_CLIS[skill.name]);
+	const runView = useMemo(() => buildRunView(session?.events ?? []), [session?.events]);
+	const thread = useMemo(() => (session ? buildThread(session, runView, null) : []), [session, runView]);
+	const latestRun = runView.runs[runView.runs.length - 1];
+	const isRunning = latestRun?.status === "running";
+	const selectedAgent = selectedAgentId ? (runView.agents.get(selectedAgentId) ?? null) : null;
+	const treeRun = runView.runs.find((run) => run.id === selectedAgent?.runId) ?? latestRun;
+	const treeRoot = treeRun?.rootId ? runView.agents.get(treeRun.rootId) : undefined;
+	const replyTo = replyToId ? runView.agents.get(replyToId) : undefined;
+	const replyTarget = replyTo?.status === "needs-input" ? replyTo : null;
 
 	async function runRequest(failure: string, request: () => Promise<void>) {
 		try {
@@ -91,269 +83,293 @@ function App() {
 		}
 	}
 
-	async function load() {
-		setIsScanning(true);
-		await runRequest("Could not read skills", async () => applyWorkspace(await skillsApi.readWorkspace()));
-		setIsScanning(false);
+	async function refreshSessions(projectRoot: string): Promise<SessionSummary[]> {
+		const list = await skillsApi.listSessions({ projectRoot });
+		setSessions((current) => ({ ...current, [projectRoot]: list }));
+		return list;
+	}
+
+	function showSession(next: Session) {
+		setSession(next);
+		setSelectedAgentId(null);
+		setReplyToId(null);
+	}
+
+	async function enterProject(root: string) {
+		setExpanded((current) => new Set(current).add(root));
+		const [latest] = await refreshSessions(root);
+		showSession(latest ? await skillsApi.readSession({ projectRoot: root, id: latest.id }) : await skillsApi.createSession({ projectRoot: root }));
+		if (!latest) await refreshSessions(root);
+	}
+
+	async function switchProject(root: string) {
+		if (workspace?.project?.root !== root) setWorkspace(await skillsApi.openProject({ root }));
 	}
 
 	useEffect(() => {
-		load();
+		runRequest("Could not read the projects", async () => {
+			const next = await skillsApi.readWorkspace();
+			setWorkspace(next);
+			if (next.project) await enterProject(next.project.root);
+		});
 	}, []);
+
+	useEffect(
+		() =>
+			onRunEvent(({ projectRoot, sessionId, event }) => {
+				setSession((current) =>
+					current?.id === sessionId ? { ...current, events: [...current.events, event], updatedAt: event.at } : current,
+				);
+				if (STATUS_EVENTS.has(event.type)) refreshSessions(projectRoot).catch(() => undefined);
+			}),
+		[],
+	);
 
 	useEffect(() => {
 		document.documentElement.dataset.theme = isDark ? "dark" : "light";
 		writeStored(THEME_KEY, isDark ? "dark" : "light");
 	}, [isDark]);
 
-	async function save() {
-		if (!skill || !draft) return;
-		setIsSaving(true);
-		await runRequest(`Could not save ${skill.name}`, async () =>
-			applyWorkspace(await skillsApi.saveSkill({ dir: skill.dir, form: draft })),
-		);
-		setIsSaving(false);
-	}
-
-	useEffect(() => {
-		const handleKey = (event: KeyboardEvent) => {
-			if ((event.metaKey || event.ctrlKey) && event.key === "s") {
-				event.preventDefault();
-				if (isDirty) save();
-			}
-		};
-		window.addEventListener("keydown", handleKey);
-		return () => window.removeEventListener("keydown", handleKey);
-	});
-
-	function guardUnsaved(next: () => void) {
-		if (isDirty) setDialog({ kind: "discard", next });
-		else next();
-	}
-
 	function openProject(root: string) {
-		guardUnsaved(() =>
-			runRequest("Could not open the project", async () => {
-				applyWorkspace(await skillsApi.openProject({ root }));
-				setIsProjectsOpen(false);
-			}),
-		);
+		runRequest("Could not open the project", async () => {
+			setWorkspace(await skillsApi.openProject({ root }));
+			await enterProject(root);
+		});
 	}
 
-	async function chooseProject() {
-		await runRequest("Could not open the folder picker", async () => {
+	function chooseProject() {
+		runRequest("Could not open the folder picker", async () => {
 			const root = await skillsApi.chooseFolder();
 			if (root) openProject(root);
 		});
 	}
 
 	function removeProject(root: string) {
-		guardUnsaved(() =>
-			runRequest("Could not remove the project", async () => applyWorkspace(await skillsApi.removeProject({ root }))),
+		runRequest("Could not remove the project", async () => {
+			setWorkspace(await skillsApi.removeProject({ root }));
+			if (session?.projectRoot === root) setSession(null);
+		});
+	}
+
+	function collapseProject(root: string) {
+		const next = new Set(expanded);
+		next.delete(root);
+		setExpanded(next);
+	}
+
+	function openSession(root: string, id: string) {
+		runRequest("Could not open the session", async () => {
+			await switchProject(root);
+			showSession(await skillsApi.readSession({ projectRoot: root, id }));
+		});
+	}
+
+	function newSession(root: string | null) {
+		if (!root) {
+			chooseProject();
+			return;
+		}
+		runRequest("Could not start a session", async () => {
+			await switchProject(root);
+			setExpanded((current) => new Set(current).add(root));
+			showSession(await skillsApi.createSession({ projectRoot: root }));
+			await refreshSessions(root);
+		});
+	}
+
+	async function deleteSession(target: SessionSummary) {
+		await skillsApi.deleteSession({ projectRoot: target.projectRoot, id: target.id });
+		if (session?.id === target.id) setSession(null);
+		await refreshSessions(target.projectRoot);
+		setDialog(null);
+	}
+
+	function renameSession(title: string) {
+		if (!session) return;
+		setSession({ ...session, title });
+		runRequest("Could not rename the session", async () => {
+			await skillsApi.renameSession({ projectRoot: session.projectRoot, id: session.id, title });
+			await refreshSessions(session.projectRoot);
+		});
+	}
+
+	function chooseForSession(choices: SessionChoices) {
+		if (!session) return;
+		setSession({ ...session, ...choices });
+		runRequest("Could not save the session's skills and agent", () =>
+			skillsApi.saveSessionChoices({ projectRoot: session.projectRoot, id: session.id, ...choices }),
 		);
 	}
 
-	function selectSkill(dir: string, nextView?: SkillView) {
-		guardUnsaved(() => {
-			if (selectedDir && dir !== selectedDir) setHistory([...history, selectedDir]);
-			setSelectedDir(dir);
-			setDraft(null);
-			if (nextView) setView(nextView);
-		});
-	}
-
-	function openSkillByName(name: string) {
-		const target =
-			skills.find((candidate) => candidate.name === name && candidate.scope === skill?.scope) ??
-			skills.find((candidate) => candidate.name === name);
-		if (target) selectSkill(target.dir);
-	}
-
-	function goBack() {
-		guardUnsaved(() => {
-			setSelectedDir(history[history.length - 1]);
-			setHistory(history.slice(0, -1));
-			setDraft(null);
-		});
-	}
-
-	function saveFavourites(base: Workspace, next: string[]) {
-		if (!base.project) return;
-		setWorkspace({ ...base, project: { ...base.project, favourites: next } });
-		runRequest("Could not save favourites", () => skillsApi.saveFavourites({ favourites: next }));
-	}
-
-	function toggleFavourite(dir: string) {
-		if (!workspace) return;
-		saveFavourites(workspace, favourites.has(dir) ? [...favourites].filter((other) => other !== dir) : [...favourites, dir]);
-	}
-
-	async function createSkill(create: SkillCreate) {
-		if (!project) return;
-		const next = await skillsApi.createSkill(create);
-		applyWorkspace(next, `${project.root}/${create.source}/${create.name}`);
-		setView("edit");
-		setDialog(null);
-	}
-
-	async function renameSkill(name: string, shouldRenameMentions: boolean) {
-		if (!skill) return;
-		const renamedDir = skill.dir.replace(/[^/]+$/, name);
-		const next = await skillsApi.renameSkill({ dir: skill.dir, name, shouldRenameMentions });
-		applyWorkspace(next, renamedDir);
-		if (favourites.has(skill.dir)) {
-			saveFavourites(next, [...[...favourites].filter((dir) => dir !== skill.dir), renamedDir]);
+	async function send(text: string): Promise<boolean> {
+		if (!session) return false;
+		const ref = { projectRoot: session.projectRoot, id: session.id };
+		try {
+			if (replyTarget) {
+				showSession(await skillsApi.replyToAgent({ ...ref, agentId: replyTarget.id, text }));
+			} else {
+				const sent = await skillsApi.sendMessage({ ...ref, text, agent: session.agent, skills: session.skills });
+				setWorkspace(sent.workspace);
+				setSession(sent.session);
+				await refreshSessions(session.projectRoot);
+			}
+			setError(null);
+			return true;
+		} catch (cause) {
+			setError(`Could not send the message: ${errorMessage(cause)}`);
+			return false;
 		}
-		setDialog(null);
 	}
 
-	async function deleteSkill() {
-		if (!skill) return;
-		const next = await skillsApi.deleteSkill({ dir: skill.dir });
-		setSelectedDir(null);
-		applyWorkspace(next);
-		if (favourites.has(skill.dir)) saveFavourites(next, [...favourites].filter((dir) => dir !== skill.dir));
-		setDialog(null);
+	function runAction(failure: string, action: (ref: { projectRoot: string; id: string }) => Promise<void>) {
+		if (session) runRequest(failure, () => action({ projectRoot: session.projectRoot, id: session.id }));
 	}
 
-	async function installSkill(target: Skill) {
-		applyWorkspace(await skillsApi.installSkill({ dir: target.dir }));
-		setDialog(null);
+	function reply(agentId: string) {
+		setReplyToId(agentId);
+		setFocusKey(focusKey + 1);
 	}
 
-	function requestInstall(target: Skill) {
-		guardUnsaved(() => {
-			if (target.install === "outdated") setDialog({ kind: "update", skill: target });
-			else runRequest(`Could not add ${target.name}`, () => installSkill(target));
-		});
+	function retry(agentId: string) {
+		runAction("Could not retry the agent", (ref) => skillsApi.retryAgent({ ...ref, agentId }));
+	}
+
+	function openAgent(agentId: string) {
+		setSelectedAgentId(agentId);
+		setView("tree");
+	}
+
+	async function updateSkill(skill: Skill) {
+		setWorkspace(await skillsApi.installSkill({ dir: skill.dir }));
+		setDialog(null);
 	}
 
 	async function saveSettings(libraryRoot: string | null) {
-		applyWorkspace(await skillsApi.setLibraryRoot({ root: libraryRoot }));
+		setWorkspace(await skillsApi.setLibraryRoot({ root: libraryRoot }));
 		setDialog(null);
 	}
-
-	const errorBanner = error && (
-		<p role="alert" className="flex items-center gap-stack bg-issue px-header-x py-rail-gap text-meta text-issue-text">
-			{error}
-			<button type="button" onClick={() => setError(null)} className="ml-auto underline">
-				Dismiss
-			</button>
-		</p>
-	);
 
 	return (
 		<div className="flex h-dvh w-full overflow-hidden bg-surface text-ink">
 			<Rail
-				isProjectsOpen={!project || isProjectsOpen}
-				hasProject={Boolean(project)}
+				isPanelOpen={isPanelOpen}
 				isDark={isDark}
-				isScanning={isScanning}
-				onShowProjects={() => setIsProjectsOpen(true)}
-				onShowSkills={() => setIsProjectsOpen(false)}
-				onNewSkill={() => guardUnsaved(() => setDialog({ kind: "new" }))}
-				onRescan={() => guardUnsaved(load)}
-				onOpenSettings={() => guardUnsaved(() => setDialog({ kind: "settings" }))}
+				onTogglePanel={() => setIsPanelOpen(!isPanelOpen)}
+				onNewSession={() => newSession(project?.root ?? null)}
+				onOpenSettings={() => setDialog({ kind: "settings" })}
 				onToggleTheme={() => setIsDark(!isDark)}
 			/>
-			{(!project || isProjectsOpen) && (
+			{isPanelOpen && (
 				<Projects
-					workspace={workspace}
-					banner={errorBanner}
-					onOpen={openProject}
-					onChoose={chooseProject}
-					onRemove={removeProject}
+					projects={workspace?.projects ?? null}
+					sessions={sessions}
+					expanded={expanded}
+					openRoot={project?.root ?? null}
+					sessionId={session?.id ?? null}
+					onChooseFolder={chooseProject}
+					onOpenProject={openProject}
+					onCollapseProject={collapseProject}
+					onRemoveProject={removeProject}
+					onOpenSession={openSession}
+					onNewSession={newSession}
+					onDeleteSession={(target) => setDialog({ kind: "delete", session: target })}
 				/>
 			)}
-			{project && !isProjectsOpen && (
-				<div className="flex min-w-0 flex-1 flex-col">
+			<div className="flex min-w-0 flex-1 flex-col">
+				{session && (
 					<Header
-						projectName={project.name}
-						skill={skill}
-						view={shownView}
-						isDirty={isDirty}
-						isSaving={isSaving}
-						canGoBack={history.length > 0}
-						onBack={goBack}
+						projectName={project?.name ?? ""}
+						title={session.title}
+						view={view}
 						onView={setView}
-						onSave={save}
-						onDiscard={() => setDraft(null)}
-						onRename={() => setDialog({ kind: "rename" })}
-						onDelete={() => setDialog({ kind: "delete" })}
-						onInstall={requestInstall}
+						onRename={renameSession}
 					/>
-					{errorBanner}
+				)}
+				{error && (
+					<p role="alert" className="flex items-center gap-stack bg-issue px-header-x py-rail-gap text-meta text-issue-text">
+						{error}
+						<button type="button" onClick={() => setError(null)} className="ml-auto underline">
+							Dismiss
+						</button>
+					</p>
+				)}
+				{!session && (
+					<div className="flex flex-1 flex-col items-center justify-center gap-card bg-canvas bg-dots text-body text-muted">
+						<p>{project ? "No session open." : "Open a project folder to start a session."}</p>
+						<button
+							type="button"
+							onClick={() => newSession(project?.root ?? null)}
+							className="inline-flex h-control items-center gap-rail-gap rounded-full bg-inverse px-node-pad text-body text-on-inverse"
+						>
+							<Icon name={project ? "plus" : "folder"} className="size-icon-sm" />
+							{project ? "New session" : "Open folder…"}
+						</button>
+					</div>
+				)}
+				{session && (
 					<div className="flex min-h-0 flex-1">
-						<Library
-							project={project}
-							projects={workspace?.projects ?? []}
-							libraryRoot={workspace?.libraryRoot ?? null}
-							selectedDir={selectedDir}
-							onSelect={(dir) => selectSkill(dir)}
-							onToggleFavourite={toggleFavourite}
-							onInstall={requestInstall}
-							onOpenProject={openProject}
-							onChooseProject={chooseProject}
-							onShowProjects={() => setIsProjectsOpen(true)}
-						/>
-						<main className="min-h-0 min-w-0 flex-1">
-							{!skill && (
-								<div className="flex h-full items-center justify-center bg-canvas bg-dots text-body text-muted">
-									No skill selected. Create one with New or add one from the library.
+						<main className={`flex min-h-0 min-w-0 flex-1 flex-col ${view === "tree" ? "bg-canvas" : "bg-surface"}`}>
+							{view === "chat" && (
+								<ChatView
+									thread={thread}
+									view={runView}
+									isRunning={isRunning}
+									onOpenAgent={openAgent}
+									onReply={reply}
+									onRetry={retry}
+								/>
+							)}
+							{view === "tree" && treeRun && treeRoot && (
+								<div className="min-h-0 flex-1">
+									<AgentTree
+										run={treeRun}
+										root={treeRoot}
+										selectedId={selectedAgentId}
+										onSelect={setSelectedAgentId}
+										onReply={reply}
+										onRetry={retry}
+									/>
 								</div>
 							)}
-							{skill && shownView === "map" && (
-								<SkillMap
-									skill={skill}
-									skills={skills}
-									isDirty={isDirty}
-									onSelect={selectSkill}
-									onSave={save}
-									onDiscard={() => setDraft(null)}
-								/>
+							{view === "tree" && !treeRoot && (
+								<p className="flex flex-1 items-center justify-center bg-dots text-body text-muted">
+									Send a message to start a run; its agents show here.
+								</p>
 							)}
-							{skill && shownView === "read" && (
-								<SkillDocument
-									key={skill.dir}
-									skill={skill}
-									skills={skills}
-									skillNames={skillNames}
-									onOpenSkill={openSkillByName}
-									onSelect={(dir) => selectSkill(dir)}
-								/>
-							)}
-							{skill && form && shownView === "edit" && (
-								<SkillEditor form={form} skillNames={skillNames} onChange={setDraft} onOpenSkill={openSkillByName} />
-							)}
+							<Composer
+								key={session.id}
+								choices={{ agent: session.agent, skills: session.skills }}
+								skills={pickableSkills}
+								agents={agentSkills}
+								isRunning={isRunning}
+								replyTo={replyTarget}
+								focusKey={focusKey}
+								onChoose={chooseForSession}
+								onSend={send}
+								onStop={() => runAction("Could not stop the run", (ref) => skillsApi.stopRun(ref))}
+								onCancelReply={() => setReplyToId(null)}
+								onUpdateSkill={(skill) => setDialog({ kind: "update", skill })}
+							/>
 						</main>
+						{view === "tree" && selectedAgent && (
+							<AgentDrawer
+								agent={selectedAgent}
+								thread={buildThread(session, runView, selectedAgent.id)}
+								view={runView}
+								onClose={() => setSelectedAgentId(null)}
+								onSelect={setSelectedAgentId}
+								onReply={reply}
+								onRetry={retry}
+							/>
+						)}
 					</div>
-				</div>
-			)}
-			{dialog?.kind === "new" && project && (
-				<NewSkillDialog sources={project.sources} onCreate={createSkill} onCancel={() => setDialog(null)} />
-			)}
-			{dialog?.kind === "rename" && skill && (
-				<RenameSkillDialog
-					skill={skill}
-					mentionCount={skills.filter((other) => other.references.includes(skill.dir)).length}
-					onRename={renameSkill}
-					onCancel={() => setDialog(null)}
-				/>
-			)}
-			{dialog?.kind === "delete" && skill && (
-				<Dialog title={`Move ${skill.name} to the Trash?`} confirmLabel="Move to Trash" isDanger onConfirm={deleteSkill} onCancel={() => setDialog(null)}>
-					<p>
-						This moves <span className="break-all font-mono text-code text-ink">{skill.dir}</span> with its SKILL.md and{" "}
-						{skill.files.length} supporting {skill.files.length === 1 ? "file" : "files"} to the Trash. You can restore
-						the folder from the Trash.
-					</p>
-				</Dialog>
-			)}
+				)}
+			</div>
 			{dialog?.kind === "update" && project && (
 				<Dialog
 					title={`Update ${dialog.skill.name} in ${project.name}?`}
 					confirmLabel="Update skill"
-					onConfirm={() => installSkill(dialog.skill)}
+					onConfirm={() => updateSkill(dialog.skill)}
 					onCancel={() => setDialog(null)}
 				>
 					<p>
@@ -365,6 +381,17 @@ function App() {
 					<p>The current copy moves to the Trash first, so any local changes can be restored from there.</p>
 				</Dialog>
 			)}
+			{dialog?.kind === "delete" && (
+				<Dialog
+					title={`Delete “${dialog.session.title}”?`}
+					confirmLabel="Delete session"
+					isDanger
+					onConfirm={() => deleteSession(dialog.session)}
+					onCancel={() => setDialog(null)}
+				>
+					<p>This deletes the session&apos;s messages and run history from the app. Files in the project are not changed.</p>
+				</Dialog>
+			)}
 			{dialog?.kind === "settings" && workspace && (
 				<SettingsDialog
 					libraryRoot={workspace.libraryRoot}
@@ -373,21 +400,6 @@ function App() {
 					onSave={saveSettings}
 					onCancel={() => setDialog(null)}
 				/>
-			)}
-			{dialog?.kind === "discard" && (
-				<Dialog
-					title="Discard unsaved changes?"
-					confirmLabel="Discard changes"
-					isDanger
-					onConfirm={() => {
-						setDialog(null);
-						setDraft(null);
-						dialog.next();
-					}}
-					onCancel={() => setDialog(null)}
-				>
-					<p>Your edits to {skill?.name} are not saved to disk yet.</p>
-				</Dialog>
 			)}
 		</div>
 	);

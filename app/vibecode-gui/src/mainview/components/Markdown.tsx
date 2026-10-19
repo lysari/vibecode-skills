@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { codeMentionsSkill } from "../../shared/skill-links";
 
 type RenderInline = (text: string) => ReactNode[];
 
@@ -13,8 +12,6 @@ const INLINE =
 
 interface MarkdownProps {
 	source: string;
-	skillNames: Set<string>;
-	onOpenSkill: (name: string) => void;
 }
 
 function isBlockStart(line: string): boolean {
@@ -32,7 +29,34 @@ function splitRow(line: string): string[] {
 	return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
 }
 
-function renderList(lines: string[], key: number, renderInline: RenderInline): ReactNode {
+const renderInline: RenderInline = (text) => {
+	const nodes: ReactNode[] = [];
+	let last = 0;
+	for (const match of text.matchAll(INLINE)) {
+		const token = match[0];
+		const key = match.index;
+		if (key > last) nodes.push(text.slice(last, key));
+		if (match[1]) {
+			nodes.push(<code key={key}>{token.slice(1, -1)}</code>);
+		} else if (match[2]) {
+			nodes.push(<strong key={key}>{renderInline(token.slice(2, -2))}</strong>);
+		} else if (match[3]) {
+			const [, label, href] = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(token) ?? [];
+			nodes.push(
+				<span key={key} title={href} className="text-accent-text underline">
+					{label}
+				</span>,
+			);
+		} else {
+			nodes.push(<em key={key}>{token.slice(1, -1)}</em>);
+		}
+		last = key + token.length;
+	}
+	if (last < text.length) nodes.push(text.slice(last));
+	return nodes;
+};
+
+function renderList(lines: string[], key: number): ReactNode {
 	const first = LIST_ITEM.exec(lines[0]);
 	const indent = first?.[1].length ?? 0;
 	const items: { text: string; children: string[] }[] = [];
@@ -49,14 +73,14 @@ function renderList(lines: string[], key: number, renderInline: RenderInline): R
 			{items.map((item, index) => (
 				<li key={index}>
 					{renderInline(item.text)}
-					{item.children.length > 0 && renderList(item.children, index, renderInline)}
+					{item.children.length > 0 && renderList(item.children, index)}
 				</li>
 			))}
 		</Tag>
 	);
 }
 
-function renderBlocks(lines: string[], renderInline: RenderInline): ReactNode[] {
+function renderBlocks(lines: string[]): ReactNode[] {
 	const blocks: ReactNode[] = [];
 	let i = 0;
 	while (i < lines.length) {
@@ -85,7 +109,7 @@ function renderBlocks(lines: string[], renderInline: RenderInline): ReactNode[] 
 		} else if (line.startsWith(">")) {
 			const quote: string[] = [];
 			for (; i < lines.length && lines[i].startsWith(">"); i++) quote.push(lines[i].replace(/^>\s?/, ""));
-			blocks.push(<blockquote key={key}>{renderBlocks(quote, renderInline)}</blockquote>);
+			blocks.push(<blockquote key={key}>{renderBlocks(quote)}</blockquote>);
 		} else if (line.trim().startsWith("|") && TABLE_DIVIDER.test(lines[i + 1] ?? "")) {
 			const rows: string[][] = [];
 			for (; i < lines.length && lines[i].trim().startsWith("|"); i++) rows.push(splitRow(lines[i]));
@@ -117,7 +141,7 @@ function renderBlocks(lines: string[], renderInline: RenderInline): ReactNode[] 
 			for (; i < lines.length && (LIST_ITEM.test(lines[i]) || /^\s{2,}\S/.test(lines[i])); i++) {
 				items.push(lines[i]);
 			}
-			blocks.push(renderList(items, key, renderInline));
+			blocks.push(renderList(items, key));
 		} else {
 			const paragraph = [line.trim()];
 			for (i++; i < lines.length && lines[i].trim() && !isBlockStart(lines[i]); i++) {
@@ -129,48 +153,6 @@ function renderBlocks(lines: string[], renderInline: RenderInline): ReactNode[] 
 	return blocks;
 }
 
-export function Markdown({ source, skillNames, onOpenSkill }: MarkdownProps) {
-	const renderInline: RenderInline = (text) => {
-		const nodes: ReactNode[] = [];
-		let last = 0;
-		for (const match of text.matchAll(INLINE)) {
-			const token = match[0];
-			const key = match.index;
-			if (key > last) nodes.push(text.slice(last, key));
-			if (match[1]) {
-				const code = token.slice(1, -1);
-				const skillName = [...skillNames].find((name) => codeMentionsSkill(code, name));
-				nodes.push(
-					skillName ? (
-						<button
-							key={key}
-							type="button"
-							onClick={() => onOpenSkill(skillName)}
-							className="bg-accent-soft px-rail-gap font-mono text-code text-accent-text hover:underline"
-						>
-							{code}
-						</button>
-					) : (
-						<code key={key}>{code}</code>
-					),
-				);
-			} else if (match[2]) {
-				nodes.push(<strong key={key}>{renderInline(token.slice(2, -2))}</strong>);
-			} else if (match[3]) {
-				const [, label, href] = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(token) ?? [];
-				nodes.push(
-					<span key={key} title={href} className="text-accent-text underline">
-						{label}
-					</span>,
-				);
-			} else {
-				nodes.push(<em key={key}>{token.slice(1, -1)}</em>);
-			}
-			last = key + token.length;
-		}
-		if (last < text.length) nodes.push(text.slice(last));
-		return nodes;
-	};
-
-	return <div className="markdown">{renderBlocks(source.replace(/\r\n/g, "\n").split("\n"), renderInline)}</div>;
+export function Markdown({ source }: MarkdownProps) {
+	return <div className="markdown">{renderBlocks(source.replace(/\r\n/g, "\n").split("\n"))}</div>;
 }

@@ -25,10 +25,6 @@ export default {
 				"warning-soft": "var(--warning-soft)",
 				"warning-dot": "var(--warning-dot)",
 				"warning-text": "var(--warning-text)",
-				condition: "var(--condition)",
-				"condition-line": "var(--condition-border)",
-				star: "var(--star)",
-				"star-empty": "var(--star-empty)",
 				connector: "var(--connector)",
 				valid: "var(--status-valid)",
 				"valid-text": "var(--status-valid-text)",
@@ -57,8 +53,11 @@ export default {
 				rail: "72px",
 				panel: "280px",
 				header: "52px",
-				node: "240px",
+				node: "272px",
 				inspector: "264px",
+				thread: "720px",
+				composer: "160px",
+				picker: "288px",
 				dialog: "384px",
 				"zoom-label": "40px",
 				"rail-item-w": "60px",
@@ -95,6 +94,12 @@ export default {
 				control: "6px",
 			},
 			borderWidth: {
+				selected: "2px",
+			},
+			outlineWidth: {
+				selected: "2px",
+			},
+			outlineOffset: {
 				selected: "2px",
 			},
 			boxShadow: {

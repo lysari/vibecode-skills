@@ -1,14 +1,12 @@
 import { existsSync, realpathSync, statSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { homedir } from "node:os";
 import { basename, dirname } from "node:path";
 import type { Project, Workspace } from "../shared/project.interface";
-import { countSkills, defaultLibraryRoot, listSkills, type SkillRoots } from "./skills";
+import { defaultLibraryRoot, listSkills, type SkillRoots } from "./skills";
 
 interface StoredProject {
 	root: string;
 	openedAt: number;
-	favourites: string[];
 }
 
 /** The app's projects store, a JSON file in its user data folder. */
@@ -33,13 +31,8 @@ function readText(value: unknown): string | null {
 
 function readStoredProject(value: unknown): StoredProject | null {
 	if (!value || typeof value !== "object") return null;
-	const { root, openedAt, favourites } = value as Record<string, unknown>;
-	if (typeof root !== "string" || typeof openedAt !== "number") return null;
-	return {
-		root,
-		openedAt,
-		favourites: Array.isArray(favourites) ? favourites.filter((dir): dir is string => typeof dir === "string") : [],
-	};
+	const { root, openedAt } = value as Record<string, unknown>;
+	return typeof root === "string" && typeof openedAt === "number" ? { root, openedAt } : null;
 }
 
 export async function readStore(storePath: string): Promise<ProjectsStore> {
@@ -72,23 +65,26 @@ export async function readRoots(storePath: string): Promise<SkillRoots> {
 	return { project: store.openRoot, library: readLibraryRoot(store) };
 }
 
-async function summarize({ root, openedAt }: StoredProject): Promise<Project> {
-	const isAvailable = isFolder(root);
-	return { root, name: basename(root), openedAt, skillCount: isAvailable ? await countSkills(root) : 0, isAvailable };
+function summarize({ root, openedAt }: StoredProject): Project {
+	return { root, name: basename(root), openedAt, isAvailable: isFolder(root) };
+}
+
+/** Checks that a folder is in the recent projects list before its sessions are read or changed. */
+export async function assertRecentProject(storePath: string, root: string): Promise<void> {
+	const store = await readStore(storePath);
+	if (!store.projects.some((project) => project.root === root)) throw new Error(`Not a recent project: ${root}`);
 }
 
 export async function readWorkspace(storePath: string): Promise<Workspace> {
 	const store = await readStore(storePath);
-	const projects = await Promise.all(store.projects.map(summarize));
+	const projects = store.projects.map(summarize);
 	const libraryRoot = readLibraryRoot(store);
 	const open = projects.find((project) => project.root === store.openRoot && project.isAvailable);
-	const favourites = store.projects.find((project) => project.root === open?.root)?.favourites ?? [];
 	return {
-		home: homedir(),
 		projects,
 		libraryRoot,
 		defaultLibraryRoot,
-		project: open ? { ...open, ...(await listSkills({ project: open.root, library: libraryRoot })), favourites } : null,
+		project: open ? { ...open, skills: await listSkills({ project: open.root, library: libraryRoot }) } : null,
 	};
 }
 
@@ -96,14 +92,10 @@ export async function openProject(storePath: string, root: string): Promise<Work
 	if (!isFolder(root)) throw new Error(`Folder not found: ${root}`);
 	const realRoot = realpathSync(root);
 	const store = await readStore(storePath);
-	const previous = store.projects.find((project) => project.root === realRoot);
 	await writeStore(storePath, {
 		...store,
 		openRoot: realRoot,
-		projects: [
-			{ root: realRoot, openedAt: Date.now(), favourites: previous?.favourites ?? [] },
-			...store.projects.filter((project) => project !== previous),
-		],
+		projects: [{ root: realRoot, openedAt: Date.now() }, ...store.projects.filter((project) => project.root !== realRoot)],
 	});
 	return readWorkspace(storePath);
 }
@@ -124,12 +116,4 @@ export async function setLibraryRoot(storePath: string, root: string | null): Pr
 	const store = await readStore(storePath);
 	await writeStore(storePath, { ...store, libraryRoot: root && realpathSync(root) });
 	return readWorkspace(storePath);
-}
-
-export async function saveFavourites(storePath: string, favourites: string[]): Promise<void> {
-	const store = await readStore(storePath);
-	await writeStore(storePath, {
-		...store,
-		projects: store.projects.map((project) => (project.root === store.openRoot ? { ...project, favourites } : project)),
-	});
 }

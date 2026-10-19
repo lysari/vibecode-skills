@@ -1,22 +1,42 @@
 # Vibecode Skills
 
-An Electrobun desktop app (React, Tailwind CSS, Sass, Vite) for browsing and managing agent skills in your projects, and for adding the skills of this repository's library to them.
+An Electrobun desktop app (React, Tailwind CSS, Sass, Vite) for running coding agents on your projects in chat sessions, like the Claude desktop and Codex apps, with the skills of this repository's library. **Agent runs are mocked for now**: a `MockAgentRunner` plays a realistic orchestration without starting any CLI; real runners for `claude`, Cursor's `agent` and `agy` plug into the same interface later.
 
-- **Projects**: like other agent desktop apps, you open a project folder first. The Projects screen (shown on launch when no project is open, and from the rail's Projects item) has an **Open folder…** button (the native folder picker) and the recent projects with their path, skill count and when they were last opened. Search filters the list; the × button removes a project from the list without touching its folder; a folder that was moved or deleted shows as **Unavailable**. The last open project reopens on launch. In a project, the library panel's dropdown switches between recent projects, opens another folder, or goes back to all projects.
-- **Project skills**: every `<folder>/<name>/SKILL.md` in the agent skill folders of the project: `.claude/skills` (Claude Code), `.agents/skills` (Codex, Gemini CLI, OpenCode), `.codex/skills`, `.cursor/skills`, `.github/skills` (GitHub Copilot), `.gemini/skills`, `.opencode/skills` and `.windsurf/skills`. These folders are also found in nested packages up to three folders deep, skipping hidden folders, `node_modules/` and build folders. Project skills can be edited, created, renamed and deleted.
-- **Our library**: the skills of the skill library folder (by default this repository, found next to the app when it runs from a checkout; change it in **Settings**, which a packaged app needs). Library skills are read-only (Map and Read). Each one shows **Installed** when the project's `.claude/skills/<name>` copy matches it, **Update available** when the copy differs (compared by `metadata.version` when both have one, otherwise by the content of every file in the folder), or an **Add to project** button. Adding copies the whole skill folder to `<project>/.claude/skills/<name>/`; updating asks first and moves the old copy to the system Trash.
-- **Favourites**: starred skills are kept per project in the projects store, never in skill files.
-- **Map**: the selected skill and the skills it links to, as a collapsible tree. Skills already shown appear as amber pills; a project skill's links to library skills are marked "From library". Pills at the top list unsaved edits and project skills with frontmatter issues. The linked skills wrap into rows that fit the panel width, so the tree shows at or near full size and is scaled down further only when a single branch is wider than the panel; the toolbar's zoom out, zoom in and Fit buttons change the scale.
-- **Links**: a skill links to another only through an explicit reference to its name, on word boundaries: an inline code span (`` `vibecode-review` ``), a slash command (`/vibecode-review`), or a markdown link or path to its folder or `SKILL.md`. A plain word in the text is not a link. A project skill links to the project's own skill of that name, else to the library's; a library skill links only within the library. Linked code spans open the skill in Read and Edit.
-- **Read**: the rendered `SKILL.md`, its frontmatter, issues, supporting files (click to preview) and the skills it links to or is linked from.
-- **Edit**: frontmatter and body editors with a live preview. Unsaved edits show an "Unsaved changes" pill; save with the Save button or Cmd/Ctrl+S.
-- **New / Rename / Delete**: create a project skill from the template; rename its folder and `name` (optionally also rewriting the links to the old name in the project's other skills, on by default); or move its folder to the system Trash after confirmation.
+## Using the app
 
-All file access runs in the main (Bun) process through Electrobun RPC (`src/bun/skills.ts`, `src/bun/workspace.ts`). Writes are allowed only inside the open project's folder and reads only inside the project or the library folder; paths are resolved through symlinks first, so a link that leads outside is rejected.
+- **Rail**: Projects (shows or hides the projects panel), New (a new session in the open project, or the folder picker when none is open), Settings (the skill library folder) and the light/dark toggle.
+- **Projects panel**: every project you opened, most recent first, with **Open folder…** (the native folder picker) and a search that matches project names, paths and session titles. A project row expands to its sessions (title, age, and a dot while the latest run is running, needs you or failed) and **New session**. Clicking a project opens it and its latest session, or a new one when it has none. The × button removes a project from the list without touching its folder, the trash button deletes a session after confirmation, and a folder that was moved or deleted shows as **Unavailable**. The last open project reopens on launch.
+- **Header**: the project, the session title (click it to rename; the first message titles a new session) and the **Chat | Tree** toggle.
+- **Chat**: the thread of the session, like Claude Code: your messages (with the selected skills as slash commands in front, e.g. `/vibecode-review fix the header`), the orchestrator's streaming text, collapsible tool calls (tool, short input, result), sub-agent blocks (name, model, status, last line, cost and time; click to see the agent in the tree), questions ("needs you", with Reply), failures (with Retry) and notes such as "Installed vibecode-review into .claude/skills". The thread follows new output until you scroll up; **Jump to latest** scrolls back down.
+- **Tree**: the run's agents as a tree: the orchestrator on top and its sub-agents on trunk, bus and elbow connectors, wrapped into rows that fit the panel. Each card shows the agent's name, model or CLI, status (Running, Done, Needs you, Failed, Stopped), task, cost and duration, and a toggle for its sub-agents. The toolbar shows the agent and running counts and the cost, **N needs you** and **N failed** pills whose popovers offer Reply or Retry (and Dismiss), and zoom out, zoom in and Fit. Selecting a card opens that agent's transcript beside the tree.
+- **Composer** (pinned below both views): Enter sends, Shift+Enter adds a line. **Skills** lists the library's skills with their state in the project (**Installed**, **Update** when the project's copy differs, **Not installed**); selected skills show as removable chips. **Agent** offers Default and the library's agent skills (`use-claude-code`, `use-cursor`, `use-antigravity`). Both choices are kept per session. While a run works, **Stop** replaces Send; after Reply the composer answers the waiting agent.
+- **On send**, every selected skill the project does not have yet is copied from the library to `<project>/.claude/skills/<name>/` (a copy that differs from the library is left as it is; its Update button replaces it after confirmation, moving the old copy to the system Trash), then the run starts.
 
-### Projects store
+All file access runs in the main (Bun) process through Electrobun RPC; run events stream from the main process to the webview as RPC messages. Skills are installed only inside the open project and read only from the library folder; paths are resolved through symlinks first, so a link that leads outside is rejected. Session requests are accepted only for projects in the recent list, and session ids must be UUIDs, so no request reaches a file outside the sessions store.
 
-The recent projects, the open project, the per-project favourites and the library folder setting are kept in `projects.json` in the app's user data folder (Electrobun's `Utils.paths.userData`), e.g. `~/Library/Application Support/io.github.lysari.vibecode-skills/dev/projects.json` for `hutch run dev` on macOS (the last folder is the build channel: `dev`, `canary` or `stable`). Deleting the file resets the app to an empty project list.
+### Stores
+
+Both live in the app's user data folder (Electrobun's `Utils.paths.userData`), e.g. `~/Library/Application Support/io.github.lysari.vibecode-skills/dev/` for `hutch run dev` on macOS (the last folder is the build channel: `dev`, `canary` or `stable`):
+
+- `projects.json`: the recent projects, the open project and the library folder setting. Deleting it resets the project list.
+- `sessions/<project hash>/<session id>.json`: one file per session (the hash is the first 16 hex digits of the SHA-256 of the project path) with its title, timestamps, selected agent and skills, messages (user messages and system notes) and every run event. Files are written through a temporary file and read back as untrusted JSON: a malformed session is skipped, malformed messages or events are dropped. A run that was interrupted by quitting the app is marked Stopped when its session opens again.
+
+### Agent runner
+
+`src/shared/run.interface.ts` defines the contract a runner implements:
+
+```ts
+interface AgentRunner {
+	start(request: RunRequest, emit: (event: RunEvent) => void): void; // RunRequest: runId, projectRoot, prompt, agent, skills
+	stop(runId: string): void; // running and waiting agents become "stopped", the run finishes as "stopped"
+	reply(runId: string, agentId: string, text: string): void; // answers an agent in "needs-input"
+	retry(runId: string, agentId: string): void; // replaces a failed agent; the failed one becomes "stopped"
+}
+```
+
+A run emits `run.started`, then `agent.spawned` (id, parent id, name, model, task, and the agent it replaces after a retry; the first agent without a parent is the orchestrator), `agent.status` (`running`, `done`, `needs-input`, `failed`, `stopped`), `agent.usage` (cost and duration totals), `text.delta` (joined by message id), `tool.started` / `tool.finished`, `input.needed`, `error`, and finally `run.finished` (`done`, `stopped` or `failed`). Every event carries its run id and time. `src/bun/chat.ts` installs the selected skills, records the user's message, starts the run, appends each event to the session (writing it to disk one write at a time) and forwards it to the webview; the renderer plays the events into both views (`src/mainview/run-view.ts`). `AGENT_CLIS` in the same interface file maps each agent skill to the command a real runner starts (`claude`, `agent`, `agy`); a real runner is constructed in `src/bun/index.ts` in place of `MockAgentRunner`.
+
+`MockAgentRunner` (`src/bun/mock-agent-runner.ts`) plays an orchestrator that looks at the project, a planner, two or three coders working in parallel (each with its own test runner) and a reviewer per selected skill, with timed text streaming, tool calls, costs and durations. A question mark in the prompt, or some seeds, make a coder ask the user and wait for the reply; some seeds make a test runner fail until it is retried. Its random choices follow from the prompt, agent and skills, or from an injected seed, and its timers come from an injectable clock, so tests step through a run deterministically.
 
 ## Getting Started
 
@@ -60,22 +80,27 @@ When you run `hutch run dev` (without HMR):
 ```
 ├── src/
 │   ├── bun/
-│   │   ├── index.ts        # Main process: window, folder picker and RPC handlers
-│   │   ├── skills.ts       # Skill discovery, install status and file I/O, restricted to the project and library folders
-│   │   └── workspace.ts    # Projects store: recent projects, open project, favourites, library folder
-│   ├── shared/             # Project, skill and RPC types and the skill link rule, used by both processes
+│   │   ├── index.ts             # Main process: window, folder picker and RPC handlers
+│   │   ├── chat.ts              # Sessions and their runs: install on send, event recording, reply, retry, stop
+│   │   ├── sessions.ts          # Sessions store: one JSON file per session, validated when read
+│   │   ├── mock-agent-runner.ts # The mocked AgentRunner
+│   │   ├── skills.ts            # Library skill discovery, install status and install, restricted to the project and library folders
+│   │   └── workspace.ts         # Projects store: recent projects, open project, library folder
+│   ├── shared/                  # Project, skill, session, run and RPC types, used by both processes
 │   └── mainview/
-│       ├── App.tsx         # App state and layout shell
-│       ├── rpc.ts          # Electroview RPC client
-│       ├── components/     # Rail, Projects, ProjectsHeader, Header, Library, SkillMap, SkillDocument, SkillEditor, dialogs
-│       ├── styles/         # Palette (light/dark colours), fonts, global styles
-│       ├── main.tsx        # React entry point
-│       ├── index.html      # HTML template
-│       └── index.scss      # Loads the styles and Tailwind
-├── tests/                  # bun:test tests for the main process (bun/), renderer helpers (mainview/) and shared code (shared/); they write to temporary folders only
-├── electrobun.config.ts    # Electrobun configuration
-├── vite.config.ts          # Vite configuration
-├── tailwind.config.js      # Tailwind configuration
+│       ├── App.tsx              # App state and layout shell
+│       ├── rpc.ts               # Electroview RPC client and the run event subscription
+│       ├── run-view.ts          # Plays run events into agent trees and transcripts
+│       ├── components/          # Rail, Projects, Header, ChatView, ThreadEntry, Composer, SkillPicker, AgentPicker, AgentTree, AgentTreeToolbar, AgentDrawer, dialogs
+│       ├── styles/              # Palette (light/dark colours), fonts, global styles
+│       ├── main.tsx             # React entry point
+│       ├── index.html           # HTML template
+│       └── index.scss           # Loads the styles and Tailwind
+├── docs/                        # What each screen, type file and test does, by topic (code comments live only in shared modules)
+├── tests/                       # bun:test tests for the main process (bun/) and renderer helpers (mainview/); they write to temporary folders only
+├── electrobun.config.ts         # Electrobun configuration
+├── vite.config.ts               # Vite configuration
+├── tailwind.config.js           # Tailwind configuration
 └── package.json
 ```
 

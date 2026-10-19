@@ -1,7 +1,7 @@
 {
 	"name": "vibecode-gui",
 	"version": "1.0.0",
-	"description": "Vibecode Skills: a desktop app for browsing and managing agent skills",
+	"description": "Vibecode Skills: a desktop app for running coding agents on your projects with agent skills",
 	"dependencies": {
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1"

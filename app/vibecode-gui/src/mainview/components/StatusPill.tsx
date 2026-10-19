@@ -1,32 +1,30 @@
-import { Icon } from "./Icon";
+import type { AgentStatus } from "../../shared/run.interface";
+import { Icon, type IconName } from "./Icon";
 
-export type StatusTone = "valid" | "issue" | "unsaved";
-
-interface StatusPillProps {
-	tone: StatusTone;
+interface StatusStyle {
+	label: string;
+	icon: IconName;
+	className: string;
 }
 
-export function StatusPill({ tone }: StatusPillProps) {
-	if (tone === "issue") {
-		return (
-			<span className="inline-flex h-chip-h shrink-0 items-center gap-rail-gap rounded-full bg-issue px-stack text-meta text-issue-text">
-				<Icon name="alert" className="size-icon-sm" />
-				Issues
-			</span>
-		);
-	}
-	if (tone === "unsaved") {
-		return (
-			<span className="inline-flex h-chip-h shrink-0 items-center gap-rail-gap rounded-full bg-unsaved px-stack text-meta text-unsaved-text">
-				<Icon name="clock" className="size-icon-sm" />
-				Unsaved
-			</span>
-		);
-	}
+export const AGENT_STATUS_STYLES: Record<AgentStatus, StatusStyle> = {
+	running: { label: "Running", icon: "loader", className: "bg-info text-info-text" },
+	done: { label: "Done", icon: "check", className: "bg-valid text-valid-text" },
+	"needs-input": { label: "Needs you", icon: "chat", className: "bg-warning-soft text-warning-text" },
+	failed: { label: "Failed", icon: "alert", className: "bg-issue text-issue-text" },
+	stopped: { label: "Stopped", icon: "stop", className: "bg-tile text-tile-icon" },
+};
+
+interface StatusPillProps {
+	status: AgentStatus;
+}
+
+export function StatusPill({ status }: StatusPillProps) {
+	const { label, icon, className } = AGENT_STATUS_STYLES[status];
 	return (
-		<span className="inline-flex h-chip-h shrink-0 items-center gap-rail-gap rounded-full bg-valid px-stack text-meta text-valid-text">
-			<Icon name="check" className="size-icon-sm" />
-			Valid
+		<span className={`inline-flex h-chip-h shrink-0 items-center gap-rail-gap rounded-full px-stack text-meta ${className}`}>
+			<Icon name={icon} className={`size-icon-sm ${status === "running" ? "motion-safe:animate-spin" : ""}`} />
+			{label}
 		</span>
 	);
 }
