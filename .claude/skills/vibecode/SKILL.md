@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, or adding features to a project, so changes stay clean, minimal, and easy to maintain
 metadata:
-  version: "0.0.1-20261019.1"
+  version: "0.0.1-20261019.2"
 ---
 
 # Vibecode
