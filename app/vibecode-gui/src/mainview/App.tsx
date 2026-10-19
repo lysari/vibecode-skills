@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import type { SkillCreate, SkillForm, SkillLibrary } from "../shared/skill.interface";
+import type { Workspace } from "../shared/project.interface";
+import type { Skill, SkillCreate, SkillForm } from "../shared/skill.interface";
 import { Dialog } from "./components/Dialog";
 import { Header } from "./components/Header";
 import { Library } from "./components/Library";
+import { Projects } from "./components/Projects";
 import { Rail } from "./components/Rail";
+import { SettingsDialog } from "./components/SettingsDialog";
 import { NewSkillDialog, RenameSkillDialog } from "./components/SkillDialogs";
 import { SkillDocument } from "./components/SkillDocument";
 import { SkillEditor } from "./components/SkillEditor";
@@ -11,13 +14,14 @@ import { SkillMap } from "./components/SkillMap";
 import { skillsApi } from "./rpc";
 import type { SkillView } from "./skill-view";
 
-const FAVOURITES_KEY = "vibecode-gui:favourites";
 const THEME_KEY = "vibecode-gui:theme";
 
 type DialogState =
 	| { kind: "new" }
 	| { kind: "rename" }
 	| { kind: "delete" }
+	| { kind: "update"; skill: Skill }
+	| { kind: "settings" }
 	| { kind: "discard"; next: () => void }
 	| null;
 
@@ -37,26 +41,17 @@ function writeStored(key: string, value: string): void {
 	}
 }
 
-function readFavourites(): Set<string> {
-	try {
-		const stored: unknown = JSON.parse(readStored(FAVOURITES_KEY) ?? "[]");
-		return new Set(Array.isArray(stored) ? stored.filter((dir): dir is string => typeof dir === "string") : []);
-	} catch {
-		return new Set();
-	}
-}
-
 function errorMessage(cause: unknown): string {
 	return cause instanceof Error ? cause.message : String(cause);
 }
 
 function App() {
-	const [library, setLibrary] = useState<SkillLibrary | null>(null);
+	const [workspace, setWorkspace] = useState<Workspace | null>(null);
+	const [isProjectsOpen, setIsProjectsOpen] = useState(false);
 	const [selectedDir, setSelectedDir] = useState<string | null>(null);
 	const [history, setHistory] = useState<string[]>([]);
 	const [view, setView] = useState<SkillView>("map");
 	const [draft, setDraft] = useState<SkillForm | null>(null);
-	const [favourites, setFavourites] = useState(readFavourites);
 	const [isDark, setIsDark] = useState(
 		() => (readStored(THEME_KEY) ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark",
 	);
@@ -65,33 +60,41 @@ function App() {
 	const [isSaving, setIsSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const skills = library?.skills ?? [];
+	const project = workspace?.project ?? null;
+	const skills = project?.skills ?? [];
+	const favourites = new Set(project?.favourites);
 	const skill = skills.find((candidate) => candidate.dir === selectedDir) ?? null;
+	// Library skills are read-only, so they open in Read where a project skill would open in Edit.
+	const shownView = skill?.scope === "library" && view === "edit" ? "read" : view;
 	const form = draft ?? (skill && { frontmatter: skill.frontmatter, body: skill.body });
 	const isDirty = Boolean(skill && draft && (draft.frontmatter !== skill.frontmatter || draft.body !== skill.body));
 	const skillNames = new Set(skills.map((candidate) => candidate.name).filter(Boolean));
 
-	function applyLibrary(next: SkillLibrary, nextDir?: string) {
-		setLibrary(next);
+	function applyWorkspace(next: Workspace, nextDir?: string) {
+		setWorkspace(next);
 		setDraft(null);
-		const dirs = new Set(next.skills.map((candidate) => candidate.dir));
+		const nextSkills = next.project?.skills ?? [];
+		const dirs = new Set(nextSkills.map((candidate) => candidate.dir));
 		setHistory((previous) => previous.filter((dir) => dirs.has(dir)));
 		setSelectedDir((current) => {
 			const wanted = nextDir ?? current;
-			return wanted && dirs.has(wanted) ? wanted : (next.skills[0]?.dir ?? null);
+			return wanted && dirs.has(wanted) ? wanted : (nextSkills[0]?.dir ?? null);
 		});
+	}
+
+	async function runRequest(failure: string, request: () => Promise<void>) {
+		try {
+			await request();
+			setError(null);
+		} catch (cause) {
+			setError(`${failure}: ${errorMessage(cause)}`);
+		}
 	}
 
 	async function load() {
 		setIsScanning(true);
-		try {
-			applyLibrary(await skillsApi.listSkills());
-			setError(null);
-		} catch (cause) {
-			setError(`Could not read skills: ${errorMessage(cause)}`);
-		} finally {
-			setIsScanning(false);
-		}
+		await runRequest("Could not read skills", async () => applyWorkspace(await skillsApi.readWorkspace()));
+		setIsScanning(false);
 	}
 
 	useEffect(() => {
@@ -103,21 +106,13 @@ function App() {
 		writeStored(THEME_KEY, isDark ? "dark" : "light");
 	}, [isDark]);
 
-	useEffect(() => {
-		writeStored(FAVOURITES_KEY, JSON.stringify([...favourites]));
-	}, [favourites]);
-
 	async function save() {
 		if (!skill || !draft) return;
 		setIsSaving(true);
-		try {
-			applyLibrary(await skillsApi.saveSkill({ dir: skill.dir, form: draft }));
-			setError(null);
-		} catch (cause) {
-			setError(`Could not save ${skill.name}: ${errorMessage(cause)}`);
-		} finally {
-			setIsSaving(false);
-		}
+		await runRequest(`Could not save ${skill.name}`, async () =>
+			applyWorkspace(await skillsApi.saveSkill({ dir: skill.dir, form: draft })),
+		);
+		setIsSaving(false);
 	}
 
 	useEffect(() => {
@@ -136,6 +131,28 @@ function App() {
 		else next();
 	}
 
+	function openProject(root: string) {
+		guardUnsaved(() =>
+			runRequest("Could not open the project", async () => {
+				applyWorkspace(await skillsApi.openProject({ root }));
+				setIsProjectsOpen(false);
+			}),
+		);
+	}
+
+	async function chooseProject() {
+		await runRequest("Could not open the folder picker", async () => {
+			const root = await skillsApi.chooseFolder();
+			if (root) openProject(root);
+		});
+	}
+
+	function removeProject(root: string) {
+		guardUnsaved(() =>
+			runRequest("Could not remove the project", async () => applyWorkspace(await skillsApi.removeProject({ root }))),
+		);
+	}
+
 	function selectSkill(dir: string, nextView?: SkillView) {
 		guardUnsaved(() => {
 			if (selectedDir && dir !== selectedDir) setHistory([...history, selectedDir]);
@@ -146,7 +163,9 @@ function App() {
 	}
 
 	function openSkillByName(name: string) {
-		const target = skills.find((candidate) => candidate.name === name);
+		const target =
+			skills.find((candidate) => candidate.name === name && candidate.scope === skill?.scope) ??
+			skills.find((candidate) => candidate.name === name);
 		if (target) selectSkill(target.dir);
 	}
 
@@ -158,16 +177,21 @@ function App() {
 		});
 	}
 
+	function saveFavourites(base: Workspace, next: string[]) {
+		if (!base.project) return;
+		setWorkspace({ ...base, project: { ...base.project, favourites: next } });
+		runRequest("Could not save favourites", () => skillsApi.saveFavourites({ favourites: next }));
+	}
+
 	function toggleFavourite(dir: string) {
-		const next = new Set(favourites);
-		if (next.has(dir)) next.delete(dir);
-		else next.add(dir);
-		setFavourites(next);
+		if (!workspace) return;
+		saveFavourites(workspace, favourites.has(dir) ? [...favourites].filter((other) => other !== dir) : [...favourites, dir]);
 	}
 
 	async function createSkill(create: SkillCreate) {
+		if (!project) return;
 		const next = await skillsApi.createSkill(create);
-		applyLibrary(next, [create.source, create.name].filter((part) => part !== ".").join("/"));
+		applyWorkspace(next, `${project.root}/${create.source}/${create.name}`);
 		setView("edit");
 		setDialog(null);
 	}
@@ -176,101 +200,137 @@ function App() {
 		if (!skill) return;
 		const renamedDir = skill.dir.replace(/[^/]+$/, name);
 		const next = await skillsApi.renameSkill({ dir: skill.dir, name, shouldRenameMentions });
+		applyWorkspace(next, renamedDir);
 		if (favourites.has(skill.dir)) {
-			const nextFavourites = new Set(favourites);
-			nextFavourites.delete(skill.dir);
-			setFavourites(nextFavourites.add(renamedDir));
+			saveFavourites(next, [...[...favourites].filter((dir) => dir !== skill.dir), renamedDir]);
 		}
-		applyLibrary(next, renamedDir);
 		setDialog(null);
 	}
 
 	async function deleteSkill() {
 		if (!skill) return;
 		const next = await skillsApi.deleteSkill({ dir: skill.dir });
-		const nextFavourites = new Set(favourites);
-		nextFavourites.delete(skill.dir);
-		setFavourites(nextFavourites);
 		setSelectedDir(null);
-		applyLibrary(next);
+		applyWorkspace(next);
+		if (favourites.has(skill.dir)) saveFavourites(next, [...favourites].filter((dir) => dir !== skill.dir));
 		setDialog(null);
 	}
+
+	async function installSkill(target: Skill) {
+		applyWorkspace(await skillsApi.installSkill({ dir: target.dir }));
+		setDialog(null);
+	}
+
+	function requestInstall(target: Skill) {
+		guardUnsaved(() => {
+			if (target.install === "outdated") setDialog({ kind: "update", skill: target });
+			else runRequest(`Could not add ${target.name}`, () => installSkill(target));
+		});
+	}
+
+	async function saveSettings(libraryRoot: string | null) {
+		applyWorkspace(await skillsApi.setLibraryRoot({ root: libraryRoot }));
+		setDialog(null);
+	}
+
+	const errorBanner = error && (
+		<p role="alert" className="flex items-center gap-stack bg-issue px-header-x py-rail-gap text-meta text-issue-text">
+			{error}
+			<button type="button" onClick={() => setError(null)} className="ml-auto underline">
+				Dismiss
+			</button>
+		</p>
+	);
 
 	return (
 		<div className="flex h-dvh w-full overflow-hidden bg-surface text-ink">
 			<Rail
+				isProjectsOpen={!project || isProjectsOpen}
+				hasProject={Boolean(project)}
 				isDark={isDark}
 				isScanning={isScanning}
+				onShowProjects={() => setIsProjectsOpen(true)}
+				onShowSkills={() => setIsProjectsOpen(false)}
 				onNewSkill={() => guardUnsaved(() => setDialog({ kind: "new" }))}
 				onRescan={() => guardUnsaved(load)}
+				onOpenSettings={() => guardUnsaved(() => setDialog({ kind: "settings" }))}
 				onToggleTheme={() => setIsDark(!isDark)}
 			/>
-			<div className="flex min-w-0 flex-1 flex-col">
-				<Header
-					skill={skill}
-					view={view}
-					isDirty={isDirty}
-					isSaving={isSaving}
-					canGoBack={history.length > 0}
-					onBack={goBack}
-					onView={setView}
-					onSave={save}
-					onDiscard={() => setDraft(null)}
-					onRename={() => setDialog({ kind: "rename" })}
-					onDelete={() => setDialog({ kind: "delete" })}
+			{(!project || isProjectsOpen) && (
+				<Projects
+					workspace={workspace}
+					banner={errorBanner}
+					onOpen={openProject}
+					onChoose={chooseProject}
+					onRemove={removeProject}
 				/>
-				{error && (
-					<p role="alert" className="flex items-center gap-stack bg-issue px-header-x py-rail-gap text-meta text-issue-text">
-						{error}
-						<button type="button" onClick={() => setError(null)} className="ml-auto underline">
-							Dismiss
-						</button>
-					</p>
-				)}
-				<div className="flex min-h-0 flex-1">
-					{library && (
+			)}
+			{project && !isProjectsOpen && (
+				<div className="flex min-w-0 flex-1 flex-col">
+					<Header
+						projectName={project.name}
+						skill={skill}
+						view={shownView}
+						isDirty={isDirty}
+						isSaving={isSaving}
+						canGoBack={history.length > 0}
+						onBack={goBack}
+						onView={setView}
+						onSave={save}
+						onDiscard={() => setDraft(null)}
+						onRename={() => setDialog({ kind: "rename" })}
+						onDelete={() => setDialog({ kind: "delete" })}
+						onInstall={requestInstall}
+					/>
+					{errorBanner}
+					<div className="flex min-h-0 flex-1">
 						<Library
-							library={library}
-							favourites={favourites}
+							project={project}
+							projects={workspace?.projects ?? []}
+							libraryRoot={workspace?.libraryRoot ?? null}
 							selectedDir={selectedDir}
 							onSelect={(dir) => selectSkill(dir)}
 							onToggleFavourite={toggleFavourite}
+							onInstall={requestInstall}
+							onOpenProject={openProject}
+							onChooseProject={chooseProject}
+							onShowProjects={() => setIsProjectsOpen(true)}
 						/>
-					)}
-					<main className="min-h-0 min-w-0 flex-1">
-						{!skill && (
-							<div className="flex h-full items-center justify-center bg-canvas bg-dots text-body text-muted">
-								{library ? "No skill selected. Create one with New." : "Reading skills…"}
-							</div>
-						)}
-						{skill && view === "map" && (
-							<SkillMap
-								skill={skill}
-								skills={skills}
-								isDirty={isDirty}
-								onSelect={selectSkill}
-								onSave={save}
-								onDiscard={() => setDraft(null)}
-							/>
-						)}
-						{skill && view === "read" && (
-							<SkillDocument
-								key={skill.dir}
-								skill={skill}
-								skills={skills}
-								skillNames={skillNames}
-								onOpenSkill={openSkillByName}
-								onSelect={(dir) => selectSkill(dir)}
-							/>
-						)}
-						{skill && form && view === "edit" && (
-							<SkillEditor form={form} skillNames={skillNames} onChange={setDraft} onOpenSkill={openSkillByName} />
-						)}
-					</main>
+						<main className="min-h-0 min-w-0 flex-1">
+							{!skill && (
+								<div className="flex h-full items-center justify-center bg-canvas bg-dots text-body text-muted">
+									No skill selected. Create one with New or add one from the library.
+								</div>
+							)}
+							{skill && shownView === "map" && (
+								<SkillMap
+									skill={skill}
+									skills={skills}
+									isDirty={isDirty}
+									onSelect={selectSkill}
+									onSave={save}
+									onDiscard={() => setDraft(null)}
+								/>
+							)}
+							{skill && shownView === "read" && (
+								<SkillDocument
+									key={skill.dir}
+									skill={skill}
+									skills={skills}
+									skillNames={skillNames}
+									onOpenSkill={openSkillByName}
+									onSelect={(dir) => selectSkill(dir)}
+								/>
+							)}
+							{skill && form && shownView === "edit" && (
+								<SkillEditor form={form} skillNames={skillNames} onChange={setDraft} onOpenSkill={openSkillByName} />
+							)}
+						</main>
+					</div>
 				</div>
-			</div>
-			{dialog?.kind === "new" && library && (
-				<NewSkillDialog sources={library.sources} onCreate={createSkill} onCancel={() => setDialog(null)} />
+			)}
+			{dialog?.kind === "new" && project && (
+				<NewSkillDialog sources={project.sources} onCreate={createSkill} onCancel={() => setDialog(null)} />
 			)}
 			{dialog?.kind === "rename" && skill && (
 				<RenameSkillDialog
@@ -283,11 +343,36 @@ function App() {
 			{dialog?.kind === "delete" && skill && (
 				<Dialog title={`Move ${skill.name} to the Trash?`} confirmLabel="Move to Trash" isDanger onConfirm={deleteSkill} onCancel={() => setDialog(null)}>
 					<p>
-						This moves <span className="font-mono text-code text-ink">{skill.dir}</span> with its SKILL.md and{" "}
+						This moves <span className="break-all font-mono text-code text-ink">{skill.dir}</span> with its SKILL.md and{" "}
 						{skill.files.length} supporting {skill.files.length === 1 ? "file" : "files"} to the Trash. You can restore
 						the folder from the Trash.
 					</p>
 				</Dialog>
+			)}
+			{dialog?.kind === "update" && project && (
+				<Dialog
+					title={`Update ${dialog.skill.name} in ${project.name}?`}
+					confirmLabel="Update skill"
+					onConfirm={() => installSkill(dialog.skill)}
+					onCancel={() => setDialog(null)}
+				>
+					<p>
+						The project&apos;s copy in{" "}
+						<span className="break-all font-mono text-code text-ink">.claude/skills/{dialog.skill.dir.split("/").pop()}</span>{" "}
+						differs from the library. Updating replaces it with the library version
+						{dialog.skill.version && ` ${dialog.skill.version}`}.
+					</p>
+					<p>The current copy moves to the Trash first, so any local changes can be restored from there.</p>
+				</Dialog>
+			)}
+			{dialog?.kind === "settings" && workspace && (
+				<SettingsDialog
+					libraryRoot={workspace.libraryRoot}
+					defaultLibraryRoot={workspace.defaultLibraryRoot}
+					onChooseFolder={() => skillsApi.chooseFolder()}
+					onSave={saveSettings}
+					onCancel={() => setDialog(null)}
+				/>
 			)}
 			{dialog?.kind === "discard" && (
 				<Dialog

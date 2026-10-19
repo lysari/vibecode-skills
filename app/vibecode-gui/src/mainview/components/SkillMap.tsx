@@ -54,11 +54,13 @@ interface NodeCardProps {
 	isRoot: boolean;
 	isDirty: boolean;
 	isCollapsed: boolean;
+	/** True in a project skill's map, where linked library skills are marked as such. */
+	marksLibrary: boolean;
 	onToggle: () => void;
 	onSelect: (dir: string, view?: SkillView) => void;
 }
 
-function NodeCard({ node, isRoot, isDirty, isCollapsed, onToggle, onSelect }: NodeCardProps) {
+function NodeCard({ node, isRoot, isDirty, isCollapsed, marksLibrary, onToggle, onSelect }: NodeCardProps) {
 	const { skill, children } = node;
 	const tone = isRoot && isDirty ? "unsaved" : skill.issues.length > 0 ? "issue" : "valid";
 	return (
@@ -83,7 +85,10 @@ function NodeCard({ node, isRoot, isDirty, isCollapsed, onToggle, onSelect }: No
 					</span>
 					<span className="min-w-0 flex-1">
 						<span className="block break-words text-node font-medium text-ink">{skill.name || skill.dir}</span>
-						<span className="block truncate text-meta text-muted">{skill.version ?? "No version"}</span>
+						<span className="block truncate text-meta text-muted">
+							{marksLibrary && skill.scope === "library" && <span className="text-accent-text">From library · </span>}
+							{skill.version ?? "No version"}
+						</span>
 					</span>
 					<StatusPill tone={tone} />
 				</span>
@@ -117,11 +122,12 @@ function NodeCard({ node, isRoot, isDirty, isCollapsed, onToggle, onSelect }: No
 interface MapEntryProps {
 	node: MapNode;
 	collapsed: Set<string>;
+	marksLibrary: boolean;
 	onToggle: (key: string) => void;
 	onSelect: (dir: string, view?: SkillView) => void;
 }
 
-function MapEntry({ node, collapsed, onToggle, onSelect }: MapEntryProps) {
+function MapEntry({ node, collapsed, marksLibrary, onToggle, onSelect }: MapEntryProps) {
 	if (node.isRepeat) {
 		return (
 			<button
@@ -143,6 +149,7 @@ function MapEntry({ node, collapsed, onToggle, onSelect }: MapEntryProps) {
 				isRoot={false}
 				isDirty={false}
 				isCollapsed={isCollapsed}
+				marksLibrary={marksLibrary}
 				onToggle={() => onToggle(node.key)}
 				onSelect={onSelect}
 			/>
@@ -150,7 +157,13 @@ function MapEntry({ node, collapsed, onToggle, onSelect }: MapEntryProps) {
 				<div className="map-branch">
 					{node.children.map((child) => (
 						<div key={child.key} className="map-branch-item">
-							<MapEntry node={child} collapsed={collapsed} onToggle={onToggle} onSelect={onSelect} />
+							<MapEntry
+								node={child}
+								collapsed={collapsed}
+								marksLibrary={marksLibrary}
+								onToggle={onToggle}
+								onSelect={onSelect}
+							/>
 						</div>
 					))}
 				</div>
@@ -174,6 +187,7 @@ export function SkillMap({ skill, skills, isDirty, onSelect, onSave, onDiscard }
 	const contentRef = useRef<HTMLDivElement>(null);
 	const { tree, skillCount, linkCount } = buildMap(skill, skills);
 	const isRootCollapsed = collapsed.has(tree.key);
+	const marksLibrary = skill.scope === "project";
 	const rows = wrapMapRows(tree.children, {
 		widths: size.columnWidths,
 		gap: size.columnGap,
@@ -262,6 +276,7 @@ export function SkillMap({ skill, skills, isDirty, onSelect, onSave, onDiscard }
 							isRoot
 							isDirty={isDirty}
 							isCollapsed={isRootCollapsed}
+							marksLibrary={marksLibrary}
 							onToggle={() => toggle(tree.key)}
 							onSelect={onSelect}
 						/>
@@ -275,7 +290,13 @@ export function SkillMap({ skill, skills, isDirty, onSelect, onSave, onDiscard }
 										{row.map((child) => (
 											<div key={child.key} className="map-column">
 												<div className="w-max">
-													<MapEntry node={child} collapsed={collapsed} onToggle={toggle} onSelect={onSelect} />
+													<MapEntry
+														node={child}
+														collapsed={collapsed}
+														marksLibrary={marksLibrary}
+														onToggle={toggle}
+														onSelect={onSelect}
+													/>
 												</div>
 											</div>
 										))}

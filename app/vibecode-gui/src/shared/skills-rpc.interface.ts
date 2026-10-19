@@ -1,15 +1,22 @@
 import type { RPCSchema } from "electrobun/rpc";
-import type { SkillCreate, SkillForm, SkillLibrary, SkillRename } from "./skill.interface";
+import type { Workspace } from "./project.interface";
+import type { SkillCreate, SkillForm, SkillRename } from "./skill.interface";
 
 export interface SkillsRPC {
 	bun: RPCSchema<{
 		requests: {
-			listSkills: { params: undefined; response: SkillLibrary };
+			chooseFolder: { params: undefined; response: string | null };
+			readWorkspace: { params: undefined; response: Workspace };
+			openProject: { params: { root: string }; response: Workspace };
+			removeProject: { params: { root: string }; response: Workspace };
+			setLibraryRoot: { params: { root: string | null }; response: Workspace };
+			saveFavourites: { params: { favourites: string[] }; response: void };
 			readSkillFile: { params: { dir: string; path: string }; response: string };
-			saveSkill: { params: { dir: string; form: SkillForm }; response: SkillLibrary };
-			createSkill: { params: SkillCreate; response: SkillLibrary };
-			renameSkill: { params: SkillRename; response: SkillLibrary };
-			deleteSkill: { params: { dir: string }; response: SkillLibrary };
+			saveSkill: { params: { dir: string; form: SkillForm }; response: Workspace };
+			createSkill: { params: SkillCreate; response: Workspace };
+			renameSkill: { params: SkillRename; response: Workspace };
+			deleteSkill: { params: { dir: string }; response: Workspace };
+			installSkill: { params: { dir: string }; response: Workspace };
 		};
 	}>;
 	webview: RPCSchema;

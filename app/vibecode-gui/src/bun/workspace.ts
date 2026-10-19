@@ -1,0 +1,135 @@
+import { existsSync, realpathSync, statSync } from "node:fs";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { basename, dirname } from "node:path";
+import type { Project, Workspace } from "../shared/project.interface";
+import { countSkills, defaultLibraryRoot, listSkills, type SkillRoots } from "./skills";
+
+interface StoredProject {
+	root: string;
+	openedAt: number;
+	favourites: string[];
+}
+
+/** The app's projects store, a JSON file in its user data folder. */
+interface ProjectsStore {
+	/** The library folder chosen in Settings; null uses the default. */
+	libraryRoot: string | null;
+	/** The project open now, reopened on launch. */
+	openRoot: string | null;
+	/** Most recently opened first. */
+	projects: StoredProject[];
+}
+
+const EMPTY_STORE: ProjectsStore = { libraryRoot: null, openRoot: null, projects: [] };
+
+function isFolder(path: string): boolean {
+	return existsSync(path) && statSync(path).isDirectory();
+}
+
+function readText(value: unknown): string | null {
+	return typeof value === "string" && value ? value : null;
+}
+
+function readStoredProject(value: unknown): StoredProject | null {
+	if (!value || typeof value !== "object") return null;
+	const { root, openedAt, favourites } = value as Record<string, unknown>;
+	if (typeof root !== "string" || typeof openedAt !== "number") return null;
+	return {
+		root,
+		openedAt,
+		favourites: Array.isArray(favourites) ? favourites.filter((dir): dir is string => typeof dir === "string") : [],
+	};
+}
+
+export async function readStore(storePath: string): Promise<ProjectsStore> {
+	if (!existsSync(storePath)) return EMPTY_STORE;
+	const value: unknown = JSON.parse(await readFile(storePath, "utf8"));
+	if (!value || typeof value !== "object") return EMPTY_STORE;
+	const { libraryRoot, openRoot, projects } = value as Record<string, unknown>;
+	return {
+		libraryRoot: readText(libraryRoot),
+		openRoot: readText(openRoot),
+		projects: Array.isArray(projects)
+			? projects.map(readStoredProject).filter((project): project is StoredProject => project !== null)
+			: [],
+	};
+}
+
+async function writeStore(storePath: string, store: ProjectsStore): Promise<void> {
+	await mkdir(dirname(storePath), { recursive: true });
+	await writeFile(storePath, `${JSON.stringify(store, null, "\t")}\n`);
+}
+
+function readLibraryRoot(store: ProjectsStore): string | null {
+	return store.libraryRoot ?? defaultLibraryRoot;
+}
+
+/** The open project and the library, for checking every path a request reads or writes. */
+export async function readRoots(storePath: string): Promise<SkillRoots> {
+	const store = await readStore(storePath);
+	if (!store.openRoot || !isFolder(store.openRoot)) throw new Error("Open a project folder first.");
+	return { project: store.openRoot, library: readLibraryRoot(store) };
+}
+
+async function summarize({ root, openedAt }: StoredProject): Promise<Project> {
+	const isAvailable = isFolder(root);
+	return { root, name: basename(root), openedAt, skillCount: isAvailable ? await countSkills(root) : 0, isAvailable };
+}
+
+export async function readWorkspace(storePath: string): Promise<Workspace> {
+	const store = await readStore(storePath);
+	const projects = await Promise.all(store.projects.map(summarize));
+	const libraryRoot = readLibraryRoot(store);
+	const open = projects.find((project) => project.root === store.openRoot && project.isAvailable);
+	const favourites = store.projects.find((project) => project.root === open?.root)?.favourites ?? [];
+	return {
+		home: homedir(),
+		projects,
+		libraryRoot,
+		defaultLibraryRoot,
+		project: open ? { ...open, ...(await listSkills({ project: open.root, library: libraryRoot })), favourites } : null,
+	};
+}
+
+export async function openProject(storePath: string, root: string): Promise<Workspace> {
+	if (!isFolder(root)) throw new Error(`Folder not found: ${root}`);
+	const realRoot = realpathSync(root);
+	const store = await readStore(storePath);
+	const previous = store.projects.find((project) => project.root === realRoot);
+	await writeStore(storePath, {
+		...store,
+		openRoot: realRoot,
+		projects: [
+			{ root: realRoot, openedAt: Date.now(), favourites: previous?.favourites ?? [] },
+			...store.projects.filter((project) => project !== previous),
+		],
+	});
+	return readWorkspace(storePath);
+}
+
+/** Removes a project from the recent list; its folder on disk is left as it is. */
+export async function removeProject(storePath: string, root: string): Promise<Workspace> {
+	const store = await readStore(storePath);
+	await writeStore(storePath, {
+		...store,
+		openRoot: store.openRoot === root ? null : store.openRoot,
+		projects: store.projects.filter((project) => project.root !== root),
+	});
+	return readWorkspace(storePath);
+}
+
+export async function setLibraryRoot(storePath: string, root: string | null): Promise<Workspace> {
+	if (root !== null && !isFolder(root)) throw new Error(`Folder not found: ${root}`);
+	const store = await readStore(storePath);
+	await writeStore(storePath, { ...store, libraryRoot: root && realpathSync(root) });
+	return readWorkspace(storePath);
+}
+
+export async function saveFavourites(storePath: string, favourites: string[]): Promise<void> {
+	const store = await readStore(storePath);
+	await writeStore(storePath, {
+		...store,
+		projects: store.projects.map((project) => (project.root === store.openRoot ? { ...project, favourites } : project)),
+	});
+}

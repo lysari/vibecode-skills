@@ -14,7 +14,7 @@ interface SkillDocumentProps {
 	onSelect: (dir: string) => void;
 }
 
-function SkillChip({ skill, onSelect }: { skill: Skill; onSelect: (dir: string) => void }) {
+function SkillChip({ skill, showsScope, onSelect }: { skill: Skill; showsScope: boolean; onSelect: (dir: string) => void }) {
 	return (
 		<button
 			type="button"
@@ -23,6 +23,7 @@ function SkillChip({ skill, onSelect }: { skill: Skill; onSelect: (dir: string) 
 		>
 			<Icon name="link" className="size-icon-sm" />
 			{skill.name}
+			{showsScope && <span className="text-muted">· {skill.scope}</span>}
 		</button>
 	);
 }
@@ -153,14 +154,14 @@ export function SkillDocument({ skill, skills, skillNames, onOpenSkill, onSelect
 					<div className="flex flex-wrap gap-rail-gap">
 						{references.length === 0 && <p className="text-meta text-muted">No other skills.</p>}
 						{references.map((other) => (
-							<SkillChip key={other.dir} skill={other} onSelect={onSelect} />
+							<SkillChip key={other.dir} skill={other} showsScope={other.scope !== skill.scope} onSelect={onSelect} />
 						))}
 					</div>
 					<h2 className="text-heading font-medium text-ink">Mentioned by</h2>
 					<div className="flex flex-wrap gap-rail-gap">
 						{referencedBy.length === 0 && <p className="text-meta text-muted">No other skills.</p>}
 						{referencedBy.map((other) => (
-							<SkillChip key={other.dir} skill={other} onSelect={onSelect} />
+							<SkillChip key={other.dir} skill={other} showsScope={other.scope !== skill.scope} onSelect={onSelect} />
 						))}
 					</div>
 				</section>

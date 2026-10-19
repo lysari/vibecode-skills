@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { Skill } from "../../shared/skill.interface";
 import type { SkillView } from "../skill-view";
+import { formatTimeAgo } from "../time-ago";
 import { Icon } from "./Icon";
 
-const MINUTE_MS = 60_000;
-const HOUR_MINUTES = 60;
-const DAY_HOURS = 24;
 const PERCENT = 100;
 const ZOOM_BUTTON_CLASS =
 	"inline-flex h-pill-h items-center justify-center rounded-full border border-line-control bg-card text-ink hover:bg-field disabled:opacity-40";
@@ -28,21 +26,16 @@ interface MapToolbarProps {
 	onZoom: (change: MapZoomChange) => void;
 }
 
-function formatEdited(modifiedAt: number): string {
-	const minutes = Math.round((Date.now() - modifiedAt) / MINUTE_MS);
-	if (minutes < 1) return "just now";
-	if (minutes < HOUR_MINUTES) return `${minutes} min ago`;
-	const hours = Math.round(minutes / HOUR_MINUTES);
-	if (hours < DAY_HOURS) return `${hours} h ago`;
-	return `${Math.round(hours / DAY_HOURS)} d ago`;
-}
-
 export function MapToolbar(props: MapToolbarProps) {
 	const { skill, skills, skillCount, linkCount, isDirty, onSelect, onSave, onDiscard, onZoom } = props;
 	const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 	const [openPopover, setOpenPopover] = useState<"issues" | "unsaved" | null>(null);
 	const popoverRef = useRef<HTMLDivElement>(null);
-	const issueSkills = skills.filter((other) => other.issues.length > 0 && !dismissed.has(other.dir));
+	const scopeSkills = skills.filter((other) => other.scope === skill.scope);
+	// Only project skills can be fixed in the editor; library skills are read-only.
+	const issueSkills = skills.filter(
+		(other) => other.scope === "project" && other.issues.length > 0 && !dismissed.has(other.dir),
+	);
 
 	useEffect(() => {
 		if (!openPopover) return;
@@ -66,10 +59,12 @@ export function MapToolbar(props: MapToolbarProps) {
 				<span className="h-icon-sm w-px bg-line" />
 				{linkCount} links
 				<span className="h-icon-sm w-px bg-line" />
-				Edited {formatEdited(skill.modifiedAt)}
+				Edited {formatTimeAgo(skill.modifiedAt)}
 			</p>
 			<div ref={popoverRef} className="relative flex items-center gap-stack text-meta">
-				<span className="whitespace-nowrap text-muted">{skills.length} skills in library</span>
+				<span className="whitespace-nowrap text-muted">
+					{scopeSkills.length} skills in {skill.scope === "project" ? "project" : "library"}
+				</span>
 				{isDirty && (
 					<button
 						type="button"

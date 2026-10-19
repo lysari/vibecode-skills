@@ -1,8 +1,10 @@
 import type { Skill } from "../../shared/skill.interface";
 import { SKILL_VIEW_LABELS, type SkillView } from "../skill-view";
 import { Icon, type IconName } from "./Icon";
+import { InstallBadge } from "./InstallBadge";
 
 interface HeaderProps {
+	projectName: string;
 	skill: Skill | null;
 	view: SkillView;
 	isDirty: boolean;
@@ -14,6 +16,7 @@ interface HeaderProps {
 	onDiscard: () => void;
 	onRename: () => void;
 	onDelete: () => void;
+	onInstall: (skill: Skill) => void;
 }
 
 const ACTION_CLASS =
@@ -37,7 +40,7 @@ function ViewButton({ view, icon, current, onView }: { view: SkillView; icon: Ic
 }
 
 export function Header(props: HeaderProps) {
-	const { skill, view, isDirty, isSaving, canGoBack, onBack, onView } = props;
+	const { projectName, skill, view, isDirty, isSaving, canGoBack, onBack, onView } = props;
 
 	return (
 		<header className="flex h-header shrink-0 items-center gap-card border-b border-line bg-surface px-header-x">
@@ -52,9 +55,11 @@ export function Header(props: HeaderProps) {
 			</button>
 			<div className="min-w-0">
 				<p className="truncate text-meta text-muted">
-					Skills{skill && ` · ${skill.source} · ${SKILL_VIEW_LABELS[view]}`}
+					{projectName}
+					{skill &&
+						` · ${skill.scope === "project" ? skill.source : "Our library"} · ${SKILL_VIEW_LABELS[view]}`}
 				</p>
-				<h1 className="truncate text-title font-medium text-ink">{skill ? skill.name || skill.dir : "Skills"}</h1>
+				<h1 className="truncate text-title font-medium text-ink">{skill ? skill.name || skill.dir : projectName}</h1>
 			</div>
 			{isDirty && (
 				<span className="inline-flex h-pill-h shrink-0 items-center gap-rail-gap rounded-full bg-warning-soft px-stack text-body text-warning-text">
@@ -62,7 +67,15 @@ export function Header(props: HeaderProps) {
 					Unsaved changes
 				</span>
 			)}
-			{skill && (
+			{skill?.scope === "library" && (
+				<div className="ml-auto flex shrink-0 items-center gap-rail-gap">
+					<ViewButton view="map" icon="map" current={view} onView={onView} />
+					<ViewButton view="read" icon="read" current={view} onView={onView} />
+					<span className="mx-rail-gap h-icon w-px bg-line" />
+					<InstallBadge skill={skill} onInstall={props.onInstall} />
+				</div>
+			)}
+			{skill?.scope === "project" && (
 				<div className="ml-auto flex shrink-0 items-center gap-rail-gap">
 					<ViewButton view="map" icon="map" current={view} onView={onView} />
 					<ViewButton view="read" icon="read" current={view} onView={onView} />
