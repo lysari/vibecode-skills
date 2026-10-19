@@ -20,9 +20,12 @@
 }
 
 @layer components {
-	/* Skill map: a card's port drops a trunk, and its linked skills hang off the trunk on elbow connectors. */
+	/* Skill map: a card's port drops a trunk, and its linked skills hang off the trunk on elbow connectors.
+	   The port sits inside the card's border, so the trunk is offset by that border too: the default border on a linked card, the selected border on the root. */
 	.map-branch {
-		margin-left: calc(theme("spacing.port-x") + theme("spacing.port") / 2 - theme("borderWidth.selected") / 2);
+		margin-left: calc(
+			theme("borderWidth.DEFAULT") + theme("spacing.port-x") + theme("spacing.port") / 2 - theme("borderWidth.selected") / 2
+		);
 
 		.map-branch-item,
 		.map-row {
@@ -53,6 +56,7 @@
 
 		/* The selected skill's links, wrapped into rows that share column widths. */
 		&.map-rows {
+			margin-left: calc(theme("spacing.port-x") + theme("spacing.port") / 2 + theme("borderWidth.selected") / 2);
 			display: grid;
 			column-gap: theme("spacing.column");
 

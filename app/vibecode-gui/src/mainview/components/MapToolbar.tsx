@@ -170,7 +170,7 @@ export function MapToolbar(props: MapToolbarProps) {
 					>
 						<Icon name="minus" className="size-icon-sm" />
 					</button>
-					<span aria-live="polite" className="w-control text-center tabular-nums text-chip">
+					<span aria-live="polite" className="w-zoom-label text-center tabular-nums text-chip">
 						{Math.round(props.scale * PERCENT)}%
 					</span>
 					<button

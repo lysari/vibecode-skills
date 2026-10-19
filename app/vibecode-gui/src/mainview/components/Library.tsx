@@ -156,7 +156,9 @@ export function Library({ library, favourites, selectedDir, onSelect, onToggleFa
 													onClick={() => onToggleFavourite(skill.dir)}
 													aria-pressed={isFavourite}
 													aria-label={`${isFavourite ? "Remove" : "Add"} ${skill.name} ${isFavourite ? "from" : "to"} favourites`}
-													className={isFavourite ? "text-star" : "text-star-empty hover:text-star"}
+													className={`flex size-control shrink-0 items-center justify-center ${
+														isFavourite ? "text-star" : "text-star-empty hover:text-star"
+													}`}
 												>
 													<Icon name="star" isFilled={isFavourite} />
 												</button>
