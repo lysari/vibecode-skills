@@ -390,8 +390,6 @@ skills/
 ├── assets/
 │   ├── Cute Vibecode Developer Diorama.png
 │   └── Vibecode AI Coding Mascot Logo.png
-├── projects/
-│   └── demo/                       # Reference implementation & testbed project
 └── README.md                       # Repository documentation
 ```
 
