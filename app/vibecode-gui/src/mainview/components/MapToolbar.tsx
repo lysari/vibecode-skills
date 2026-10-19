@@ -59,8 +59,8 @@ export function MapToolbar(props: MapToolbarProps) {
 	}, [openPopover]);
 
 	return (
-		<div className="flex shrink-0 items-center justify-between gap-card px-header-x pt-header-x">
-			<p className="inline-flex h-stat-h items-center gap-stack rounded-full border border-line bg-card px-node-pad text-meta text-chip">
+		<div className="flex shrink-0 flex-wrap items-center justify-between gap-card px-header-x pt-header-x">
+			<p className="inline-flex h-stat-h items-center gap-stack whitespace-nowrap rounded-full border border-line bg-card px-node-pad text-meta text-chip">
 				<Icon name="map" className="size-icon-sm" />
 				{skillCount} {skillCount === 1 ? "skill" : "skills"}
 				<span className="h-icon-sm w-px bg-line" />
@@ -69,7 +69,7 @@ export function MapToolbar(props: MapToolbarProps) {
 				Edited {formatEdited(skill.modifiedAt)}
 			</p>
 			<div ref={popoverRef} className="relative flex items-center gap-stack text-meta">
-				<span className="text-muted">{skills.length} skills in library</span>
+				<span className="whitespace-nowrap text-muted">{skills.length} skills in library</span>
 				{isDirty && (
 					<button
 						type="button"

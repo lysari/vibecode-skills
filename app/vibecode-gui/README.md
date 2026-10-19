@@ -3,7 +3,7 @@
 An Electrobun desktop app (React, Tailwind CSS, Vite) for browsing and managing the agent skills in this repository.
 
 - **Library**: every `SKILL.md` found under the repository root (skipping `app/`, `node_modules/` and build folders), grouped by name prefix, with search, a folder filter and favourites (stored in the app's local storage, never in skill files).
-- **Map**: the selected skill and the skills it links to, as a collapsible tree. Skills already shown appear as amber pills. Pills at the top list unsaved edits and skills with frontmatter issues. The tree is scaled to fit the panel width; the toolbar's zoom out, zoom in and Fit buttons change the scale.
+- **Map**: the selected skill and the skills it links to, as a collapsible tree. Skills already shown appear as amber pills. Pills at the top list unsaved edits and skills with frontmatter issues. The linked skills wrap into rows that fit the panel width, so the tree shows at or near full size and is scaled down further only when a single branch is wider than the panel; the toolbar's zoom out, zoom in and Fit buttons change the scale.
 - **Links**: a skill links to another only through an explicit reference to its name, on word boundaries: an inline code span (`` `vibecode-review` ``), a slash command (`/vibecode-review`), or a markdown link or path to its folder or `SKILL.md`. A plain word in the text is not a link. Linked code spans open the skill in Read and Edit.
 - **Read**: the rendered `SKILL.md`, its frontmatter, issues, supporting files (click to preview) and the skills it links to or is linked from.
 - **Edit**: frontmatter and body editors with a live preview. Unsaved edits show an "Unsaved changes" pill; save with the Save button or Cmd/Ctrl+S.

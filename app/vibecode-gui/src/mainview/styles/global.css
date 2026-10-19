@@ -20,63 +20,19 @@
 }
 
 @layer components {
-	/* Skill map: org-chart connectors between a skill and the skills it references. */
-	.map-row {
-		position: relative;
-		display: flex;
-		justify-content: center;
-		padding-top: calc(theme(spacing.level) / 2);
-
-		&::before {
-			content: "";
-			position: absolute;
-			top: 0;
-			left: 50%;
-			height: calc(theme(spacing.level) / 2);
-			border-left: theme(borderWidth.selected) solid var(--connector);
-		}
-	}
-
-	.map-column {
-		position: relative;
-		padding: calc(theme(spacing.level) / 2) calc(theme(spacing.column) / 2) 0;
-
-		&::before {
-			content: "";
-			position: absolute;
-			top: 0;
-			left: 50%;
-			height: calc(theme(spacing.level) / 2);
-			border-left: theme(borderWidth.selected) solid var(--connector);
-		}
-
-		&::after {
-			content: "";
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			border-top: theme(borderWidth.selected) solid var(--connector);
-		}
-
-		&:first-child::after {
-			left: 50%;
-		}
-
-		&:last-child::after {
-			right: 50%;
-		}
-
-		&:only-child::after {
-			display: none;
-		}
-	}
-
+	/* Skill map: a card's port drops a trunk, and its linked skills hang off the trunk on elbow connectors. */
 	.map-branch {
-		margin-left: theme(spacing.port-x);
+		margin-left: calc(theme(spacing.port-x) + theme(spacing.port) / 2 - theme(borderWidth.selected) / 2);
 	}
 
-	.map-branch-item {
+	/* The selected skill's links, wrapped into rows that share column widths. */
+	.map-rows {
+		display: grid;
+		column-gap: theme(spacing.column);
+	}
+
+	.map-branch-item,
+	.map-row {
 		position: relative;
 		padding: theme(spacing.stack) 0 0 theme(spacing.elbow);
 
@@ -99,6 +55,51 @@
 			bottom: 0;
 			left: 0;
 			border-left: theme(borderWidth.selected) solid var(--connector);
+		}
+	}
+
+	/* A row's elbow runs on as a bus along the top of its columns and across the gaps; each card drops from it. */
+	.map-row {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		padding-top: calc(theme(spacing.stack) + theme(spacing.elbow-y) - theme(borderWidth.selected));
+	}
+
+	.map-column {
+		position: relative;
+		padding-top: calc(theme(spacing.level) / 2);
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: calc(theme(spacing.node) / 2);
+			height: calc(theme(spacing.level) / 2);
+			border-left: theme(borderWidth.selected) solid var(--connector);
+		}
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: calc(-1 * theme(spacing.column));
+			border-top: theme(borderWidth.selected) solid var(--connector);
+		}
+
+		&:last-child {
+			&::before {
+				display: none;
+			}
+
+			&::after {
+				right: auto;
+				width: calc(theme(spacing.node) / 2 + theme(borderWidth.selected));
+				height: calc(theme(spacing.level) / 2);
+				border-right: theme(borderWidth.selected) solid var(--connector);
+				border-top-right-radius: theme(borderRadius.control);
+			}
 		}
 	}
 

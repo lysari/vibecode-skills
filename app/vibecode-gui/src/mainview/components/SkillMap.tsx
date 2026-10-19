@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Skill } from "../../shared/skill.interface";
+import { wrapMapRows } from "../map-rows";
 import type { SkillView } from "../skill-view";
 import { Icon } from "./Icon";
 import { MapToolbar, type MapZoomChange } from "./MapToolbar";
@@ -8,6 +9,8 @@ import { StatusPill } from "./StatusPill";
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 2;
 const ZOOM_STEP = 1.25;
+// Rows wrap only as far as needed to show the map at this scale or larger, so a few pixels too wide never cost a column.
+const WRAP_MIN_SCALE = 0.9;
 
 interface MapNode {
 	key: string;
@@ -105,11 +108,7 @@ function NodeCard({ node, isRoot, isDirty, isCollapsed, onToggle, onSelect }: No
 				)}
 			</div>
 			{children.length > 0 && !isCollapsed && (
-				<span
-					className={`absolute bottom-0 size-port translate-y-1/2 rounded-full border-selected border-connector bg-canvas ${
-						isRoot ? "left-1/2 -translate-x-1/2" : "left-port-x"
-					}`}
-				/>
+				<span className="absolute bottom-0 left-port-x size-port translate-y-1/2 rounded-full border-selected border-connector bg-canvas" />
 			)}
 		</div>
 	);
@@ -163,11 +162,23 @@ function MapEntry({ node, collapsed, onToggle, onSelect }: MapEntryProps) {
 export function SkillMap({ skill, skills, isDirty, onSelect, onSave, onDiscard }: SkillMapProps) {
 	const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 	const [zoom, setZoom] = useState<{ dir: string; scale: number } | null>(null);
-	const [size, setSize] = useState({ viewportWidth: 0, contentWidth: 0, contentHeight: 0 });
+	const [size, setSize] = useState({
+		viewportWidth: 0,
+		contentWidth: 0,
+		contentHeight: 0,
+		columnWidths: [] as number[],
+		columnGap: 0,
+		columnIndent: 0,
+	});
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const contentRef = useRef<HTMLDivElement>(null);
 	const { tree, skillCount, linkCount } = buildMap(skill, skills);
 	const isRootCollapsed = collapsed.has(tree.key);
+	const rows = wrapMapRows(tree.children, {
+		widths: size.columnWidths,
+		gap: size.columnGap,
+		available: size.viewportWidth / WRAP_MIN_SCALE - size.columnIndent,
+	});
 	const zoomScale = zoom?.dir === skill.dir ? zoom.scale : null;
 	const fitScale = size.contentWidth > 0 ? Math.min(1, size.viewportWidth / size.contentWidth) : 1;
 	const scale = zoomScale ?? fitScale;
@@ -178,10 +189,18 @@ export function SkillMap({ skill, skills, isDirty, onSelect, onSave, onDiscard }
 		if (!scroller || !content) return;
 		const observer = new ResizeObserver(() => {
 			const { paddingLeft, paddingRight } = getComputedStyle(scroller);
+			const rowsGrid = content.querySelector<HTMLElement>(".map-rows");
+			const columns = [...content.querySelectorAll<HTMLElement>(".map-column")];
+			const contentBox = content.getBoundingClientRect();
+			const shownScale = contentBox.width / content.offsetWidth;
 			setSize({
 				viewportWidth: scroller.clientWidth - parseFloat(paddingLeft) - parseFloat(paddingRight),
 				contentWidth: content.offsetWidth,
 				contentHeight: content.offsetHeight,
+				// A column stretches to its grid track, so its own width is that of its max-content child.
+				columnWidths: columns.map((column) => (column.firstElementChild as HTMLElement).offsetWidth),
+				columnGap: rowsGrid ? parseFloat(getComputedStyle(rowsGrid).columnGap) : 0,
+				columnIndent: columns[0] ? (columns[0].getBoundingClientRect().left - contentBox.left) / shownScale : 0,
 			});
 		});
 		observer.observe(scroller);
@@ -234,7 +253,7 @@ export function SkillMap({ skill, skills, isDirty, onSelect, onSave, onDiscard }
 				>
 					<div
 						ref={contentRef}
-						className="flex w-max origin-top-left flex-col items-center"
+						className="w-max origin-top-left"
 						style={{ transform: `scale(${scale})` }}
 					>
 						<NodeCard
@@ -246,11 +265,20 @@ export function SkillMap({ skill, skills, isDirty, onSelect, onSave, onDiscard }
 							onToggle={() => toggle(tree.key)}
 							onSelect={onSelect}
 						/>
-						{!isRootCollapsed && tree.children.length > 0 && (
-							<div className="map-row">
-								{tree.children.map((child) => (
-									<div key={child.key} className="map-column">
-										<MapEntry node={child} collapsed={collapsed} onToggle={toggle} onSelect={onSelect} />
+						{!isRootCollapsed && rows.length > 0 && (
+							<div
+								className="map-branch map-rows"
+								style={{ gridTemplateColumns: `repeat(${rows[0].length}, max-content)` }}
+							>
+								{rows.map((row) => (
+									<div key={row[0].key} className="map-row">
+										{row.map((child) => (
+											<div key={child.key} className="map-column">
+												<div className="w-max">
+													<MapEntry node={child} collapsed={collapsed} onToggle={toggle} onSelect={onSelect} />
+												</div>
+											</div>
+										))}
 									</div>
 								))}
 							</div>
