@@ -66,6 +66,10 @@ The skill contains a customizable [`config.json`](./config.json) that controls p
     "force_provider": null,            // e.g. "antigravity", "claude_code", "native_subagent"
     "force_model": null                // e.g. "gemini-3.8-flash-medium", "sonnet"
   },
+  "monitoring": {
+    "live_progress_artifact": true,    // maintains a live dashboard artifact in side panel
+    "artifact_filename": "task-progress.md"
+  },
   "providers": {
     "native_subagent": { "enabled": true, "models": { "light": "flash", "heavy": "pro" } },
     "antigravity": { "enabled": true, "cli_command": "agy", "models": { "light": "gemini-3.8-flash-medium", "heavy": "claude-sonnet-5-5-medium" } },
@@ -80,10 +84,54 @@ The skill contains a customizable [`config.json`](./config.json) that controls p
 ```
 
 ### Key Configuration Controls
-1. **Enable/Disable Providers**: Set `"enabled": false` under any provider to prevent Jev from considering it.
-2. **Force Overrides**: Set `"force_provider": "antigravity"` to bypass Jev completely and pin a specific tool.
-3. **Allow Prompts**: If you *want* interactive dialogs, set `"allow_interactive_prompts": true`. By default it is `false` to prevent unwanted modals.
-4. **Custom Fallback Priority**: Customize `"priority_order"` to control which provider takes over when HTTP 429 occurs.
+1. **Live Monitoring**: `"live_progress_artifact": true` tells the orchestrator to pin a real-time progress dashboard artifact in the user's IDE side panel.
+2. **Enable/Disable Providers**: Set `"enabled": false` under any provider to prevent Jev from considering it.
+3. **Force Overrides**: Set `"force_provider": "antigravity"` to bypass Jev completely and pin a specific tool.
+4. **Allow Prompts**: If you *want* interactive dialogs, set `"allow_interactive_prompts": true`. By default it is `false` to prevent unwanted modals.
+5. **Custom Fallback Priority**: Customize `"priority_order"` to control which provider takes over when HTTP 429 occurs.
+
+---
+
+## Live Monitoring: The Side-by-Side Dashboard Artifact
+
+When `monitoring.live_progress_artifact` is enabled (default), the Main Agent creates and updates a dedicated markdown artifact in `<appDataDir>/brain/<conversation-id>/task-progress.md`. 
+
+Because it is a rendered Artifact, it opens in a side pane next to the code and updates **live in place** without flooding the conversation history with spammy log messages.
+
+### Dashboard Artifact Template
+```markdown
+# 🚀 Task Dashboard: <Task Name>
+
+| Field | Current Status |
+| :--- | :--- |
+| **Active Phase** | `[▶] STAGE 2: WORKER EXECUTING` |
+| **Selected Provider** | `Antigravity CLI (agy)` |
+| **Selected Model** | `gemini-3.8-flash-medium` |
+| **Jev Decision** | Auto-picked (Confidence: `0.92`) |
+| **Elapsed / Status** | Working on in-place edits |
+
+---
+
+### Progress Checklist
+- [x] **Stage 1: Task Scoping**: Evaluated task complexity and constraints.
+- [x] **Stage 2: Pre-Flight & Discovery**: Verified authentication and live models.
+- [x] **Stage 3: Jev Decision Gate**: Chose most proportional provider & model.
+- [▶] **Stage 4: Worker Execution**: Worker editing code adhering to `vibecode`.
+- [ ] **Stage 5: Vibecode Review Gate**: Mandatory compliance audit against disk.
+- [ ] **Stage 6: Final Verification**: Builds & unit tests passing.
+
+---
+
+### Working Files & Changes
+- `src/components/dialog/liquid-dialog.scss` (modified)
+- `src/components/dialog/liquid-dialog.ts` (modified)
+
+### Audit & Review Verdict
+- [x] Code Search before create: PASS
+- [x] In-place edits, no dead code: PASS
+- [ ] Design Tokens applied: PENDING
+- [ ] Final Verdict: `IN_PROGRESS`
+```
 
 ---
 
