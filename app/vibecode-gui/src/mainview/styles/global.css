@@ -1,0 +1,170 @@
+@layer base {
+	html,
+	body,
+	#root {
+		height: 100%;
+	}
+
+	body {
+		margin: 0;
+		font-family: var(--font-sans);
+		background: var(--surface);
+		color: var(--text);
+		-webkit-font-smoothing: antialiased;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+	}
+}
+
+@layer components {
+	/* Skill map: org-chart connectors between a skill and the skills it references. */
+	.map-row {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		padding-top: calc(theme(spacing.level) / 2);
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 50%;
+			height: calc(theme(spacing.level) / 2);
+			border-left: theme(borderWidth.selected) solid var(--connector);
+		}
+	}
+
+	.map-column {
+		position: relative;
+		padding: calc(theme(spacing.level) / 2) calc(theme(spacing.column) / 2) 0;
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 50%;
+			height: calc(theme(spacing.level) / 2);
+			border-left: theme(borderWidth.selected) solid var(--connector);
+		}
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			border-top: theme(borderWidth.selected) solid var(--connector);
+		}
+
+		&:first-child::after {
+			left: 50%;
+		}
+
+		&:last-child::after {
+			right: 50%;
+		}
+
+		&:only-child::after {
+			display: none;
+		}
+	}
+
+	.map-branch {
+		margin-left: theme(spacing.port-x);
+	}
+
+	.map-branch-item {
+		position: relative;
+		padding: theme(spacing.stack) 0 0 theme(spacing.elbow);
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: theme(spacing.elbow);
+			height: calc(theme(spacing.stack) + theme(spacing.elbow-y));
+			border-left: theme(borderWidth.selected) solid var(--connector);
+			border-bottom: theme(borderWidth.selected) solid var(--connector);
+			border-bottom-left-radius: theme(borderRadius.control);
+		}
+
+		&:not(:last-child)::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			border-left: theme(borderWidth.selected) solid var(--connector);
+		}
+	}
+
+	.markdown {
+		@apply text-body text-copy;
+
+		& > * + * {
+			@apply mt-stack;
+		}
+
+		& h1 {
+			@apply text-title font-semibold text-ink;
+		}
+
+		& h2 {
+			@apply mt-level text-node font-semibold text-ink;
+		}
+
+		& h3,
+		& h4 {
+			@apply mt-header-x text-heading font-medium text-ink;
+		}
+
+		& ul {
+			@apply list-disc pl-header-x;
+		}
+
+		& ol {
+			@apply list-decimal pl-header-x;
+		}
+
+		& li + li {
+			@apply mt-rail-gap;
+		}
+
+		& code {
+			@apply bg-field px-rail-gap font-mono text-code text-ink;
+		}
+
+		& pre {
+			@apply overflow-x-auto bg-field p-card font-mono text-code text-ink;
+
+			& code {
+				@apply bg-transparent p-0;
+			}
+		}
+
+		& blockquote {
+			@apply border-l-selected border-accent pl-card;
+		}
+
+		& hr {
+			@apply border-line;
+		}
+
+		& table {
+			@apply w-full border-collapse text-meta;
+		}
+
+		& th,
+		& td {
+			@apply border border-line px-stack py-rail-gap text-left align-top;
+		}
+
+		& th {
+			@apply bg-field font-medium text-ink;
+		}
+	}
+}

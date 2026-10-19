@@ -1,4 +1,13 @@
-import { BrowserWindow, Updater } from "electrobun/main";
+import { BrowserView, BrowserWindow, Updater } from "electrobun/main";
+import type { SkillsRPC } from "../shared/skills-rpc.interface";
+import {
+	createSkill,
+	deleteSkill,
+	listSkills,
+	readSkillFile,
+	renameSkill,
+	saveSkill,
+} from "./skills";
 
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
@@ -20,18 +29,30 @@ async function getMainViewUrl(): Promise<string> {
 	return "views://mainview/index.html";
 }
 
-// Create the main application window
-const url = await getMainViewUrl();
-
-const mainWindow = new BrowserWindow({
-	title: "React + Tailwind + Vite",
-	url,
-	frame: {
-		width: 900,
-		height: 700,
-		x: 200,
-		y: 200,
+const rpc = BrowserView.defineRPC<SkillsRPC>({
+	handlers: {
+		requests: {
+			listSkills,
+			readSkillFile,
+			saveSkill,
+			createSkill,
+			renameSkill,
+			deleteSkill,
+		},
 	},
 });
 
-console.log("React Tailwind Vite app started!");
+// Create the main application window
+const url = await getMainViewUrl();
+
+new BrowserWindow({
+	title: "Vibecode Skills",
+	url,
+	rpc,
+	frame: {
+		width: 1440,
+		height: 900,
+		x: 120,
+		y: 80,
+	},
+});
