@@ -53,6 +53,7 @@ In multi-turn conversations, agents suffer from **context dilution and recency d
 ### 1. Main Agent (Orchestrator)
 - **Analyzes User Intent**: Interprets the user's high-level request, determines the scope, and splits work into modular tasks if needed.
 - **NEVER Reads Source Code or Investigates Bugs**: **Strictly forbidden from reading project source code, implementation files, or grepping the codebase.** Code exploration, debugging, locating files, and root cause analysis belong entirely inside the Sub-Agent.
+- **Maintains Live Progress Dashboard**: Creates and updates a rendered markdown artifact (`task-progress.md`) in the IDE's artifact panel so the user can observe live task milestones, touched files, and audit gates without conversation noise.
 - **Dispatches Immediately**: As soon as the task is understood from the user's prompt, dispatches a sub-agent with the brief. Do NOT investigate first.
 - **Does Not Write Code Directly**: Refrains from making file edits directly. All implementation happens inside sub-agents.
 - **Validates Deliverables**: Reviews the sub-agent's output report, verifies the `[PASS]` review verdict, and handles the transition to the next task.

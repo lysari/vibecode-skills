@@ -9,6 +9,10 @@
     "force_provider": null,
     "force_model": null
   },
+  "monitoring": {
+    "live_progress_artifact": true,
+    "artifact_filename": "task-progress.md"
+  },
   "providers": {
     "native_subagent": {
       "enabled": true,
