@@ -12,6 +12,7 @@
 - Put each distinct UI region (layout, header, sidebar, content section, card) in its own file instead of combining them in the root or page file, e.g. `layout`, `header`, `sidebar`.
 - Keep related files close: a module and its types sit side by side.
 - Keep a feature module self-contained: place a module's private pages, components, and domain services inside that module's own directory, and move code into a shared directory only when 2 or more distinct modules consume it, e.g. a checkout module keeps its order form and payment service, while shared holds the button primitive.
+- Organize every file in a shared directory into a subfolder grouped by its kind (components, utils, constants, interfaces, services). Never place files loose directly in the root of the shared directory, e.g. `shared/interfaces/user` or `shared/utils/date`, never `shared/user`.
 - Put tests in the project's dedicated test folder, at the same relative path as the code they test. Never put a test file beside the code it tests.
 
 ## Files not to add unless asked
