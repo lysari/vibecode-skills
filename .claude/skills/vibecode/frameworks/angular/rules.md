@@ -2,6 +2,12 @@
 
 Apply these on top of the generic rules when the project root has an `angular.json`.
 
+## Directory structure
+- Organize the application under `src/app/` into `core/`, `shared/`, and `features/`; never place feature components, pages, or domain logic in a flat `src/app/components/` directory or loose in `src/app/`.
+- Put singleton services, guards, interceptors, and app-wide infrastructure in `src/app/core/`, e.g. `src/app/core/services/auth.service.ts`.
+- Put reusable UI primitives (buttons, inputs, dialogs), shared pipes, and directives in `src/app/shared/components/`, `src/app/shared/pipes/`, or `src/app/shared/directives/`; never put domain-specific business components in `shared/`.
+- Put each domain or page in its own folder under `src/app/features/<feature>/` containing its private components, services, models, and route definitions, e.g. `src/app/features/checkout/components/order-summary/order-summary.ts`.
+
 ## Forms
 - Write every fixed form field as its own control in the template and its own entry in the form definition. Do not generate fixed fields from a config array with `@for`.
 - Use `@for` only over a `FormArray` whose rows the user adds or removes.

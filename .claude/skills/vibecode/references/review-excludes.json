@@ -23,6 +23,15 @@
     "firebase": {
       "directories": [".firebase/", "functions/lib/"],
       "files": ["firestore-debug.log"]
+    },
+    "nextjs": {
+      "directories": [".next/"]
+    },
+    "vue": {
+      "directories": [".nuxt/"]
+    },
+    "python": {
+      "directories": [".pytest_cache/", ".mypy_cache/", ".ruff_cache/"]
     }
   }
 }

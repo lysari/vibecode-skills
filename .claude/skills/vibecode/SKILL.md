@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, or adding features to a project, so changes stay clean, minimal, and easy to maintain
 metadata:
-  version: "0.0.1-20261020.3"
+  version: "0.0.1-20261020.7"
 ---
 
 # Vibecode
@@ -34,6 +34,14 @@ Check the project root, then read every file whose row matches before writing co
 | Project has | Read |
 |-------------|------|
 | `angular.json` | `frameworks/angular/rules.md` |
+| `next.config.js`, `next.config.mjs`, or `next.config.ts` | `frameworks/nextjs/rules.md` |
+| `package.json` with `"react"` and no `next.config.*` | `frameworks/react/rules.md` |
+| `package.json` with `"vue"` or `nuxt.config.*` | `frameworks/vue/rules.md` |
+| `nest-cli.json` | `frameworks/nestjs/rules.md` |
+| `package.json` with `"express"`, `"fastify"`, or `"hono"` | `frameworks/nodejs/rules.md` |
+| `go.mod` | `frameworks/golang/rules.md` |
+| `pyproject.toml`, `requirements.txt`, or `setup.py` | `frameworks/python/rules.md` |
+| `bunfig.toml` or `bun.lockb` / `bun.lock` | `frameworks/bun/rules.md` |
 | `tsconfig.json` | `frameworks/typescript/rules.md` |
 | `firebase.json` | `frameworks/firebase/rules.md` |
 | `.css`, `.scss`, `.sass` or `.less` files | `frameworks/css/rules.md` |
