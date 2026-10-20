@@ -2,7 +2,7 @@
 name: vibecode-review
 description: Use after an agent finishes implementing a task or when reviewing work done in the current session, to re-read all skills used, verify compliance against every rule, detect skipped or violated rules, and produce a checklist review
 metadata:
-  version: "0.0.1-20261019.1"
+  version: "0.0.1-20261020.1"
 ---
 
 # Vibecode review
@@ -25,10 +25,14 @@ The reviewer never relies on memory, cached summaries, or assumptions. It must *
 
 ### 1. Identify all skills used or applicable
 
-Scan the session context and project root to list every skill that governed or should have governed the work:
+Scan the session context, project root, and modified files to list every skill that governed or should have governed the work:
 
 1. **Active session skills**: Any skill loaded, mentioned, or invoked during the session (e.g. `vibecode`, `vibecode-design`).
-2. **Project-matching framework rules**: Check project root files matching the table in `vibecode/SKILL.md` (e.g., `angular.json`, `tsconfig.json`, `firebase.json`, stylesheets).
+2. **Project- and diff-matching framework rules**: Check both project root files AND all file extensions created or modified in `git status -s` against the table in `vibecode/SKILL.md`. Projects routinely match multiple rows:
+   - If any `.css`, `.scss`, `.sass`, or `.less` file was created or modified, `frameworks/css/rules.md` is **mandatory** in the re-read list.
+   - If `tsconfig.json` or any `.ts`/`.tsx` file was modified, `frameworks/typescript/rules.md` is **mandatory**.
+   - If `angular.json` is present or any Angular component/service was touched, `frameworks/angular/rules.md` is **mandatory**.
+   - Never stop after the first framework match. Every matching row must be included.
 3. **Reference files**: Any topic reference files relevant to the changes made (e.g., `file-organization.md`, `naming.md`, `code-structure.md`, `change-scope.md`, `cleanup.md`, `project-hygiene.md`).
 4. **Project rules & instructions**: `.claude/project-rules.md`, `AGENTS.md`, and `CLAUDE.md`.
 
@@ -133,6 +137,7 @@ Output the review formatted as a clear checklist:
 | Mistake | Fix |
 |---|---|
 | Assuming rules from memory without re-reading files | Always read the actual `SKILL.md`, `references/`, and `frameworks/` files from disk before checking |
+| Auditing only the primary framework (e.g., checking only Angular but skipping CSS rules when styles were touched) | Inspect `git status -s` file extensions against all rows in `vibecode/SKILL.md`; include every matching framework in the Step 1 re-read list |
 | Giving a vague high-level "looks good" text | Output an explicit checklist with `[x]`, `[ ]`, `[!]`, and `[-]` for every rule |
 | Ignoring silent skips | If a rule applies to the work (e.g. check existing callers, remove debug code) and wasn't done, mark it `[!] SKIPPED` |
 | Overriding project instructions | `AGENTS.md` and `CLAUDE.md` always take precedence over skill rules |

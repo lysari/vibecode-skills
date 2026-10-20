@@ -7,7 +7,8 @@
 - Remove any dependency or config entry your change made unnecessary.
 
 ## Leave alone
-- Dead code that existed before your change. Report it to the user instead of deleting it.
+- Dead code that existed before your change in an established codebase. Report it to the user instead of deleting it.
+- Never preserve scaffolded starter boilerplate, default demo components, or template placeholder files in a newly initialized project; purge or replace them immediately.
 
 ## Final check
 1. List the files you created or modified and confirm each one is needed.

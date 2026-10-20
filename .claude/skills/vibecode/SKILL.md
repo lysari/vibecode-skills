@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, or adding features to a project, so changes stay clean, minimal, and easy to maintain
 metadata:
-  version: "0.0.1-20261020.10"
+  version: "0.0.1-20261020.11"
 ---
 
 # Vibecode
@@ -58,11 +58,12 @@ When the project has no `.claude/project-rules.md`, do not start the task yet:
 - Never generate the file without the user's answers.
 - Start the task only after the file exists, and follow it.
 
-## Existing code
+## Existing code and newly scaffolded projects
 
-The rules apply to the code you write or change. Report old violations to the user and leave them in place until the user asks for a cleanup.
+Before writing code, inspect git history, commit depth, and the file tree to determine whether the repository is an established codebase with existing domain features or a newly created, template-generated, or freshly scaffolded project:
 
-Move the comments out of every file you edit into its doc, as `references/code-structure.md` → "Comments and docs" says. It is the one old violation you fix without being asked.
+- **In an established codebase**: The rules apply only to the code you write or change. Report pre-existing violations to the user and leave them in place until the user asks for a cleanup. Move comments out of edited files into their docs, as `references/code-structure.md` → "Comments and docs" says.
+- **In a newly created or freshly scaffolded project**: Never preserve default CLI boilerplate, demo files, or scaffolded structures that violate Vibecode rules. Replace, restructure, or delete template boilerplate immediately upon initial implementation, e.g. move scaffolded co-located test files to the dedicated test directory and replace placeholder markup with the real layout shell.
 
 ## Precedence
 
