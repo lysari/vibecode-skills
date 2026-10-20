@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, or adding features to a project, so changes stay clean, minimal, and easy to maintain
 metadata:
-  version: "0.0.1-20261019.3"
+  version: "0.0.1-20261020.1"
 ---
 
 # Vibecode
@@ -48,6 +48,8 @@ When the project has a `.claude/project-rules.md`, read it after the framework f
 
 The rules apply to the code you write or change. Report old violations to the user and leave them in place until the user asks for a cleanup.
 
+Move the comments out of every file you edit into its doc, as `references/code-structure.md` → "Comments and docs" says. It is the one old violation you fix without being asked.
+
 ## Precedence
 
 When the project's own `AGENTS.md` or `CLAUDE.md` sets a different rule, follow the project's rule.
@@ -60,7 +62,7 @@ Read the file for the topic at hand before writing code that touches it.
 |-------|------|
 | Where files go, when to create one | `references/file-organization.md` |
 | Naming files, functions, variables | `references/naming.md` |
-| Function/file size, duplication, comments | `references/code-structure.md` |
+| Function/file size, duplication, comments and docs | `references/code-structure.md` |
 | Keeping edits minimal | `references/change-scope.md` |
 | Dead code, temp files, leftovers | `references/cleanup.md` |
 | Secrets, safeguards, repo, tests, README, commits | `references/project-hygiene.md` |
