@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { SESSION_VIEW_LABELS, type SessionView } from "../session-view";
-import { Icon, type IconName } from "./Icon";
+import { SESSION_VIEW_LABELS, type SessionView } from "./session-view";
+import { Icon, type IconName } from "../../components/Icon";
 
 interface HeaderProps {
 	projectName: string;

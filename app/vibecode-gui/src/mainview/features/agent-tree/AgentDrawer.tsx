@@ -1,7 +1,7 @@
-import { formatCost, formatDuration, type AgentNode, type RunView, type ThreadItem } from "../run-view";
-import { Icon } from "./Icon";
-import { StatusPill } from "./StatusPill";
-import { ThreadEntry } from "./ThreadEntry";
+import { formatCost, formatDuration, type AgentNode, type RunView, type ThreadItem } from "../../utils/run-view";
+import { Icon } from "../../components/Icon";
+import { StatusPill } from "../../components/StatusPill";
+import { ThreadEntry } from "../../components/ThreadEntry";
 
 interface AgentDrawerProps {
 	agent: AgentNode;

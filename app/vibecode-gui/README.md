@@ -34,7 +34,7 @@ interface AgentRunner {
 }
 ```
 
-A run emits `run.started`, then `agent.spawned` (id, parent id, name, model, task, and the agent it replaces after a retry; the first agent without a parent is the orchestrator), `agent.status` (`running`, `done`, `needs-input`, `failed`, `stopped`), `agent.usage` (cost and duration totals), `text.delta` (joined by message id), `tool.started` / `tool.finished`, `input.needed`, `error`, and finally `run.finished` (`done`, `stopped` or `failed`). Every event carries its run id and time. `src/bun/chat.ts` installs the selected skills, records the user's message, starts the run, appends each event to the session (writing it to disk one write at a time) and forwards it to the webview; the renderer plays the events into both views (`src/mainview/run-view.ts`). `AGENT_CLIS` in the same interface file maps each agent skill to the command a real runner starts (`claude`, `agent`, `agy`); a real runner is constructed in `src/bun/index.ts` in place of `MockAgentRunner`.
+A run emits `run.started`, then `agent.spawned` (id, parent id, name, model, task, and the agent it replaces after a retry; the first agent without a parent is the orchestrator), `agent.status` (`running`, `done`, `needs-input`, `failed`, `stopped`), `agent.usage` (cost and duration totals), `text.delta` (joined by message id), `tool.started` / `tool.finished`, `input.needed`, `error`, and finally `run.finished` (`done`, `stopped` or `failed`). Every event carries its run id and time. `src/bun/chat.ts` installs the selected skills, records the user's message, starts the run, appends each event to the session (writing it to disk one write at a time) and forwards it to the webview; the renderer plays the events into both views (`src/mainview/utils/run-view.ts`). `AGENT_CLIS` in the same interface file maps each agent skill to the command a real runner starts (`claude`, `agent`, `agy`); a real runner is constructed in `src/bun/index.ts` in place of `MockAgentRunner`.
 
 `MockAgentRunner` (`src/bun/mock-agent-runner.ts`) plays an orchestrator that looks at the project, a planner, two or three coders working in parallel (each with its own test runner) and a reviewer per selected skill, with timed text streaming, tool calls, costs and durations. A question mark in the prompt, or some seeds, make a coder ask the user and wait for the reply; some seeds make a test runner fail until it is retried. Its random choices follow from the prompt, agent and skills, or from an injected seed, and its timers come from an injectable clock, so tests step through a run deterministically.
 
@@ -89,10 +89,16 @@ When you run `hutch run dev` (without HMR):
 │   ├── shared/
 │   │   └── interfaces/          # Project, skill, session, run and RPC types, used by both processes
 │   └── mainview/
-│       ├── App.tsx              # App state and layout shell
-│       ├── rpc.ts               # Electroview RPC client and the run event subscription
-│       ├── run-view.ts          # Plays run events into agent trees and transcripts
-│       ├── components/          # Rail, Projects, Header, ChatView, ThreadEntry, Composer, SkillPicker, AgentPicker, AgentTree, AgentTreeToolbar, AgentDrawer, dialogs
+│       ├── features/            # One folder per feature with its own components and helpers
+│       │   ├── app-shell/       # App (app state and layout shell), Header, Rail, the session views and the Electroview RPC client
+│       │   ├── projects/        # The projects panel and its age labels
+│       │   ├── chat/            # ChatView, the session thread
+│       │   ├── agent-tree/      # AgentTree, its toolbar, the agent drawer and the row wrapping
+│       │   ├── composer/        # Composer, SkillPicker, AgentPicker, InstallBadge
+│       │   └── settings/        # The settings dialog
+│       ├── components/          # Shared by 2 or more features: Icon, Dialog, StatusPill, ThreadEntry, Markdown
+│       ├── hooks/               # Shared hooks: useDismiss for popovers and pickers
+│       ├── utils/               # Shared helpers: run-view plays run events into agent trees and transcripts
 │       ├── styles/              # Palette (light/dark colours), fonts, global styles
 │       ├── main.tsx             # React entry point
 │       ├── index.html           # HTML template

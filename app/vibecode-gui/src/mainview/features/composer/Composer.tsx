@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import type { SessionChoices } from "../../shared/interfaces/session.interface";
-import type { Skill } from "../../shared/interfaces/skill.interface";
-import type { AgentNode } from "../run-view";
+import type { SessionChoices } from "../../../shared/interfaces/session.interface";
+import type { Skill } from "../../../shared/interfaces/skill.interface";
+import type { AgentNode } from "../../utils/run-view";
 import { AgentPicker } from "./AgentPicker";
-import { Icon } from "./Icon";
+import { Icon } from "../../components/Icon";
 import { SkillPicker } from "./SkillPicker";
 
 interface ComposerProps {

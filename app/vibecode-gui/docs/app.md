@@ -2,7 +2,7 @@
 
 The app's one window: the rail, the projects panel, the session header, the Chat or Tree view with the composer below it, and the dialogs.
 
-## `src/mainview/App.tsx`
+## `src/mainview/features/app-shell/App.tsx`
 
 - Holds the app state: the workspace, each project's session list, the expanded projects, the open session, the Chat | Tree view, the selected agent, the reply target, the panel and theme toggles, the open dialog (`DialogState`: update a skill, delete a session, settings) and the error banner.
 - Run events of the types in `STATUS_EVENTS` (`run.started`, `run.finished`, `agent.status`) can change a session's status dot, so they refresh that project's session list.
@@ -16,18 +16,18 @@ The app's one window: the rail, the projects panel, the session header, the Chat
 
 `main.tsx` mounts `App` in `StrictMode` into the `#root` element of `index.html` and loads `index.scss`, which loads the palette, fonts and global partials (see `palette.md`, `fonts.md`, `global.md`) and Tailwind's layers.
 
-## `src/mainview/components/Header.tsx`
+## `src/mainview/features/app-shell/Header.tsx`
 
 The project name, the session title and the Chat | Tree toggle (`ViewButton`, labelled from `SESSION_VIEW_LABELS`). Clicking the title edits it: Enter or leaving the field saves a changed, non-empty title; Escape cancels.
 
-## `src/mainview/components/Rail.tsx`
+## `src/mainview/features/app-shell/Rail.tsx`
 
 The app's navigation: Projects (shows or hides the projects panel), New, Settings and the light/dark toggle.
 
-## `src/mainview/session-view.ts`
+## `src/mainview/features/app-shell/session-view.ts`
 
 `SESSION_VIEW_LABELS` lists the session's two views with their labels; `SessionView` is one of its keys.
 
-## `src/mainview/rpc.ts`
+## `src/mainview/features/app-shell/rpc.ts`
 
 The webview's Electroview RPC client. `skillsApi` holds the request functions of `SkillsRPC`; a request fails after `MAX_REQUEST_MS`. `onRunEvent(listener)` calls the listener with every run event the main process streams and returns the unsubscribe function.

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import { formatCost, type AgentNode } from "../run-view";
-import { useDismiss } from "../use-dismiss";
-import { Icon } from "./Icon";
+import { formatCost, type AgentNode } from "../../utils/run-view";
+import { useDismiss } from "../../hooks/use-dismiss";
+import { Icon } from "../../components/Icon";
 
 const PERCENT = 100;
 const ZOOM_BUTTON_CLASS =

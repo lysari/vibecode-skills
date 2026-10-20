@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import type { Skill } from "../../shared/interfaces/skill.interface";
-import { useDismiss } from "../use-dismiss";
-import { Icon } from "./Icon";
+import type { Skill } from "../../../shared/interfaces/skill.interface";
+import { useDismiss } from "../../hooks/use-dismiss";
+import { Icon } from "../../components/Icon";
 import { InstallBadge } from "./InstallBadge";
 
 interface SkillPickerProps {

@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
-import { AGENT_CLIS } from "../../shared/interfaces/run.interface";
-import type { Skill } from "../../shared/interfaces/skill.interface";
-import { useDismiss } from "../use-dismiss";
-import { Icon } from "./Icon";
+import { AGENT_CLIS } from "../../../shared/interfaces/run.interface";
+import type { Skill } from "../../../shared/interfaces/skill.interface";
+import { useDismiss } from "../../hooks/use-dismiss";
+import { Icon } from "../../components/Icon";
 
 const DEFAULT_LABEL = "Default";
 

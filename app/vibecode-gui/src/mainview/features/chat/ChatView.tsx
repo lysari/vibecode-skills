@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import type { RunView, ThreadItem } from "../run-view";
-import { Icon } from "./Icon";
-import { ThreadEntry } from "./ThreadEntry";
+import type { RunView, ThreadItem } from "../../utils/run-view";
+import { Icon } from "../../components/Icon";
+import { ThreadEntry } from "../../components/ThreadEntry";
 
 const PIN_DISTANCE_PX = 48;
 

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { Project } from "../../shared/interfaces/project.interface";
-import type { SessionStatus, SessionSummary } from "../../shared/interfaces/session.interface";
-import { formatTimeAgo } from "../time-ago";
-import { Icon } from "./Icon";
-import { AGENT_STATUS_STYLES } from "./StatusPill";
+import type { Project } from "../../../shared/interfaces/project.interface";
+import type { SessionStatus, SessionSummary } from "../../../shared/interfaces/session.interface";
+import { formatTimeAgo } from "./time-ago";
+import { Icon } from "../../components/Icon";
+import { AGENT_STATUS_STYLES } from "../../components/StatusPill";
 
 const STATUS_DOTS: Partial<Record<SessionStatus, string>> = {
 	running: "bg-info-text motion-safe:animate-pulse",

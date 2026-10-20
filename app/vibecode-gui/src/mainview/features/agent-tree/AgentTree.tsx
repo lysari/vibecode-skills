@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { wrapMapRows } from "../map-rows";
-import { formatCost, formatDuration, listTreeAgents, type AgentNode, type AgentRun } from "../run-view";
+import { wrapMapRows } from "./map-rows";
+import { formatCost, formatDuration, listTreeAgents, type AgentNode, type AgentRun } from "../../utils/run-view";
 import { AgentTreeToolbar, type TreeZoomChange } from "./AgentTreeToolbar";
-import { Icon } from "./Icon";
-import { StatusPill } from "./StatusPill";
+import { Icon } from "../../components/Icon";
+import { StatusPill } from "../../components/StatusPill";
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 2;

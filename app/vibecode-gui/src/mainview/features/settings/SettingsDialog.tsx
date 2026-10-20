@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog } from "./Dialog";
+import { Dialog } from "../../components/Dialog";
 
 const BUTTON_CLASS = "h-control rounded-full border border-line-control px-node-pad text-body text-ink hover:bg-field";
 

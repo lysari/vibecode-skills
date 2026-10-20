@@ -1,5 +1,5 @@
 import { Electroview } from "electrobun/view";
-import type { RunEventMessage, SkillsRPC } from "../shared/interfaces/skills-rpc.interface";
+import type { RunEventMessage, SkillsRPC } from "../../../shared/interfaces/skills-rpc.interface";
 
 const MAX_REQUEST_MS = 15_000;
 

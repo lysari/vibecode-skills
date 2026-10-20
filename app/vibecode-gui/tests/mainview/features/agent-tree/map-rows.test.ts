@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { wrapMapRows } from "../../src/mainview/map-rows";
+import { wrapMapRows } from "../../../../src/mainview/features/agent-tree/map-rows";
 
 describe("wrapMapRows", () => {
 	test("keeps every item in one row when they fit", () => {
