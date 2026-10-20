@@ -22,8 +22,17 @@ export function useTheme() {
 	);
 
 	useEffect(() => {
-		document.documentElement.dataset.theme = isDark ? "dark" : "light";
-		writeStored(THEME_KEY, isDark ? "dark" : "light");
+		const theme = isDark ? "dark" : "light";
+		const root = document.documentElement;
+		writeStored(THEME_KEY, theme);
+		if (root.dataset.theme === theme) return;
+		if (!root.dataset.theme || !("startViewTransition" in document)) {
+			root.dataset.theme = theme;
+			return;
+		}
+		document.startViewTransition(() => {
+			root.dataset.theme = theme;
+		});
 	}, [isDark]);
 
 	return { isDark, setIsDark };

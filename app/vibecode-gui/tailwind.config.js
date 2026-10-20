@@ -1,3 +1,16 @@
+const EASE = {
+	standard: "cubic-bezier(0.32, 0.72, 0, 1)",
+	spring: "cubic-bezier(0.34, 1.32, 0.64, 1)",
+	quick: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+};
+
+const DURATION = {
+	instant: "1ms",
+	micro: "120ms",
+	standard: "220ms",
+	panel: "340ms",
+};
+
 /** @type {import('tailwindcss').Config} */
 export default {
 	content: ["./src/mainview/**/*.{html,js,ts,jsx,tsx}"],
@@ -35,6 +48,15 @@ export default {
 				info: "var(--status-info)",
 				"info-text": "var(--status-info-text)",
 				scrim: "var(--scrim)",
+				sidebar: "var(--surface-sidebar)",
+				"sidebar-field": "var(--surface-sidebar-field)",
+				"sidebar-hover": "var(--surface-sidebar-hover)",
+				"sidebar-selected": "var(--surface-sidebar-selected)",
+				"line-sidebar": "var(--border-sidebar)",
+				"line-sidebar-field": "var(--border-sidebar-field)",
+				"sidebar-ink": "var(--text-sidebar)",
+				"sidebar-muted": "var(--text-sidebar-secondary)",
+				"sidebar-icon": "var(--icon-sidebar)",
 			},
 			fontFamily: {
 				sans: "var(--font-sans)",
@@ -42,17 +64,20 @@ export default {
 			},
 			fontSize: {
 				title: ["18px", "24px"],
+				crumb: ["15px", "20px"],
 				node: ["15px", "20px"],
 				heading: ["14px", "20px"],
 				body: ["13px", "20px"],
 				meta: ["12px", "16px"],
-				rail: ["11px", "14px"],
+				section: ["11px", "16px"],
 				code: ["12px", "18px"],
 			},
 			spacing: {
-				rail: "72px",
+				sidebar: "220px",
 				panel: "280px",
-				header: "52px",
+				header: "48px",
+				"traffic-lights": "94px",
+				"traffic-lights-toggle": "134px",
 				node: "272px",
 				inspector: "264px",
 				thread: "720px",
@@ -60,12 +85,11 @@ export default {
 				picker: "288px",
 				dialog: "384px",
 				"zoom-label": "40px",
-				"rail-item-w": "60px",
-				"rail-item-h": "48px",
 				logo: "32px",
 				control: "28px",
 				tile: "28px",
 				field: "32px",
+				"search-h": "30px",
 				group: "32px",
 				"stat-h": "28px",
 				"pill-h": "26px",
@@ -75,6 +99,8 @@ export default {
 				port: "8px",
 				gutter: "12px",
 				"header-x": "16px",
+				"footer-x": "10px",
+				"item-gap": "10px",
 				card: "12px",
 				stack: "8px",
 				"node-pad": "12px",
@@ -88,7 +114,7 @@ export default {
 			borderRadius: {
 				card: "6px",
 				node: "8px",
-				rail: "6px",
+				item: "8px",
 				field: "6px",
 				logo: "8px",
 				control: "6px",
@@ -113,14 +139,65 @@ export default {
 			backgroundSize: {
 				dots: "24px 24px",
 			},
-			keyframes: {
-				"node-in": {
-					from: { opacity: "0", transform: "translateY(4px)" },
-					to: { opacity: "1", transform: "translateY(0)" },
-				},
+			scale: {
+				press: "0.98",
+				pop: "0.96",
 			},
+			transitionProperty: {
+				colors: "color, background-color, border-color, outline-color, text-decoration-color, fill, stroke",
+				padding: "padding",
+			},
+			transitionTimingFunction: {
+				DEFAULT: EASE.quick,
+				...EASE,
+			},
+			transitionDuration: {
+				DEFAULT: DURATION.micro,
+				...DURATION,
+			},
+			data: {
+				enter: 'presence="enter"',
+				exit: 'presence="exit"',
+			},
+			keyframes: ({ theme }) => ({
+				"fade-in": {
+					from: { opacity: "0" },
+				},
+				"fade-out": {
+					to: { opacity: "0" },
+				},
+				"rise-in": {
+					from: { opacity: "0", transform: `translateY(${theme("spacing.rail-gap")})` },
+				},
+				"drop-in": {
+					from: { opacity: "0", transform: `translateY(-${theme("spacing.rail-gap")})` },
+				},
+				"pop-in": {
+					from: { opacity: "0", transform: `scale(${theme("scale.pop")})` },
+				},
+				"pop-out": {
+					to: { opacity: "0", transform: `scale(${theme("scale.pop")})` },
+				},
+				expand: {
+					from: { width: "0", opacity: "0" },
+				},
+				collapse: {
+					to: { width: "0", opacity: "0" },
+				},
+				"focus-in": {
+					from: { outlineColor: "transparent", outlineOffset: theme("spacing.rail-gap") },
+				},
+			}),
 			animation: {
-				"node-in": "node-in 240ms ease-out both",
+				"fade-in": `fade-in ${DURATION.standard} ${EASE.standard} backwards`,
+				"fade-out": `fade-out ${DURATION.micro} ${EASE.quick} forwards`,
+				"rise-in": `rise-in ${DURATION.standard} ${EASE.standard} backwards`,
+				"drop-in": `drop-in ${DURATION.standard} ${EASE.standard} backwards`,
+				"pop-in": `pop-in ${DURATION.standard} ${EASE.spring} backwards`,
+				"pop-out": `pop-out ${DURATION.micro} ${EASE.quick} forwards`,
+				expand: `expand ${DURATION.panel} ${EASE.standard} backwards`,
+				collapse: `collapse ${DURATION.panel} ${EASE.standard} forwards`,
+				"focus-in": `focus-in ${DURATION.micro} ${EASE.quick}`,
 			},
 		},
 	},

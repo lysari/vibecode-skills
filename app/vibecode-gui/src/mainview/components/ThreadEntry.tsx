@@ -8,7 +8,7 @@ import { StatusPill } from "./StatusPill";
 
 const SLASH_COMMANDS = /^((?:\/[\w-]+\s+)*)([\s\S]*)$/;
 const MARKDOWN_MARKS = /[`*_#]/g;
-const ACTION_CLASS = "h-control shrink-0 rounded-full px-card text-body";
+const ACTION_CLASS = "h-control shrink-0 rounded-full px-card text-body transition active:scale-press";
 
 interface ThreadEntryProps {
 	item: ThreadItem;
@@ -57,12 +57,18 @@ function ToolBlock({ tool }: { tool: ToolItem }) {
 				{tool.result === null ? (
 					<Icon name="loader" className="size-icon-sm text-info-text motion-safe:animate-spin" />
 				) : (
-					<Icon name={tool.isError ? "alert" : "check"} className={`size-icon-sm ${tool.isError ? "text-issue-text" : "text-valid-text"}`} />
+					<Icon
+					name={tool.isError ? "alert" : "check"}
+					className={`size-icon-sm animate-pop-in ${tool.isError ? "text-issue-text" : "text-valid-text"}`}
+				/>
 				)}
-				<Icon name={isOpen ? "chevron-up" : "chevron-down"} className="size-icon-sm text-muted" />
+				<Icon
+					name="chevron-down"
+					className={`size-icon-sm text-muted transition-transform duration-standard ease-standard ${isOpen ? "rotate-180" : ""}`}
+				/>
 			</button>
 			{isOpen && (
-				<pre className="overflow-x-auto border-t border-line bg-field px-card py-stack font-mono text-code text-ink">
+				<pre className="animate-fade-in overflow-x-auto border-t border-line bg-field px-card py-stack font-mono text-code text-ink">
 					{tool.result ?? "Running…"}
 				</pre>
 			)}
@@ -97,7 +103,7 @@ export function ThreadEntry({ item, view, isStreaming, onOpenAgent, onReply, onR
 				type="button"
 				onClick={() => onOpenAgent(agent.id)}
 				aria-label={`Show ${agent.name} in the tree`}
-				className="flex w-full items-start gap-stack rounded-card border border-line-card bg-card p-card text-left shadow-card hover:border-accent"
+				className="flex w-full items-start gap-stack rounded-card border border-line-card bg-card p-card text-left shadow-card transition-colors duration-standard hover:border-accent"
 			>
 				<span className="flex size-tile shrink-0 items-center justify-center bg-accent-soft text-accent-text">
 					<Icon name="agent" />
@@ -124,7 +130,7 @@ export function ThreadEntry({ item, view, isStreaming, onOpenAgent, onReply, onR
 	const closedLabel = agent.status === "stopped" && !isRetried ? "Stopped" : item.kind === "question" ? "Answered" : "Retried";
 	return (
 		<div
-			className={`flex items-start gap-stack rounded-card p-card text-body ${
+			className={`flex items-start gap-stack rounded-card p-card text-body transition-colors duration-standard ${
 				item.kind === "question" ? "bg-warning-soft text-warning-text" : "bg-issue text-issue-text"
 			}`}
 		>
@@ -143,7 +149,7 @@ export function ThreadEntry({ item, view, isStreaming, onOpenAgent, onReply, onR
 					Retry
 				</button>
 			)}
-			{!isOpen && <span className="shrink-0 text-meta">{closedLabel}</span>}
+			{!isOpen && <span className="shrink-0 animate-fade-in text-meta">{closedLabel}</span>}
 		</div>
 	);
 }

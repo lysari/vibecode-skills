@@ -9,14 +9,15 @@ The Tree view of a session: the run's agents as a tree, its toolbar, and the tra
 - A `ResizeObserver` measures the viewport, the unscaled content, the column widths, the column gap and the first column's indent.
 - Fit scales the tree down to the viewport width, never above 100%. Zoom in and out step by `ZOOM_STEP` between `MIN_ZOOM` and `MAX_ZOOM`, and a zoom applies only to the run it was set on.
 - The tree is centred horizontally when the run or the scale changes, and the selected card is scrolled into view.
+- Cards rise in as their agents appear. Every card carries the selection outline, transparent unless selected, so selecting one fades it in. The sub-agent toggle's chevron rotates.
 
 ## `src/mainview/features/agent-tree/AgentTreeToolbar.tsx`
 
-`agents` are every agent of the shown run, the orchestrator first. The toolbar shows the agent and running counts and the total cost; **N needs you** and **N failed** pills whose popovers offer Reply or Retry, and Dismiss, which hides that agent from the pill; and zoom out, zoom in and Fit.
+`agents` are every agent of the shown run, the orchestrator first. The toolbar shows the agent and running counts and the total cost; **N needs you** and **N failed** pills whose popovers offer Reply or Retry, and Dismiss, which hides that agent from the pill; and zoom out, zoom in and Fit. The pills pop in; their popover scales from its top-right corner and keeps the closing list while it animates out (`usePresence`).
 
 ## `src/mainview/features/agent-tree/AgentDrawer.tsx`
 
-The selected agent's transcript beside the tree, with its model, status, cost, duration and task.
+The selected agent's transcript beside the tree, with its model, status, cost, duration and task. `App` animates it in and out through `presence` (see `app.md`); its entries rise in.
 
 ## `src/mainview/features/agent-tree/map-rows.ts`
 

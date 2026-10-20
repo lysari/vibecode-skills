@@ -22,9 +22,13 @@ interface StatusPillProps {
 export function StatusPill({ status }: StatusPillProps) {
 	const { label, icon, className } = AGENT_STATUS_STYLES[status];
 	return (
-		<span className={`inline-flex h-chip-h shrink-0 items-center gap-rail-gap rounded-full px-stack text-meta ${className}`}>
-			<Icon name={icon} className={`size-icon-sm ${status === "running" ? "motion-safe:animate-spin" : ""}`} />
-			{label}
+		<span
+			className={`inline-flex h-chip-h shrink-0 items-center rounded-full px-stack text-meta transition-colors duration-standard ease-standard ${className}`}
+		>
+			<span key={status} className="inline-flex animate-fade-in items-center gap-rail-gap">
+				<Icon name={icon} className={`size-icon-sm ${status === "running" ? "motion-safe:animate-spin" : ""}`} />
+				{label}
+			</span>
 		</span>
 	);
 }

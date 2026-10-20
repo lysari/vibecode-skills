@@ -4,9 +4,9 @@ An Electrobun desktop app (React, Tailwind CSS, Sass, Vite) for running coding a
 
 ## Using the app
 
-- **Rail**: Projects (shows or hides the projects panel), New (a new session in the open project, or the folder picker when none is open) and the light/dark toggle.
-- **Projects panel**: every project you opened, most recent first, with **Open folder…** (the native folder picker) and a search that matches project names, paths and session titles. A project row expands to its sessions (title, age, and a dot while the latest run is running, needs you or failed) and **New session**. Clicking a project opens it and its latest session, or a new one when it has none. The × button removes a project from the list without touching its folder, the trash button deletes a session after confirmation, and a folder that was moved or deleted shows as **Unavailable**. The last open project reopens on launch.
-- **Header**: the project, the session title (click it to rename; the first message titles a new session) and the **Chat | Tree** toggle.
+- **Projects sidebar**: every project you opened, most recent first, under **Projects** (a folder that was moved or deleted is listed under **Unavailable**), with a search (⌘F) that matches project names and paths, the sidebar toggle in the top row, and **Open folder…** (the native folder picker) and the light/dark toggle in the footer. Clicking a project opens it and its latest session, or a new one when it has none. The × button removes a project from the list without touching its folder. The last open project reopens on launch.
+- **Sessions panel**: opens to the right of the projects sidebar for the open project: its sessions (title, age, and a dot while the latest run is running, needs you or failed) and **New session** (+). Clicking a session opens it; the trash button deletes a session after confirmation.
+- **Header**: a `Project / Session` breadcrumb (click the session title to rename it; the first message titles a new session) and the **Chat | Tree** toggle.
 - **Chat**: the thread of the session, like Claude Code: your messages (with the selected skills as slash commands in front, e.g. `/vibecode-review fix the header`), the orchestrator's streaming text, collapsible tool calls (tool, short input, result), sub-agent blocks (name, model, status, last line, cost and time; click to see the agent in the tree), questions ("needs you", with Reply), failures (with Retry) and the run's end. The thread follows new output until you scroll up; **Jump to latest** scrolls back down.
 - **Tree**: the run's agents as a tree: the orchestrator on top and its sub-agents on trunk, bus and elbow connectors, wrapped into rows that fit the panel. Each card shows the agent's name, model or CLI, status (Running, Done, Needs you, Failed, Stopped), task, cost and duration, and a toggle for its sub-agents. The toolbar shows the agent and running counts and the cost, **N needs you** and **N failed** pills whose popovers offer Reply or Retry (and Dismiss), and zoom out, zoom in and Fit. Selecting a card opens that agent's transcript beside the tree.
 - **Composer** (pinned below both views): Enter sends, Shift+Enter adds a line. **Skills** lists the skills the selected agent can already use, each marked **Project** (in the open project's skill folders, e.g. `.claude/skills` or `.agents/skills`) or **Global** (in the agent's global folder; a project skill wins over a global one with the same name); selected skills show as removable chips. A new session starts with `vibecode-workflow` selected; remove its chip to send without it. **Agent** offers Default and the agent skills found in the project or the global folders (`use-claude-code`, `use-cursor`, `use-antigravity`). Both choices are kept per session. While a run works, **Stop** replaces Send; after Reply the composer answers the waiting agent.
@@ -97,13 +97,13 @@ When you run `hutch run dev` (without HMR):
 │   │   └── interfaces/          # Project, skill, session, run and RPC types used by both processes; run-view types used by the webview's views
 │   └── mainview/
 │       ├── features/            # One folder per feature with its own components and helpers
-│       │   ├── app-shell/       # App (layout shell), Header, Rail, the session views and the app state hooks (workspace, run, error, theme)
-│       │   ├── projects/        # The projects panel and its age labels
+│       │   ├── app-shell/       # App (layout shell), Header, the session views and the app state hooks (workspace, run, error, theme)
+│       │   ├── projects/        # The projects sidebar, the sessions panel and its age labels
 │       │   ├── chat/            # ChatView, the session thread
 │       │   ├── agent-tree/      # AgentTree, its toolbar, the agent drawer and the row wrapping
 │       │   └── composer/        # Composer, SkillPicker, AgentPicker, SkillSourceBadge
 │       ├── components/          # Shared by 2 or more features: Icon, Dialog, StatusPill, ThreadEntry, Markdown
-│       ├── hooks/               # Shared hooks: useDismiss for popovers and pickers
+│       ├── hooks/               # Shared hooks: useDismiss for popovers and pickers, usePresence for exit animations
 │       ├── services/            # App-wide services: rpc, the Electroview RPC client
 │       ├── utils/               # Shared helpers: run-view plays run events into agent trees and transcripts
 │       ├── styles/              # Palette (light/dark colours), fonts, global styles
@@ -122,7 +122,7 @@ When you run `hutch run dev` (without HMR):
 ## Customizing
 
 - **React components**: Edit files in `src/mainview/`
-- **Design tokens**: Sizes, type and radii live in `tailwind.config.js`; colours live in `src/mainview/styles/_palette.scss`
+- **Design tokens**: Sizes, type, radii and motion (easing, durations, animations) live in `tailwind.config.js`; colours live in `src/mainview/styles/_palette.scss`
 - **Vite settings**: Edit `vite.config.ts`
 - **Window settings**: Edit `src/bun/index.ts`
 - **App metadata**: Edit `electrobun.config.ts` (display name "Vibecode Skills", identifier `io.github.lysari.vibecode-skills`)

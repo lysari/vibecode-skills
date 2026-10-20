@@ -79,6 +79,7 @@ new BrowserWindow({
 	title: "Vibecode Skills",
 	url,
 	rpc,
+	titleBarStyle: "hiddenInset",
 	frame: {
 		width: 1440,
 		height: 900,

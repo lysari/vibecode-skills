@@ -1,167 +1,175 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Project } from "../../../shared/interfaces/project.interface";
-import type { SessionStatus, SessionSummary } from "../../../shared/interfaces/session.interface";
-import { formatTimeAgo } from "./time-ago";
 import { Icon } from "../../components/Icon";
-import { AGENT_STATUS_STYLES } from "../../components/StatusPill";
+import { usePresence } from "../../hooks/use-presence";
 
-const STATUS_DOTS: Partial<Record<SessionStatus, string>> = {
-	running: "bg-info-text motion-safe:animate-pulse",
-	"needs-input": "bg-warning-dot",
-	failed: "bg-issue-text",
-};
-const ROW_ACTION_CLASS =
-	"flex size-control shrink-0 items-center justify-center rounded-control text-muted opacity-0 hover:bg-field hover:text-ink focus-visible:opacity-100 group-hover:opacity-100";
+const ICON_BUTTON_CLASS =
+	"size-control shrink-0 items-center justify-center rounded-control text-sidebar-muted transition hover:bg-sidebar-hover hover:text-sidebar-ink active:scale-press";
 
 interface ProjectsProps {
+	isSidebarOpen: boolean;
 	projects: Project[] | null;
-	sessions: Record<string, SessionSummary[]>;
-	expanded: Set<string>;
 	openRoot: string | null;
-	sessionId: string | null;
+	isDark: boolean;
+	onHideSidebar: () => void;
+	onToggleTheme: () => void;
 	onChooseFolder: () => void;
 	onOpenProject: (root: string) => void;
-	onCollapseProject: (root: string) => void;
 	onRemoveProject: (root: string) => void;
-	onOpenSession: (root: string, id: string) => void;
-	onNewSession: (root: string) => void;
-	onDeleteSession: (session: SessionSummary) => void;
 }
 
-function statusLabel(status: SessionStatus): string | null {
-	return status === "running" || status === "needs-input" || status === "failed" ? AGENT_STATUS_STYLES[status].label : null;
+interface ProjectSectionProps {
+	title: string;
+	projects: Project[];
+	openRoot: string | null;
+	onOpenProject: (root: string) => void;
+	onRemoveProject: (root: string) => void;
+}
+
+function ProjectSection({ title, projects, openRoot, onOpenProject, onRemoveProject }: ProjectSectionProps) {
+	return (
+		<section className="flex flex-col gap-rail-gap pt-card">
+			<h3 className="px-stack text-section font-semibold text-sidebar-muted">{title}</h3>
+			<ul className="flex flex-col gap-rail-gap">
+				{projects.map((project) => {
+					const isOpen = project.root === openRoot;
+					return (
+						<li
+							key={project.root}
+							className={`group flex animate-rise-in items-center rounded-item pr-rail-gap transition active:scale-press ${
+								isOpen ? "bg-sidebar-selected" : project.isAvailable ? "hover:bg-sidebar-hover" : ""
+							}`}
+						>
+							<button
+								type="button"
+								onClick={() => onOpenProject(project.root)}
+								disabled={!project.isAvailable}
+								aria-current={isOpen}
+								title={project.isAvailable ? project.root : `${project.root} was moved or deleted`}
+								className="flex h-group min-w-0 flex-1 items-center gap-item-gap rounded-item px-stack text-left text-heading"
+							>
+								<Icon name="folder" className={`size-icon ${project.isAvailable ? "text-sidebar-icon" : "text-sidebar-muted"}`} />
+								<span className={`min-w-0 flex-1 truncate ${project.isAvailable ? "text-sidebar-ink" : "text-sidebar-muted"}`}>
+									{project.name}
+								</span>
+							</button>
+							<button
+								type="button"
+								onClick={() => onRemoveProject(project.root)}
+								aria-label={`Remove ${project.name} from the list`}
+								title="Remove from list (the folder stays on disk)"
+								className={`hidden animate-fade-in group-focus-within:flex group-hover:flex ${ICON_BUTTON_CLASS}`}
+							>
+								<Icon name="close" className="size-icon-sm" />
+							</button>
+						</li>
+					);
+				})}
+			</ul>
+		</section>
+	);
 }
 
 export function Projects(props: ProjectsProps) {
-	const { projects, sessions, expanded, openRoot, sessionId } = props;
+	const { isSidebarOpen, projects, openRoot, isDark } = props;
+	const sidebar = usePresence(isSidebarOpen);
 	const [query, setQuery] = useState("");
+	const searchRef = useRef<HTMLInputElement>(null);
 	const needle = query.trim().toLowerCase();
-	const visible = (projects ?? []).flatMap((project) => {
-		const projectSessions = sessions[project.root] ?? [];
-		if (`${project.name} ${project.root}`.toLowerCase().includes(needle)) return [{ project, shown: projectSessions }];
-		const matching = projectSessions.filter((session) => session.title.toLowerCase().includes(needle));
-		return matching.length > 0 ? [{ project, shown: matching }] : [];
-	});
+	const shown = (projects ?? []).filter((project) => `${project.name} ${project.root}`.toLowerCase().includes(needle));
+	const available = shown.filter((project) => project.isAvailable);
+	const unavailable = shown.filter((project) => !project.isAvailable);
+
+	useEffect(() => {
+		function focusSearch(event: KeyboardEvent) {
+			if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "f") return;
+			event.preventDefault();
+			searchRef.current?.focus();
+		}
+		window.addEventListener("keydown", focusSearch);
+		return () => window.removeEventListener("keydown", focusSearch);
+	}, []);
+
+	if (!sidebar.shown) return null;
 
 	return (
-		<aside aria-label="Projects and sessions" className="flex w-panel shrink-0 flex-col border-r border-line bg-surface">
-			<div className="flex flex-col gap-card border-b border-line p-gutter">
-				<div className="flex items-center justify-between gap-stack">
-					<h2 className="text-heading font-medium text-ink">
-						Projects <span className="font-normal text-muted">{projects?.length ?? ""}</span>
-					</h2>
+		<aside
+			{...sidebar.presence}
+			aria-label="Sidebar"
+			className="flex w-sidebar shrink-0 justify-end overflow-hidden data-enter:animate-expand data-exit:pointer-events-none data-exit:animate-collapse"
+		>
+			<div className="flex w-sidebar shrink-0 flex-col border-r border-line-sidebar bg-sidebar text-sidebar-ink">
+				<div className="electrobun-webkit-app-region-drag flex h-header shrink-0 items-center pl-traffic-lights pr-gutter">
 					<button
 						type="button"
-						onClick={props.onChooseFolder}
-						className="inline-flex h-control shrink-0 items-center gap-rail-gap rounded-full bg-inverse px-card text-body text-on-inverse"
+						onClick={props.onHideSidebar}
+						aria-label="Hide sidebar"
+						title="Hide sidebar"
+						className={`electrobun-webkit-app-region-no-drag flex ${ICON_BUTTON_CLASS}`}
 					>
-						<Icon name="folder" className="size-icon-sm" />
-						Open folder…
+						<Icon name="sidebar" />
 					</button>
 				</div>
-				<label className="flex h-field items-center gap-stack rounded-field border border-line bg-card px-card text-heading focus-within:border-accent">
-					<Icon name="search" className="size-icon text-muted" />
-					<span className="sr-only">Find a project or session</span>
-					<input
-						type="search"
-						value={query}
-						onChange={(event) => setQuery(event.target.value)}
-						placeholder="Find a project or session"
-						className="min-w-0 flex-1 bg-transparent text-ink outline-none placeholder:text-muted"
-					/>
-				</label>
-			</div>
-			<div className="min-h-0 flex-1 overflow-y-auto p-gutter">
-				{projects?.length === 0 && <p className="text-body text-muted">No projects yet. Open a folder to start.</p>}
-				{!projects && <p className="text-body text-muted">Reading projects…</p>}
-				{projects && projects.length > 0 && visible.length === 0 && (
-					<p className="text-body text-muted">Nothing matches “{query.trim()}”.</p>
-				)}
-				<ul className="flex flex-col gap-rail-gap">
-					{visible.map(({ project, shown }) => {
-						const isExpanded = project.isAvailable && (expanded.has(project.root) || (needle !== "" && shown.length > 0));
-						const isOpen = project.root === openRoot;
-						return (
-							<li key={project.root}>
-								<div className="group flex items-center gap-rail-gap">
-									<button
-										type="button"
-										onClick={() => (isExpanded && isOpen ? props.onCollapseProject(project.root) : props.onOpenProject(project.root))}
-										disabled={!project.isAvailable}
-										aria-expanded={project.isAvailable ? isExpanded : undefined}
-										title={project.root}
-										className="flex h-group min-w-0 flex-1 items-center gap-stack rounded-control px-rail-gap text-left hover:bg-field disabled:hover:bg-transparent"
-									>
-										<Icon name={isExpanded ? "chevron-down" : "chevron-right"} className="size-icon-sm text-muted" />
-										<Icon name="folder" className={`size-icon ${project.isAvailable ? "text-accent-text" : "text-muted"}`} />
-										<span className={`min-w-0 flex-1 truncate text-heading font-medium ${project.isAvailable ? "text-ink" : "text-muted"}`}>
-											{project.name}
-										</span>
-										{!project.isAvailable && (
-											<span className="inline-flex h-chip-h shrink-0 items-center gap-rail-gap rounded-full bg-issue px-stack text-meta text-issue-text">
-												<Icon name="alert" className="size-icon-sm" />
-												Unavailable
-											</span>
-										)}
-									</button>
-									<button
-										type="button"
-										onClick={() => props.onRemoveProject(project.root)}
-										aria-label={`Remove ${project.name} from the list`}
-										title="Remove from list (the folder stays on disk)"
-										className={ROW_ACTION_CLASS}
-									>
-										<Icon name="close" className="size-icon-sm" />
-									</button>
-								</div>
-								{isExpanded && (
-									<ul className="ml-header-x flex flex-col border-l border-line pl-rail-gap">
-										{shown.map((session) => {
-											const label = statusLabel(session.status);
-											const isCurrent = session.id === sessionId;
-											return (
-												<li key={session.id} className="group flex items-center gap-rail-gap">
-													<button
-														type="button"
-														onClick={() => props.onOpenSession(project.root, session.id)}
-														aria-current={isCurrent}
-														className={`flex h-control min-w-0 flex-1 items-center gap-stack rounded-control px-stack text-left ${
-															isCurrent ? "bg-accent-soft text-accent-text" : "text-copy hover:bg-field"
-														}`}
-													>
-														<span className={`size-port shrink-0 rounded-full ${STATUS_DOTS[session.status] ?? ""}`}>
-															{label && <span className="sr-only">{label}</span>}
-														</span>
-														<span className="min-w-0 flex-1 truncate text-body">{session.title}</span>
-														<span className="shrink-0 text-meta text-muted">{formatTimeAgo(session.updatedAt)}</span>
-													</button>
-													<button
-														type="button"
-														onClick={() => props.onDeleteSession(session)}
-														aria-label={`Delete ${session.title}`}
-														className={ROW_ACTION_CLASS}
-													>
-														<Icon name="trash" className="size-icon-sm" />
-													</button>
-												</li>
-											);
-										})}
-										<li>
-											<button
-												type="button"
-												onClick={() => props.onNewSession(project.root)}
-												className="flex h-control w-full items-center gap-stack rounded-control px-stack text-body text-muted hover:bg-field hover:text-ink"
-											>
-												<Icon name="plus" className="size-icon-sm" />
-												New session
-											</button>
-										</li>
-									</ul>
-								)}
-							</li>
-						);
-					})}
-				</ul>
+				<div className="shrink-0 px-gutter">
+					<label className="flex h-search-h items-center gap-stack rounded-item border border-line-sidebar-field bg-sidebar-field px-card text-body transition-colors focus-within:border-accent">
+						<Icon name="search" className="size-icon text-sidebar-muted" />
+						<span className="sr-only">Search projects</span>
+						<input
+							ref={searchRef}
+							type="search"
+							value={query}
+							onChange={(event) => setQuery(event.target.value)}
+							placeholder="Search…"
+							aria-keyshortcuts="Meta+F Control+F"
+							className="min-w-0 flex-1 bg-transparent text-sidebar-ink outline-none placeholder:text-sidebar-muted"
+						/>
+						<kbd aria-hidden="true" className="shrink-0 font-sans text-section text-sidebar-muted">
+							⌘F
+						</kbd>
+					</label>
+				</div>
+				<nav aria-label="Projects" className="min-h-0 flex-1 overflow-y-auto px-gutter pb-gutter">
+					{!projects && <p className="px-stack pt-card text-body text-sidebar-muted">Reading projects…</p>}
+					{projects?.length === 0 && <p className="px-stack pt-card text-body text-sidebar-muted">No projects yet. Open a folder to start.</p>}
+					{projects && projects.length > 0 && shown.length === 0 && (
+						<p className="px-stack pt-card text-body text-sidebar-muted">Nothing matches “{query.trim()}”.</p>
+					)}
+					<div className="flex flex-col gap-rail-gap">
+						{available.length > 0 && (
+							<ProjectSection
+								title="Projects"
+								projects={available}
+								openRoot={openRoot}
+								onOpenProject={props.onOpenProject}
+								onRemoveProject={props.onRemoveProject}
+							/>
+						)}
+						{unavailable.length > 0 && (
+							<ProjectSection
+								title="Unavailable"
+								projects={unavailable}
+								openRoot={openRoot}
+								onOpenProject={props.onOpenProject}
+								onRemoveProject={props.onRemoveProject}
+							/>
+						)}
+					</div>
+				</nav>
+				<div className="flex h-header shrink-0 items-center justify-between px-footer-x">
+					<button type="button" onClick={props.onChooseFolder} aria-label="Open folder…" title="Open folder…" className={`flex ${ICON_BUTTON_CLASS}`}>
+						<Icon name="folder-plus" />
+					</button>
+					<button
+						type="button"
+						onClick={props.onToggleTheme}
+						aria-label="Dark theme"
+						aria-pressed={isDark}
+						title={isDark ? "Switch to the light theme" : "Switch to the dark theme"}
+						className={`flex ${ICON_BUTTON_CLASS}`}
+					>
+						<Icon name={isDark ? "sun" : "moon"} />
+					</button>
+				</div>
 			</div>
 		</aside>
 	);

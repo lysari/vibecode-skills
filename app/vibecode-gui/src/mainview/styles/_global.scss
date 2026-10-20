@@ -16,6 +16,22 @@
 	:focus-visible {
 		outline: 2px solid var(--accent);
 		outline-offset: 2px;
+		@apply animate-focus-in;
+	}
+
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation-duration: theme("transitionDuration.standard");
+		animation-timing-function: theme("transitionTimingFunction.standard");
+	}
+
+	*,
+	*::before,
+	*::after {
+		@media (prefers-reduced-motion: reduce) {
+			animation-duration: theme("transitionDuration.instant") !important;
+			transition-duration: theme("transitionDuration.instant") !important;
+		}
 	}
 }
 

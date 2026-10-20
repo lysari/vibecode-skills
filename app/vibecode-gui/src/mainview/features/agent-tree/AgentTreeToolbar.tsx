@@ -2,13 +2,14 @@ import { useRef, useState } from "react";
 import type { AgentNode } from "../../../shared/interfaces/run-view.interface";
 import { formatCost } from "../../utils/run-view";
 import { useDismiss } from "../../hooks/use-dismiss";
+import { usePresence } from "../../hooks/use-presence";
 import { Icon } from "../../components/Icon";
 
 const PERCENT = 100;
 const ZOOM_BUTTON_CLASS =
-	"inline-flex h-pill-h items-center justify-center rounded-full border border-line-control bg-card text-ink hover:bg-field disabled:opacity-40";
-const SECONDARY_CLASS = "h-control rounded-full border border-line-control px-card text-body text-ink hover:bg-field";
-const PRIMARY_CLASS = "h-control rounded-full bg-inverse px-card text-body text-on-inverse";
+	"inline-flex h-pill-h items-center justify-center rounded-full border border-line-control bg-card text-ink transition hover:bg-field active:scale-press disabled:opacity-40";
+const SECONDARY_CLASS = "h-control rounded-full border border-line-control px-card text-body text-ink transition hover:bg-field active:scale-press";
+const PRIMARY_CLASS = "h-control rounded-full bg-inverse px-card text-body text-on-inverse transition active:scale-press";
 
 export type TreeZoomChange = "in" | "out" | "fit";
 
@@ -29,11 +30,12 @@ export function AgentTreeToolbar(props: AgentTreeToolbarProps) {
 	const [openPopover, setOpenPopover] = useState<"needs-input" | "failed" | null>(null);
 	const popoverRef = useRef<HTMLDivElement>(null);
 	useDismiss(popoverRef, openPopover !== null, () => setOpenPopover(null));
+	const popover = usePresence(openPopover);
 	const runningCount = agents.filter((agent) => agent.status === "running").length;
 	const totalCost = agents.reduce((total, agent) => total + agent.costUsd, 0);
 	const waiting = agents.filter((agent) => agent.status === "needs-input" && !dismissed.has(agent.id));
 	const failed = agents.filter((agent) => agent.status === "failed" && !dismissed.has(agent.id));
-	const shown = openPopover === "needs-input" ? waiting : openPopover === "failed" ? failed : [];
+	const shown = popover.shown === "needs-input" ? waiting : popover.shown === "failed" ? failed : [];
 
 	function act(action: (agentId: string) => void, agentId: string) {
 		setOpenPopover(null);
@@ -56,10 +58,13 @@ export function AgentTreeToolbar(props: AgentTreeToolbarProps) {
 						type="button"
 						onClick={() => setOpenPopover(openPopover === "needs-input" ? null : "needs-input")}
 						aria-expanded={openPopover === "needs-input"}
-						className="inline-flex h-pill-h items-center gap-rail-gap rounded-full bg-warning-soft px-stack text-warning-text"
+						className="inline-flex h-pill-h animate-pop-in items-center gap-rail-gap rounded-full bg-warning-soft px-stack text-warning-text transition active:scale-press"
 					>
 						{waiting.length} needs you
-						<Icon name={openPopover === "needs-input" ? "chevron-up" : "chevron-down"} className="size-icon-sm" />
+						<Icon
+							name="chevron-down"
+							className={`size-icon-sm transition-transform duration-standard ease-standard ${openPopover === "needs-input" ? "rotate-180" : ""}`}
+						/>
 					</button>
 				)}
 				{failed.length > 0 && (
@@ -67,24 +72,30 @@ export function AgentTreeToolbar(props: AgentTreeToolbarProps) {
 						type="button"
 						onClick={() => setOpenPopover(openPopover === "failed" ? null : "failed")}
 						aria-expanded={openPopover === "failed"}
-						className="inline-flex h-pill-h items-center gap-rail-gap rounded-full bg-issue px-stack text-issue-text"
+						className="inline-flex h-pill-h animate-pop-in items-center gap-rail-gap rounded-full bg-issue px-stack text-issue-text transition active:scale-press"
 					>
 						{failed.length} failed
-						<Icon name={openPopover === "failed" ? "chevron-up" : "chevron-down"} className="size-icon-sm" />
+						<Icon
+							name="chevron-down"
+							className={`size-icon-sm transition-transform duration-standard ease-standard ${openPopover === "failed" ? "rotate-180" : ""}`}
+						/>
 					</button>
 				)}
 				{shown.length > 0 && (
-					<div className="absolute right-0 top-full z-10 mt-rail-gap flex w-dialog flex-col gap-card rounded-card border border-line bg-card p-card shadow-popover">
+					<div
+						{...popover.presence}
+						className="absolute right-0 top-full z-10 mt-rail-gap flex w-dialog origin-top-right flex-col gap-card rounded-card border border-line bg-card p-card shadow-popover data-enter:animate-pop-in data-exit:pointer-events-none data-exit:animate-pop-out"
+					>
 						{shown.map((agent) => (
-							<div key={agent.id} className="flex flex-col gap-stack">
+							<div key={agent.id} className="flex animate-fade-in flex-col gap-stack">
 								<p className="flex gap-stack text-body text-copy">
 									<Icon
-										name={openPopover === "failed" ? "alert" : "chat"}
-										className={`size-icon ${openPopover === "failed" ? "text-issue-text" : "text-warning-text"}`}
+										name={popover.shown === "failed" ? "alert" : "chat"}
+										className={`size-icon ${popover.shown === "failed" ? "text-issue-text" : "text-warning-text"}`}
 									/>
 									<span>
 										<span className="font-medium text-ink">{agent.name}</span>{" "}
-										{openPopover === "failed" ? agent.error : agent.question}
+										{popover.shown === "failed" ? agent.error : agent.question}
 									</span>
 								</p>
 								<div className="flex justify-end gap-stack">
@@ -95,7 +106,7 @@ export function AgentTreeToolbar(props: AgentTreeToolbarProps) {
 									>
 										Dismiss
 									</button>
-									{openPopover === "failed" ? (
+									{popover.shown === "failed" ? (
 										<button type="button" onClick={() => act(onRetry, agent.id)} className={PRIMARY_CLASS}>
 											Retry
 										</button>

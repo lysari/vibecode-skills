@@ -52,11 +52,11 @@ export function Composer(props: ComposerProps) {
 
 	return (
 		<div className="shrink-0 px-header-x pb-header-x pt-stack">
-			<div className="mx-auto flex max-w-thread flex-col gap-stack rounded-node border border-line-control bg-card p-card shadow-card focus-within:border-accent">
+			<div className="mx-auto flex max-w-thread flex-col gap-stack rounded-node border border-line-control bg-card p-card shadow-card transition-colors duration-standard focus-within:border-accent">
 				{(replyTo || choices.skills.length > 0) && (
 					<div className="flex flex-wrap items-center gap-rail-gap">
 						{replyTo && (
-							<span className="inline-flex h-chip-h min-w-0 max-w-full items-center gap-rail-gap rounded-full bg-warning-soft pl-stack pr-rail-gap text-meta text-warning-text">
+							<span className="inline-flex h-chip-h min-w-0 max-w-full animate-fade-in items-center gap-rail-gap rounded-full bg-warning-soft pl-stack pr-rail-gap text-meta text-warning-text">
 								<Icon name="chat" className="size-icon-sm" />
 								<span className="truncate">
 									Replying to <span className="font-medium">{replyTo.name}</span>
@@ -66,7 +66,7 @@ export function Composer(props: ComposerProps) {
 									type="button"
 									onClick={props.onCancelReply}
 									aria-label="Cancel the reply"
-									className="flex size-icon shrink-0 items-center justify-center rounded-full hover:bg-field"
+									className="flex size-icon shrink-0 items-center justify-center rounded-full transition-colors hover:bg-field"
 								>
 									<Icon name="close" className="size-icon-sm" />
 								</button>
@@ -75,14 +75,14 @@ export function Composer(props: ComposerProps) {
 						{choices.skills.map((name) => (
 							<span
 								key={name}
-								className="inline-flex h-chip-h items-center gap-rail-gap rounded-full bg-accent-soft pl-stack pr-rail-gap font-mono text-code text-accent-text"
+								className="inline-flex h-chip-h animate-fade-in items-center gap-rail-gap rounded-full bg-accent-soft pl-stack pr-rail-gap font-mono text-code text-accent-text"
 							>
 								/{name}
 								<button
 									type="button"
 									onClick={() => props.onChoose({ ...choices, skills: choices.skills.filter((other) => other !== name) })}
 									aria-label={`Remove ${name}`}
-									className="flex size-icon items-center justify-center rounded-full hover:bg-field"
+									className="flex size-icon items-center justify-center rounded-full transition-colors hover:bg-field"
 								>
 									<Icon name="close" className="size-icon-sm" />
 								</button>
@@ -114,7 +114,7 @@ export function Composer(props: ComposerProps) {
 							<button
 								type="button"
 								onClick={props.onStop}
-								className="inline-flex h-control items-center gap-rail-gap rounded-full border border-line-control px-card text-body text-ink hover:bg-field"
+								className="inline-flex h-control animate-pop-in items-center gap-rail-gap rounded-full border border-line-control px-card text-body text-ink transition hover:bg-field active:scale-press"
 							>
 								<Icon name="stop" className="size-icon-sm" />
 								Stop
@@ -125,7 +125,7 @@ export function Composer(props: ComposerProps) {
 								type="button"
 								onClick={send}
 								disabled={!canSend}
-								className="inline-flex h-control items-center gap-rail-gap rounded-full bg-inverse px-card text-body text-on-inverse disabled:opacity-40"
+								className="inline-flex h-control items-center gap-rail-gap rounded-full bg-inverse px-card text-body text-on-inverse transition active:scale-press disabled:opacity-40"
 							>
 								<Icon name="send" className="size-icon-sm" />
 								{replyTo ? "Reply" : "Send"}

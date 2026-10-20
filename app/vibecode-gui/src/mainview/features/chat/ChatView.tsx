@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import type { RunView, ThreadItem } from "../../../shared/interfaces/run-view.interface";
 import { Icon } from "../../components/Icon";
 import { ThreadEntry } from "../../components/ThreadEntry";
+import { usePresence } from "../../hooks/use-presence";
 
 const PIN_DISTANCE_PX = 48;
 
@@ -17,6 +18,7 @@ interface ChatViewProps {
 export function ChatView({ thread, view, isRunning, onOpenAgent, onReply, onRetry }: ChatViewProps) {
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [isPinned, setIsPinned] = useState(true);
+	const jump = usePresence(!isPinned);
 	const last = thread[thread.length - 1];
 	const streamingKey = isRunning && last?.kind === "text" ? last.key : null;
 
@@ -31,11 +33,11 @@ export function ChatView({ thread, view, isRunning, onOpenAgent, onReply, onRetr
 	}
 
 	return (
-		<div className="relative min-h-0 flex-1">
+		<div className="relative min-h-0 flex-1 animate-fade-in">
 			<div ref={scrollRef} onScroll={handleScroll} className="h-full overflow-y-auto px-header-x py-header-x">
 				<ol aria-label="Messages" className="mx-auto flex max-w-thread flex-col gap-card">
 					{thread.length === 0 && (
-						<li className="flex flex-col items-center gap-stack py-level text-center">
+						<li className="flex animate-fade-in flex-col items-center gap-stack py-level text-center">
 							<span className="flex size-logo items-center justify-center rounded-logo bg-accent-soft text-accent-text">
 								<Icon name="chat" />
 							</span>
@@ -46,7 +48,7 @@ export function ChatView({ thread, view, isRunning, onOpenAgent, onReply, onRetr
 						</li>
 					)}
 					{thread.map((item) => (
-						<li key={item.key}>
+						<li key={item.key} className="animate-rise-in">
 							<ThreadEntry
 								item={item}
 								view={view}
@@ -59,18 +61,23 @@ export function ChatView({ thread, view, isRunning, onOpenAgent, onReply, onRetr
 					))}
 				</ol>
 			</div>
-			{!isPinned && (
-				<button
-					type="button"
-					onClick={() => {
-						setIsPinned(true);
-						scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-					}}
-					className="absolute bottom-card left-1/2 inline-flex h-control -translate-x-1/2 items-center gap-rail-gap rounded-full border border-line-control bg-card px-card text-body text-ink shadow-popover hover:bg-field"
+			{jump.shown && (
+				<div
+					{...jump.presence}
+					className="pointer-events-none absolute inset-x-0 bottom-card flex origin-bottom justify-center data-enter:animate-pop-in data-exit:animate-pop-out"
 				>
-					<Icon name="chevron-down" className="size-icon-sm" />
-					Jump to latest
-				</button>
+					<button
+						type="button"
+						onClick={() => {
+							setIsPinned(true);
+							scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+						}}
+						className="pointer-events-auto inline-flex h-control items-center gap-rail-gap rounded-full border border-line-control bg-card px-card text-body text-ink shadow-popover transition hover:bg-field active:scale-press"
+					>
+						<Icon name="chevron-down" className="size-icon-sm" />
+						Jump to latest
+					</button>
+				</div>
 			)}
 		</div>
 	);

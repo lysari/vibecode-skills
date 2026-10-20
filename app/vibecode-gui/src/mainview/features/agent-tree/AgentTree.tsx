@@ -34,9 +34,9 @@ function AgentCard({ agent, isRoot, isSelected, isCollapsed, onToggle, onSelect 
 	return (
 		<div
 			data-agent-id={agent.id}
-			className={`relative w-node scroll-m-card rounded-node bg-card p-node-pad shadow-node motion-safe:animate-node-in ${
+			className={`relative w-node scroll-m-card animate-rise-in rounded-node bg-card p-node-pad shadow-node outline outline-selected outline-offset-selected transition-colors duration-standard ease-standard ${
 				isRoot ? "border-selected border-accent" : "border border-line-card"
-			} ${isSelected ? "outline outline-selected outline-offset-selected outline-accent" : ""}`}
+			} ${isSelected ? "outline-accent" : "outline-transparent"}`}
 		>
 			<button
 				type="button"
@@ -74,15 +74,18 @@ function AgentCard({ agent, isRoot, isSelected, isCollapsed, onToggle, onSelect 
 						onClick={onToggle}
 						aria-expanded={!isCollapsed}
 						aria-label={`${isCollapsed ? "Show" : "Hide"} ${children.length} sub-${children.length === 1 ? "agent" : "agents"}`}
-						className="inline-flex h-chip-h items-center gap-rail-gap rounded-full px-rail-gap hover:bg-field"
+						className="inline-flex h-chip-h items-center gap-rail-gap rounded-full px-rail-gap transition hover:bg-field active:scale-press"
 					>
 						{isCollapsed ? `+${children.length}` : children.length}
-						<Icon name={isCollapsed ? "chevron-right" : "chevron-down"} className="size-icon-sm" />
+						<Icon
+							name="chevron-down"
+							className={`size-icon-sm transition-transform duration-standard ease-standard ${isCollapsed ? "-rotate-90" : ""}`}
+						/>
 					</button>
 				)}
 			</div>
 			{children.length > 0 && !isCollapsed && (
-				<span className="absolute bottom-0 left-port-x size-port translate-y-1/2 rounded-full border-selected border-connector bg-canvas" />
+				<span className="absolute bottom-0 left-port-x size-port translate-y-1/2 animate-fade-in rounded-full border-selected border-connector bg-canvas" />
 			)}
 		</div>
 	);
@@ -240,7 +243,7 @@ export function AgentTree({ run, root, selectedId, onSelect, onReply, onRetry }:
 								))}
 							</div>
 						)}
-						{root.children.length === 0 && <p className="mt-level text-body text-muted">No sub-agents yet.</p>}
+						{root.children.length === 0 && <p className="mt-level animate-fade-in text-body text-muted">No sub-agents yet.</p>}
 					</div>
 				</div>
 			</div>

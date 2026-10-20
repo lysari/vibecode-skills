@@ -9,7 +9,6 @@ const STATUS_EVENTS = new Set<RunEvent["type"]>(["run.started", "run.finished", 
 export function useWorkspace(runRequest: (failure: string, request: () => Promise<void>) => Promise<boolean>) {
 	const [workspace, setWorkspace] = useState<Workspace | null>(null);
 	const [sessions, setSessions] = useState<Record<string, SessionSummary[]>>({});
-	const [expanded, setExpanded] = useState<Set<string>>(new Set());
 	const [session, setSession] = useState<Session | null>(null);
 	const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
 	const [replyToId, setReplyToId] = useState<string | null>(null);
@@ -27,7 +26,6 @@ export function useWorkspace(runRequest: (failure: string, request: () => Promis
 	}
 
 	async function enterProject(root: string) {
-		setExpanded((current) => new Set(current).add(root));
 		const [latest] = await refreshSessions(root);
 		showSession(latest ? await skillsApi.readSession({ projectRoot: root, id: latest.id }) : await skillsApi.createSession({ projectRoot: root }));
 		if (!latest) await refreshSessions(root);
@@ -77,12 +75,6 @@ export function useWorkspace(runRequest: (failure: string, request: () => Promis
 		});
 	}
 
-	function collapseProject(root: string) {
-		const next = new Set(expanded);
-		next.delete(root);
-		setExpanded(next);
-	}
-
 	function openSession(root: string, id: string) {
 		runRequest("Could not open the session", async () => {
 			await switchProject(root);
@@ -97,7 +89,6 @@ export function useWorkspace(runRequest: (failure: string, request: () => Promis
 		}
 		runRequest("Could not start a session", async () => {
 			await switchProject(root);
-			setExpanded((current) => new Set(current).add(root));
 			showSession(await skillsApi.createSession({ projectRoot: root }));
 			await refreshSessions(root);
 		});
@@ -129,7 +120,6 @@ export function useWorkspace(runRequest: (failure: string, request: () => Promis
 	return {
 		workspace,
 		sessions,
-		expanded,
 		session,
 		selectedAgentId,
 		replyToId,
@@ -142,7 +132,6 @@ export function useWorkspace(runRequest: (failure: string, request: () => Promis
 		openProject,
 		chooseProject,
 		removeProject,
-		collapseProject,
 		openSession,
 		newSession,
 		deleteSession,

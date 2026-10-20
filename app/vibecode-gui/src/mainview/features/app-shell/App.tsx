@@ -10,8 +10,9 @@ import { Dialog } from "../../components/Dialog";
 import { Header } from "./Header";
 import { Icon } from "../../components/Icon";
 import { Projects } from "../projects/Projects";
-import { Rail } from "./Rail";
+import { Sessions } from "../projects/Sessions";
 import { buildThread } from "../../utils/run-view";
+import { usePresence } from "../../hooks/use-presence";
 import type { SessionView } from "./session-view";
 import { useError } from "./use-error";
 import { useRun } from "./use-run";
@@ -25,7 +26,6 @@ export function App() {
 	const {
 		workspace,
 		sessions,
-		expanded,
 		session,
 		selectedAgentId,
 		replyToId,
@@ -38,7 +38,6 @@ export function App() {
 		openProject,
 		chooseProject,
 		removeProject,
-		collapseProject,
 		openSession,
 		newSession,
 		deleteSession,
@@ -58,8 +57,11 @@ export function App() {
 	});
 	const { isDark, setIsDark } = useTheme();
 	const [view, setView] = useState<SessionView>("chat");
-	const [isPanelOpen, setIsPanelOpen] = useState(true);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 	const [dialog, setDialog] = useState<DialogState>(null);
+	const banner = usePresence(error);
+	const drawer = usePresence(view === "tree" && selectedAgent);
+	const { shown: shownDialog, presence: dialogPresence } = usePresence(dialog);
 
 	const project = workspace?.project ?? null;
 	const skills = project?.skills ?? [];
@@ -83,55 +85,57 @@ export function App() {
 	}
 
 	return (
-		<div className="flex h-dvh w-full overflow-hidden bg-surface text-ink">
-			<Rail
-				isPanelOpen={isPanelOpen}
+		<div className="flex h-dvh w-full animate-fade-in overflow-hidden bg-surface text-ink">
+			<Projects
+				isSidebarOpen={isSidebarOpen}
+				projects={workspace?.projects ?? null}
+				openRoot={project?.root ?? null}
 				isDark={isDark}
-				onTogglePanel={() => setIsPanelOpen(!isPanelOpen)}
-				onNewSession={() => newSession(project?.root ?? null)}
+				onHideSidebar={() => setIsSidebarOpen(false)}
 				onToggleTheme={() => setIsDark(!isDark)}
+				onChooseFolder={chooseProject}
+				onOpenProject={openProject}
+				onRemoveProject={removeProject}
 			/>
-			{isPanelOpen && (
-				<Projects
-					projects={workspace?.projects ?? null}
+			{workspace && (
+				<Sessions
+					project={isSidebarOpen ? project : null}
 					sessions={sessions}
-					expanded={expanded}
-					openRoot={project?.root ?? null}
 					sessionId={session?.id ?? null}
-					onChooseFolder={chooseProject}
-					onOpenProject={openProject}
-					onCollapseProject={collapseProject}
-					onRemoveProject={removeProject}
 					onOpenSession={openSession}
 					onNewSession={newSession}
 					onDeleteSession={(target) => setDialog({ kind: "delete", session: target })}
 				/>
 			)}
 			<div className="flex min-w-0 flex-1 flex-col">
-				{session && (
-					<Header
-						projectName={project?.name ?? ""}
-						title={session.title}
-						view={view}
-						onView={setView}
-						onRename={renameSession}
-					/>
-				)}
-				{error && (
-					<p role="alert" className="flex items-center gap-stack bg-issue px-header-x py-rail-gap text-meta text-issue-text">
-						{error}
-						<button type="button" onClick={() => setError(null)} className="ml-auto underline">
+				<Header
+					projectName={project?.name ?? null}
+					title={session?.title ?? null}
+					view={view}
+					isSidebarOpen={isSidebarOpen}
+					onShowSidebar={() => setIsSidebarOpen(true)}
+					onView={setView}
+					onRename={renameSession}
+				/>
+				{banner.shown && (
+					<p
+						{...banner.presence}
+						role="alert"
+						className="flex items-center gap-stack bg-issue px-header-x py-rail-gap text-meta text-issue-text data-enter:animate-drop-in data-exit:animate-fade-out"
+					>
+						{banner.shown}
+						<button type="button" onClick={() => setError(null)} className="ml-auto underline transition-opacity hover:opacity-60">
 							Dismiss
 						</button>
 					</p>
 				)}
 				{!session && (
-					<div className="flex flex-1 flex-col items-center justify-center gap-card bg-canvas bg-dots text-body text-muted">
+					<div className="flex flex-1 animate-fade-in flex-col items-center justify-center gap-card bg-canvas bg-dots text-body text-muted">
 						<p>{project ? "No session open." : "Open a project folder to start a session."}</p>
 						<button
 							type="button"
 							onClick={() => newSession(project?.root ?? null)}
-							className="inline-flex h-control items-center gap-rail-gap rounded-full bg-inverse px-node-pad text-body text-on-inverse"
+							className="inline-flex h-control items-center gap-rail-gap rounded-full bg-inverse px-node-pad text-body text-on-inverse transition active:scale-press"
 						>
 							<Icon name={project ? "plus" : "folder"} className="size-icon-sm" />
 							{project ? "New session" : "Open folder…"}
@@ -152,7 +156,7 @@ export function App() {
 								/>
 							)}
 							{view === "tree" && treeRun && treeRoot && (
-								<div className="min-h-0 flex-1">
+								<div className="min-h-0 flex-1 animate-fade-in">
 									<AgentTree
 										run={treeRun}
 										root={treeRoot}
@@ -164,7 +168,7 @@ export function App() {
 								</div>
 							)}
 							{view === "tree" && !treeRoot && (
-								<p className="flex flex-1 items-center justify-center bg-dots text-body text-muted">
+								<p className="flex flex-1 animate-fade-in items-center justify-center bg-dots text-body text-muted">
 									Send a message to start a run; its agents show here.
 								</p>
 							)}
@@ -182,11 +186,12 @@ export function App() {
 								onCancelReply={() => setReplyToId(null)}
 							/>
 						</main>
-						{view === "tree" && selectedAgent && (
+						{drawer.shown && (
 							<AgentDrawer
-								agent={selectedAgent}
-								thread={buildThread(session, runView, selectedAgent.id)}
+								agent={drawer.shown}
+								thread={buildThread(session, runView, drawer.shown.id)}
 								view={runView}
+								presence={drawer.presence}
 								onClose={() => setSelectedAgentId(null)}
 								onSelect={setSelectedAgentId}
 								onReply={reply}
@@ -196,12 +201,13 @@ export function App() {
 					</div>
 				)}
 			</div>
-			{dialog?.kind === "delete" && (
+			{shownDialog?.kind === "delete" && (
 				<Dialog
-					title={`Delete “${dialog.session.title}”?`}
+					title={`Delete “${shownDialog.session.title}”?`}
 					confirmLabel="Delete session"
 					isDanger
-					onConfirm={() => confirmDelete(dialog.session)}
+					presence={dialogPresence}
+					onConfirm={() => confirmDelete(shownDialog.session)}
 					onCancel={() => setDialog(null)}
 				>
 					<p>This deletes the session&apos;s messages and run history from the app. Files in the project are not changed.</p>

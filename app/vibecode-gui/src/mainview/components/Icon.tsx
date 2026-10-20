@@ -7,10 +7,10 @@ const ICON_PATHS = {
 			<path d="M17 15v-3a3 3 0 0 0-3-3h-3" />
 		</>
 	),
-	projects: (
+	sidebar: (
 		<>
-			<path d="M8 5h3l2 2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
-			<path d="M3 9v9a2 2 0 0 0 2 2h11" />
+			<rect x="3" y="4" width="18" height="16" rx="2" />
+			<path d="M9 4v16" />
 		</>
 	),
 	skills: (
@@ -41,7 +41,6 @@ const ICON_PATHS = {
 	moon: <path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" />,
 	"chevron-down": <path d="M6 9l6 6 6-6" />,
 	"chevron-up": <path d="M18 15l-6-6-6 6" />,
-	"chevron-right": <path d="M9 18l6-6-6-6" />,
 	search: (
 		<>
 			<circle cx="11" cy="11" r="7" />
@@ -49,6 +48,12 @@ const ICON_PATHS = {
 		</>
 	),
 	folder: <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />,
+	"folder-plus": (
+		<>
+			<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+			<path d="M12 10v6M9 13h6" />
+		</>
+	),
 	map: (
 		<>
 			<rect x="9" y="3" width="6" height="5" rx="1" />
