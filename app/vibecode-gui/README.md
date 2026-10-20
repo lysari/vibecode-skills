@@ -23,7 +23,7 @@ Both live in the app's user data folder (Electrobun's `Utils.paths.userData`), e
 
 ### Agent runner
 
-`src/shared/run.interface.ts` defines the contract a runner implements:
+`src/shared/interfaces/run.interface.ts` defines the contract a runner implements:
 
 ```ts
 interface AgentRunner {
@@ -86,7 +86,8 @@ When you run `hutch run dev` (without HMR):
 │   │   ├── mock-agent-runner.ts # The mocked AgentRunner
 │   │   ├── skills.ts            # Library skill discovery, install status and install, restricted to the project and library folders
 │   │   └── workspace.ts         # Projects store: recent projects, open project, library folder
-│   ├── shared/                  # Project, skill, session, run and RPC types, used by both processes
+│   ├── shared/
+│   │   └── interfaces/          # Project, skill, session, run and RPC types, used by both processes
 │   └── mainview/
 │       ├── App.tsx              # App state and layout shell
 │       ├── rpc.ts               # Electroview RPC client and the run event subscription

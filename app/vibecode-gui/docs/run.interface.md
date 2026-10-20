@@ -1,6 +1,6 @@
 # Run types
 
-## `src/shared/run.interface.ts`
+## `src/shared/interfaces/run.interface.ts`
 
 The contract between a session and the agent runner, used by both the main process and the webview.
 

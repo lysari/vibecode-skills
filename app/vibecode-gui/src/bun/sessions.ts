@@ -2,8 +2,8 @@ import { createHash, randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { AGENT_STATUSES, RUN_END_STATUSES, type AgentStatus, type RunEndStatus, type RunEvent } from "../shared/run.interface";
-import type { ChatMessage, Session, SessionStatus, SessionSummary } from "../shared/session.interface";
+import { AGENT_STATUSES, RUN_END_STATUSES, type AgentStatus, type RunEndStatus, type RunEvent } from "../shared/interfaces/run.interface";
+import type { ChatMessage, Session, SessionStatus, SessionSummary } from "../shared/interfaces/session.interface";
 
 export const DEFAULT_TITLE = "New session";
 const TITLE_LENGTH = 60;

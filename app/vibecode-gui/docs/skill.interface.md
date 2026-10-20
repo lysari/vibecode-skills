@@ -1,6 +1,6 @@
 # Skill types
 
-## `src/shared/skill.interface.ts`
+## `src/shared/interfaces/skill.interface.ts`
 
 Used by both the main process and the webview.
 

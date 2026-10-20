@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { AGENT_CLIS, type AgentRunner, type RunEvent } from "../shared/run.interface";
-import type { Session, SessionChoices, SessionSummary } from "../shared/session.interface";
-import type { RunEventMessage } from "../shared/skills-rpc.interface";
+import { AGENT_CLIS, type AgentRunner, type RunEvent } from "../shared/interfaces/run.interface";
+import type { Session, SessionChoices, SessionSummary } from "../shared/interfaces/session.interface";
+import type { RunEventMessage } from "../shared/interfaces/skills-rpc.interface";
 import {
 	createSession,
 	DEFAULT_TITLE,

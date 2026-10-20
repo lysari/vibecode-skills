@@ -1,6 +1,6 @@
 # Session types
 
-## `src/shared/session.interface.ts`
+## `src/shared/interfaces/session.interface.ts`
 
 Used by both the main process and the webview.
 

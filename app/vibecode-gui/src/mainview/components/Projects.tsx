@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Project } from "../../shared/project.interface";
-import type { SessionStatus, SessionSummary } from "../../shared/session.interface";
+import type { Project } from "../../shared/interfaces/project.interface";
+import type { SessionStatus, SessionSummary } from "../../shared/interfaces/session.interface";
 import { formatTimeAgo } from "../time-ago";
 import { Icon } from "./Icon";
 import { AGENT_STATUS_STYLES } from "./StatusPill";

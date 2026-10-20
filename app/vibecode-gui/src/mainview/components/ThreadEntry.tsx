@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { UserMessage } from "../../shared/session.interface";
+import type { UserMessage } from "../../shared/interfaces/session.interface";
 import { formatCost, formatDuration, type RunView, type ThreadItem, type ToolItem } from "../run-view";
 import { Icon } from "./Icon";
 import { Markdown } from "./Markdown";

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { buildRunView, buildThread, formatCost, formatDuration, listTreeAgents } from "../../src/mainview/run-view";
-import type { RunEvent } from "../../src/shared/run.interface";
-import type { Session } from "../../src/shared/session.interface";
+import type { RunEvent } from "../../src/shared/interfaces/run.interface";
+import type { Session } from "../../src/shared/interfaces/session.interface";
 
 const events: RunEvent[] = [
 	{ type: "run.started", runId: "r1", at: 10 },

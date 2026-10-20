@@ -13,7 +13,7 @@ import {
 	titleFromText,
 	writeSession,
 } from "../../src/bun/sessions";
-import type { Session } from "../../src/shared/session.interface";
+import type { Session } from "../../src/shared/interfaces/session.interface";
 
 const PROJECT = "/projects/app";
 let sessionsRoot = "";

@@ -1,4 +1,4 @@
-import type { Skill } from "../../shared/skill.interface";
+import type { Skill } from "../../shared/interfaces/skill.interface";
 import { Icon } from "./Icon";
 
 interface InstallBadgeProps {

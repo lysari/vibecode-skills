@@ -1,7 +1,7 @@
 import { existsSync, realpathSync } from "node:fs";
 import { cp, mkdir, readFile, readdir } from "node:fs/promises";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import type { Skill, SkillInstall } from "../shared/skill.interface";
+import type { Skill, SkillInstall } from "../shared/interfaces/skill.interface";
 
 const SKILL_FILE = "SKILL.md";
 const DEFAULT_SOURCE = join(".claude", "skills");

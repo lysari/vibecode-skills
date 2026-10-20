@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import type { Workspace } from "../shared/project.interface";
-import { AGENT_CLIS, type RunEvent } from "../shared/run.interface";
-import type { Session, SessionChoices, SessionSummary } from "../shared/session.interface";
-import type { Skill } from "../shared/skill.interface";
+import type { Workspace } from "../shared/interfaces/project.interface";
+import { AGENT_CLIS, type RunEvent } from "../shared/interfaces/run.interface";
+import type { Session, SessionChoices, SessionSummary } from "../shared/interfaces/session.interface";
+import type { Skill } from "../shared/interfaces/skill.interface";
 import { AgentDrawer } from "./components/AgentDrawer";
 import { AgentTree } from "./components/AgentTree";
 import { ChatView } from "./components/ChatView";

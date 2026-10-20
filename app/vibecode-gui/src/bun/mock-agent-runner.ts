@@ -5,7 +5,7 @@ import {
 	type RunEvent,
 	type RunEventBody,
 	type RunRequest,
-} from "../shared/run.interface";
+} from "../shared/interfaces/run.interface";
 
 export interface RunnerClock {
 	now(): number;

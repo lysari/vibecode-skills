@@ -1,5 +1,5 @@
-import type { AgentStatus, RunEndStatus, RunEvent } from "../shared/run.interface";
-import type { Session, UserMessage } from "../shared/session.interface";
+import type { AgentStatus, RunEndStatus, RunEvent } from "../shared/interfaces/run.interface";
+import type { Session, UserMessage } from "../shared/interfaces/session.interface";
 
 const SECOND_MS = 1000;
 const MINUTE_SECONDS = 60;

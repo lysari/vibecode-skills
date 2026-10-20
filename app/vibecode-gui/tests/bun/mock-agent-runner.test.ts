@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { MockAgentRunner, type RunnerClock } from "../../src/bun/mock-agent-runner";
-import type { AgentStatus, RunEvent, RunRequest } from "../../src/shared/run.interface";
+import type { AgentStatus, RunEvent, RunRequest } from "../../src/shared/interfaces/run.interface";
 
 const SEED_SEARCH = 200;
 

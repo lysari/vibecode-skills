@@ -1,6 +1,6 @@
 # Project types
 
-## `src/shared/project.interface.ts`
+## `src/shared/interfaces/project.interface.ts`
 
 Used by both the main process and the webview.
 

@@ -6,8 +6,8 @@ import { join } from "node:path";
 import { Chat } from "../../src/bun/chat";
 import { readSession, writeSession } from "../../src/bun/sessions";
 import type { SkillRoots } from "../../src/bun/skills";
-import type { AgentRunner, RunEvent, RunRequest } from "../../src/shared/run.interface";
-import type { RunEventMessage } from "../../src/shared/skills-rpc.interface";
+import type { AgentRunner, RunEvent, RunRequest } from "../../src/shared/interfaces/run.interface";
+import type { RunEventMessage } from "../../src/shared/interfaces/skills-rpc.interface";
 
 class StubRunner implements AgentRunner {
 	readonly started: { request: RunRequest; emit: (event: RunEvent) => void }[] = [];

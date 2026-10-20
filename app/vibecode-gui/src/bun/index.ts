@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { BrowserView, BrowserWindow, Updater, Utils } from "electrobun/main";
-import type { SkillsRPC } from "../shared/skills-rpc.interface";
+import type { SkillsRPC } from "../shared/interfaces/skills-rpc.interface";
 import { Chat } from "./chat";
 import { MockAgentRunner } from "./mock-agent-runner";
 import { installSkill } from "./skills";

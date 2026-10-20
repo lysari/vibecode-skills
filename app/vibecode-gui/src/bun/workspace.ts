@@ -1,7 +1,7 @@
 import { existsSync, realpathSync, statSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { basename, dirname } from "node:path";
-import type { Project, Workspace } from "../shared/project.interface";
+import type { Project, Workspace } from "../shared/interfaces/project.interface";
 import { defaultLibraryRoot, listSkills, type SkillRoots } from "./skills";
 
 interface StoredProject {

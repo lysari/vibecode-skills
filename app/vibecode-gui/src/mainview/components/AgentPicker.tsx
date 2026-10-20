@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { AGENT_CLIS } from "../../shared/run.interface";
-import type { Skill } from "../../shared/skill.interface";
+import { AGENT_CLIS } from "../../shared/interfaces/run.interface";
+import type { Skill } from "../../shared/interfaces/skill.interface";
 import { useDismiss } from "../use-dismiss";
 import { Icon } from "./Icon";
 

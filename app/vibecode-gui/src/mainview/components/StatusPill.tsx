@@ -1,4 +1,4 @@
-import type { AgentStatus } from "../../shared/run.interface";
+import type { AgentStatus } from "../../shared/interfaces/run.interface";
 import { Icon, type IconName } from "./Icon";
 
 interface StatusStyle {
