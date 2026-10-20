@@ -4,9 +4,19 @@ Apply these on top of the generic rules when the project root has an `angular.js
 
 ## Directory structure
 - Organize the application under `src/app/` into `core/`, `shared/`, and `features/`; never place feature components, pages, or domain logic in a flat `src/app/components/` directory or loose in `src/app/`.
-- Put singleton services, guards, interceptors, and app-wide infrastructure in `src/app/core/`, e.g. `src/app/core/services/auth.service.ts`.
-- Put reusable UI primitives (buttons, inputs, dialogs), shared pipes, and directives in `src/app/shared/components/`, `src/app/shared/pipes/`, or `src/app/shared/directives/`; never put domain-specific business components in `shared/`.
-- Put each domain or page in its own folder under `src/app/features/<feature>/` containing its private components, services, models, and route definitions, e.g. `src/app/features/checkout/components/order-summary/order-summary.ts`.
+- Put singleton infrastructure services, guards, interceptors, and app configuration in `src/app/core/`, e.g. `src/app/core/services/token.service.ts`.
+- Put reusable UI primitives (buttons, inputs, dialogs), shared pipes, directives, and cross-feature global stores in `src/app/shared/components/`, `src/app/shared/pipes/`, `src/app/shared/directives/`, or `src/app/shared/stores/`, e.g. `src/app/shared/stores/session.store.ts`; never put domain-specific business components in `shared/`.
+- Structure each feature module under `src/app/features/<feature>/` into `pages/`, `components/`, `stores/`, `services/`, and route definitions:
+  - `pages/` holds route-level screen components, e.g. `src/app/features/billing/pages/invoice-list.page.ts`.
+  - `stores/` holds feature reactive state and signals, e.g. `src/app/features/billing/stores/invoice.store.ts`.
+  - `components/` holds private presentational subcomponents, e.g. `src/app/features/billing/components/invoice-row.component.ts`.
+  - `services/` holds API clients and data communication, e.g. `src/app/features/billing/services/invoice-api.service.ts`.
+
+## Data flow (pages > stores > services)
+- Enforce the unidirectional data flow: `pages > stores > services`.
+- Inject and read stores from page and component files; never inject or call API data services directly inside a component or page template.
+- Write business logic, reactive state transitions, and asynchronous coordination inside stores; stores call services to perform HTTP requests or storage operations.
+- Restrict API services to HTTP calls, payload serialization, and endpoint contracts; never store reactive state or signals in an API service.
 
 ## Forms
 - Write every fixed form field as its own control in the template and its own entry in the form definition. Do not generate fixed fields from a config array with `@for`.
