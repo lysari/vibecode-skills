@@ -2,14 +2,14 @@
 name: vibecode-init
 description: Use when onboarding an existing or new project to the Vibecode ecosystem, to inspect repository architecture, code styles, path aliases, shared helpers, and test tooling, generate a tailored .claude/project-rules.md, and configure AGENTS.md to enforce /vibecode-workflow across all AI tools
 metadata:
-  version: "0.0.1-20261019.2"
+  version: "0.0.1-20261020.2"
 ---
 
 # Vibecode Init
 
 ## Overview
 
-Profile an existing or new repository and generate a tailored `.claude/project-rules.md` file. In addition, configure the root `AGENTS.md` to enforce the `/vibecode-workflow` skill for all coding tasks, and safely point auxiliary client files (`CLAUDE.md`, `GEMINI.md`) to `AGENTS.md`. This establishes a unified, project-specific contract that ensures all AI tools adapt faithfully to the project's existing architecture and idioms without breaking legacy conventions.
+Profile an existing or new repository and generate a tailored `.claude/project-rules.md` file. In addition, configure the root `AGENTS.md` to enforce the `/vibecode-workflow` skill for all coding tasks, and safely point auxiliary client files (`CLAUDE.md`, `GEMINI.md`) to `AGENTS.md`. This establishes a unified, project-specific contract that all AI tools follow. For every place the project differs from the Vibecode rules, the contract records the user's answer: keep the project's current way, or change it to follow the rule.
 
 Vibecode skills treat `.claude/project-rules.md` and `AGENTS.md` as higher precedence than all generic and framework rules. Generating these files upfront is the primary safeguard when introducing Vibecode to legacy or established repositories.
 
@@ -81,6 +81,24 @@ Inspect scripts in the manifest to document standard verification commands:
 
 ---
 
+## Compare With Vibecode Rules & Ask the User
+
+After profiling, and before drafting anything:
+
+1. Ask the user one question first: "Keep this project's current structure and conventions, or restructure it to follow the Vibecode rules?", with the options "Keep current (adapt the rules to this project)" and "Restructure to follow Vibecode".
+2. **Keep current**: ask nothing more. Record each observed pattern as the project's rule, record the choice under "Decisions", and go on to drafting.
+3. **Restructure**: compare and ask about each difference.
+   - Read `vibecode/SKILL.md`, every file under `vibecode/references/`, the framework files whose row matches the project, and `vibecode-design/SKILL.md` when the project has a UI.
+   - List each place the project differs from a rule, e.g. folder structure, shared code layout, naming, where tests, types or docs live. For each difference, record the rule (`file:line`) and what the project does (real paths).
+   - Also list each place where the rules are silent and the project made its own choice, e.g. a folder name the rules do not set.
+   - Ask the user about every item, e.g. "Tests live beside the source files: keep them there, or move them to a mirrored test folder?". Ask in batches of up to 4 questions until every item has an answer.
+   - Give every question a "Keep current" option. Put the recommended option first and mark it "(Recommended)"; never drop "Keep current" from a question.
+   - Never draft or write `.claude/project-rules.md` before every item has an answer.
+4. When `.claude/project-rules.md` already exists, read it first, keep every answer listed under its "Decisions", and ask only the questions it does not answer, the first question included.
+5. Init never moves or rewrites project code. Record each "change" answer as a rule and list the moves it needs under "Pending Restructure", then offer to run that restructure as a separate task.
+
+---
+
 ## Output Template for `.claude/project-rules.md`
 
 Generate `.claude/project-rules.md` using this standard structure, populated with project facts:
@@ -125,7 +143,15 @@ Generate `.claude/project-rules.md` using this standard structure, populated wit
 - Typecheck: `<typecheck-command>`
 - Test: `<test-command>`
 - Build: `<build-command>`
+
+## Decisions
+- <topic>: keep `<project way>` | follow `<vibecode rule>` (`<rule file:line>`), answered <YYYY-MM-DD>
+
+## Pending Restructure
+- <move or rename needed by a "follow" decision>, e.g. `<old path>` → `<new path>`
 ```
+
+Write every section above from the user's answers and observed facts. Remove "Pending Restructure" once its moves are done.
 
 ---
 
@@ -160,10 +186,12 @@ Different AI tools look for specific root instruction files. Unify them by refer
 ## Workflow & User Safeguards
 
 1. **Perform read-only scan**: Never alter project files during profiling.
-2. **Draft project rules**: Populate the template based strictly on observed repository patterns.
-3. **Present to the user**: Show the detected profile, proposed `.claude/project-rules.md`, and planned `AGENTS.md` directives to the user for review.
-4. **Write `.claude/project-rules.md`**: Create `.claude/` if needed and write the project rules.
-5. **Update or create `AGENTS.md`**: Add the `/vibecode-workflow` directive.
-6. **Link auxiliary files (`CLAUDE.md`, `GEMINI.md`)**: Safely reference `@AGENTS.md` without clobbering existing content.
-7. **Verify with Git**: Run `git status -s` to confirm only the intended instruction and rule files were touched.
+2. **Ask keep or restructure**: Follow "Compare With Vibecode Rules & Ask the User". On "Keep current", go straight to drafting; on "Restructure", ask until every difference has an answer.
+3. **Draft project rules**: Populate the template from observed repository patterns and the user's answers.
+4. **Present to the user**: Show the detected profile, proposed `.claude/project-rules.md`, and planned `AGENTS.md` directives to the user for review.
+5. **Write `.claude/project-rules.md`**: Create `.claude/` if needed and write the project rules.
+6. **Update or create `AGENTS.md`**: Add the `/vibecode-workflow` directive.
+7. **Link auxiliary files (`CLAUDE.md`, `GEMINI.md`)**: Safely reference `@AGENTS.md` without clobbering existing content.
+8. **Verify with Git**: Run `git status -s` to confirm only the intended instruction and rule files were touched.
+9. **Offer the restructure**: When "Pending Restructure" lists moves, offer to run them as a separate task.
 

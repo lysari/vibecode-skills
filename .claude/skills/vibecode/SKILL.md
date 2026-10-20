@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, or adding features to a project, so changes stay clean, minimal, and easy to maintain
 metadata:
-  version: "0.0.1-20261020.2"
+  version: "0.0.1-20261020.3"
 ---
 
 # Vibecode
@@ -42,7 +42,13 @@ With no matching row, apply only the generic rules and the references below. A t
 
 ## Project rules
 
-When the project has a `.claude/project-rules.md`, read it after the framework files. It holds that project's own folders, aliases, helpers and tools, and wins over the framework files where they differ. When the project does not have one, run or consult `vibecode-init` to profile the repository and generate it.
+When the project has a `.claude/project-rules.md`, read it after the framework files and follow it. It holds that project's own folders, aliases, helpers and tools, and wins over the framework files where they differ.
+
+When the project has no `.claude/project-rules.md`, do not start the task yet:
+
+- Run `vibecode-init`. It first asks the user to keep the project's current structure or restructure it to follow these rules, and on "restructure" asks about each difference, always with a "Keep current" option.
+- Never generate the file without the user's answers.
+- Start the task only after the file exists, and follow it.
 
 ## Existing code
 
