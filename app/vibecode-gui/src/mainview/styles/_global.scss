@@ -20,8 +20,6 @@
 }
 
 @layer components {
-	/* Agent tree: a card's port drops a trunk, and its sub-agents hang off the trunk on elbow connectors.
-	   The port sits inside the card's border, so the trunk is offset by that border too: the default border on a sub-agent card, the selected border on the orchestrator. */
 	.map-branch {
 		margin-left: calc(
 			theme("borderWidth.DEFAULT") + theme("spacing.port-x") + theme("spacing.port") / 2 - theme("borderWidth.selected") / 2
@@ -54,13 +52,11 @@
 			}
 		}
 
-		/* The orchestrator's sub-agents, wrapped into rows that share column widths. */
 		&.map-rows {
 			margin-left: calc(theme("spacing.port-x") + theme("spacing.port") / 2 + theme("borderWidth.selected") / 2);
 			display: grid;
 			column-gap: theme("spacing.column");
 
-			/* A row's elbow runs on as a bus along the top of its columns and across the gaps; each card drops from it. */
 			.map-row {
 				display: grid;
 				grid-column: 1 / -1;
@@ -107,7 +103,6 @@
 		}
 	}
 
-	/* The caret after assistant text that is still streaming in. */
 	.streaming {
 		.markdown > :last-child::after {
 			content: "";

@@ -9,13 +9,9 @@ interface StoredProject {
 	openedAt: number;
 }
 
-/** The app's projects store, a JSON file in its user data folder. */
 interface ProjectsStore {
-	/** The library folder chosen in Settings; null uses the default. */
 	libraryRoot: string | null;
-	/** The project open now, reopened on launch. */
 	openRoot: string | null;
-	/** Most recently opened first. */
 	projects: StoredProject[];
 }
 
@@ -58,7 +54,6 @@ function readLibraryRoot(store: ProjectsStore): string | null {
 	return store.libraryRoot ?? defaultLibraryRoot;
 }
 
-/** The open project and the library, for checking every path a request reads or writes. */
 export async function readRoots(storePath: string): Promise<SkillRoots> {
 	const store = await readStore(storePath);
 	if (!store.openRoot || !isFolder(store.openRoot)) throw new Error("Open a project folder first.");
@@ -69,7 +64,6 @@ function summarize({ root, openedAt }: StoredProject): Project {
 	return { root, name: basename(root), openedAt, isAvailable: isFolder(root) };
 }
 
-/** Checks that a folder is in the recent projects list before its sessions are read or changed. */
 export async function assertRecentProject(storePath: string, root: string): Promise<void> {
 	const store = await readStore(storePath);
 	if (!store.projects.some((project) => project.root === root)) throw new Error(`Not a recent project: ${root}`);
@@ -100,7 +94,6 @@ export async function openProject(storePath: string, root: string): Promise<Work
 	return readWorkspace(storePath);
 }
 
-/** Removes a project from the recent list; its folder on disk is left as it is. */
 export async function removeProject(storePath: string, root: string): Promise<Workspace> {
 	const store = await readStore(storePath);
 	await writeStore(storePath, {

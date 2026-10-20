@@ -1,9 +1,6 @@
 export interface MapRowSpace {
-	/** Rendered width of each item, in item order; unmeasured items count as zero, so they start in one row. */
 	widths: number[];
-	/** Space between two columns. */
 	gap: number;
-	/** Width the rows may take. */
 	available: number;
 }
 
@@ -17,7 +14,6 @@ function gridWidth(widths: number[], gap: number, columns: number): number {
 	return total;
 }
 
-/** Splits items into rows of equal length, using the most columns whose shared column widths fit the space. */
 export function wrapMapRows<T>(items: T[], { widths, gap, available }: MapRowSpace): T[][] {
 	let columns = items.length;
 	while (columns > 1 && gridWidth(widths, gap, columns) > available) columns--;

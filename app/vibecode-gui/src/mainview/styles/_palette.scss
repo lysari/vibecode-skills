@@ -1,4 +1,3 @@
-/* Base colours sampled from the reference screenshot and screen recording, darkened where text needs WCAG AA contrast. */
 :root {
 	--white: #ffffff;
 	--neutral-25: #fafaf8;
@@ -56,7 +55,6 @@
 	--scrim-dark: rgb(0 0 0 / 0.56);
 }
 
-/* Design colours: light theme. */
 :root {
 	--surface: var(--white);
 	--surface-canvas: var(--neutral-25);
@@ -93,7 +91,6 @@
 	--scrim: var(--scrim-light);
 	color-scheme: light;
 
-	/* Design colours: dark theme. */
 	&[data-theme="dark"] {
 		--surface: var(--ink-900);
 		--surface-canvas: var(--ink-950);

@@ -96,7 +96,7 @@ When you run `hutch run dev` (without HMR):
 │       ├── main.tsx             # React entry point
 │       ├── index.html           # HTML template
 │       └── index.scss           # Loads the styles and Tailwind
-├── docs/                        # What each screen, type file and test does, by topic (code comments live only in shared modules)
+├── docs/                        # One doc per page (e.g. agent-tree.md) or file (e.g. sessions.md, run.interface.md) with its tests; code comments live only in reusable files shared across features
 ├── tests/                       # bun:test tests for the main process (bun/) and renderer helpers (mainview/); they write to temporary folders only
 ├── electrobun.config.ts         # Electrobun configuration
 ├── vite.config.ts               # Vite configuration

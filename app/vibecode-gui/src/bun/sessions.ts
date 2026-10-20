@@ -9,12 +9,10 @@ export const DEFAULT_TITLE = "New session";
 const TITLE_LENGTH = 60;
 const SESSION_FILE = /^(.+)\.json$/;
 const SESSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-// A project's folder name in the sessions store: a hash of its path, so any path maps to one safe folder name.
 const PROJECT_HASH_LENGTH = 16;
 
 type FieldType = "string" | "number" | "boolean" | "string-or-null" | "agent-status" | "run-end-status";
 
-// The fields each run event type has besides `type`, `runId` and `at`, checked when a session file is read.
 const EVENT_FIELDS: Record<RunEvent["type"], Record<string, FieldType>> = {
 	"run.started": {},
 	"run.finished": { status: "run-end-status" },
@@ -63,7 +61,6 @@ function readChatMessage(value: unknown): ChatMessage | null {
 	return { kind: "user", id, at, text, runId: value.runId, replyTo: value.replyTo as string | null };
 }
 
-/** Reads a session file's JSON, keeping its valid messages and events; null when the session itself is malformed. */
 function parseSession(text: string): Session | null {
 	let value: unknown;
 	try {
@@ -117,7 +114,6 @@ export async function readSession(sessionsRoot: string, projectRoot: string, id:
 	return session;
 }
 
-/** The project's sessions, most recently updated first; malformed files are skipped. */
 export async function listSessions(sessionsRoot: string, projectRoot: string): Promise<Session[]> {
 	const dir = projectDir(sessionsRoot, projectRoot);
 	if (!existsSync(dir)) return [];
@@ -126,7 +122,6 @@ export async function listSessions(sessionsRoot: string, projectRoot: string): P
 	return sessions.filter((session): session is Session => session !== null).sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-// Written to a temporary file first, so a crash mid-write never leaves half a session behind.
 export async function writeSession(sessionsRoot: string, session: Session): Promise<void> {
 	const path = sessionPath(sessionsRoot, session.projectRoot, session.id);
 	await mkdir(projectDir(sessionsRoot, session.projectRoot), { recursive: true });
@@ -134,7 +129,6 @@ export async function writeSession(sessionsRoot: string, session: Session): Prom
 	await rename(`${path}.tmp`, path);
 }
 
-/** Starts a session in the project, or returns its latest one when nothing was sent there yet. */
 export async function createSession(sessionsRoot: string, projectRoot: string): Promise<Session> {
 	const [latest] = await listSessions(sessionsRoot, projectRoot);
 	if (latest && latest.messages.length === 0) return latest;
@@ -158,7 +152,6 @@ export async function deleteSession(sessionsRoot: string, projectRoot: string, i
 	await rm(sessionPath(sessionsRoot, projectRoot, id));
 }
 
-/** A title from the first message: its first line without the slash commands in front, shortened. */
 export function titleFromText(text: string): string {
 	const line = text.trim().split("\n")[0].replace(/^(\/[\w-]+\s+)+/, "").trim();
 	if (!line) return DEFAULT_TITLE;
@@ -168,7 +161,6 @@ export function titleFromText(text: string): string {
 interface LastRun {
 	runId: string;
 	endStatus: RunEndStatus | null;
-	/** The latest status of each agent of the run. */
 	statuses: Map<string, AgentStatus>;
 }
 
@@ -184,7 +176,6 @@ export function readLastRun(events: RunEvent[]): LastRun | null {
 	return run;
 }
 
-/** `isLive` is false when no runner is working on the session, so an unfinished run was interrupted by a quit. */
 export function summarizeSession(session: Session, isLive: boolean): SessionSummary {
 	const run = readLastRun(session.events);
 	const statuses = [...(run?.statuses.values() ?? [])];

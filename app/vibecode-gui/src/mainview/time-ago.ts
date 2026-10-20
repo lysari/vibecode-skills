@@ -2,7 +2,6 @@ const MINUTE_MS = 60_000;
 const HOUR_MINUTES = 60;
 const DAY_HOURS = 24;
 
-/** A compact age for narrow lists, e.g. `now`, `5m`, `3h`, `2d`. */
 export function formatTimeAgo(time: number): string {
 	const minutes = Math.round((Date.now() - time) / MINUTE_MS);
 	if (minutes < 1) return "now";

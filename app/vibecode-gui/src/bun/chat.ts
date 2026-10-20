@@ -16,24 +16,19 @@ import {
 import { installSkill, listSkills, type SkillRoots } from "./skills";
 
 interface ChatOptions {
-	/** Folder of the sessions store, e.g. `<user data>/sessions`. */
 	sessionsRoot: string;
 	runner: AgentRunner;
 	moveToTrash: (path: string) => boolean;
-	/** Receives every run event after it is added to its session. */
 	onEvent: (message: RunEventMessage) => void;
 }
 
-/** A session held in memory while a run streams into it, until its last change is written. */
 interface LiveSession {
 	session: Session;
-	/** The run in progress; null once it finished. */
 	runId: string | null;
 	saving: Promise<void> | null;
 	hasUnsaved: boolean;
 }
 
-/** Adds the stop events for a run that a quit interrupted; returns false when the last run had finished. */
 function stopInterruptedRun(session: Session): boolean {
 	const run = readLastRun(session.events);
 	if (!run || run.endStatus) return false;
@@ -47,7 +42,6 @@ function stopInterruptedRun(session: Session): boolean {
 	return true;
 }
 
-/** The project's chat sessions and the runs started from them. */
 export class Chat {
 	private readonly live = new Map<string, LiveSession>();
 
@@ -93,23 +87,17 @@ export class Chat {
 
 	async remove(projectRoot: string, id: string): Promise<void> {
 		const live = this.live.get(id);
-		// Dropped before stopping, so the stop events are not written back into the deleted file.
 		this.live.delete(id);
 		if (live?.runId) this.options.runner.stop(live.runId);
 		await deleteSession(this.options.sessionsRoot, projectRoot, id);
 	}
 
-	/**
-	 * Installs the selected library skills the project does not have yet (a differing copy is left as it is), adds
-	 * the user's message with the skills as slash commands in front, and starts a run for it.
-	 */
 	async send(roots: SkillRoots, id: string, { text, agent, skills }: SessionChoices & { text: string }): Promise<Session> {
 		const message = text.trim();
 		if (!message) throw new Error("Write a message first.");
 		const session = await this.load(roots.project, id);
 		if (this.live.get(id)?.runId) throw new Error("Wait for the current run to finish, or stop it.");
 		const library = await listSkills(roots);
-		// In the order the user picked them, so the slash commands read as chosen.
 		const chosen = skills.flatMap((name) => library.filter((skill) => skill.name === name));
 		for (const skill of chosen) {
 			if (skill.install !== "available") continue;
@@ -151,7 +139,6 @@ export class Chat {
 		this.options.runner.stop(this.requireRun(projectRoot, id).runId);
 	}
 
-	/** Resolves when every pending session write is on disk. */
 	async flush(): Promise<void> {
 		await Promise.all([...this.live.values()].map((live) => live.saving));
 	}
@@ -178,7 +165,6 @@ export class Chat {
 		this.options.onEvent({ projectRoot: live.session.projectRoot, sessionId: live.session.id, event });
 	}
 
-	// Writes run one at a time per session; changes made during a write are written right after it.
 	private save(live: LiveSession): void {
 		live.hasUnsaved = true;
 		if (live.saving) return;

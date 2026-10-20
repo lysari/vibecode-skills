@@ -1,6 +1,5 @@
 import { useEffect, type RefObject } from "react";
 
-/** Calls `onDismiss` on a click outside `ref` or on Escape while `isOpen`, for popovers and pickers. */
 export function useDismiss(ref: RefObject<HTMLElement>, isOpen: boolean, onDismiss: () => void): void {
 	useEffect(() => {
 		if (!isOpen) return;

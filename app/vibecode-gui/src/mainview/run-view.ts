@@ -15,18 +15,14 @@ export interface AgentNode {
 	status: AgentStatus;
 	costUsd: number;
 	durationMs: number;
-	/** The failed agent this one replaces after a retry. */
 	replaces: string | null;
-	/** The open question while the agent needs the user. */
 	question: string | null;
-	/** The last error, kept while the agent stays failed. */
 	error: string | null;
 	children: AgentNode[];
 }
 
 export interface AgentRun {
 	id: string;
-	/** The orchestrator; null until it is spawned. */
 	rootId: string | null;
 	status: RunEndStatus | "running";
 }
@@ -56,12 +52,10 @@ export interface ToolItem extends ThreadItemBase {
 	kind: "tool";
 	name: string;
 	input: string;
-	/** Null while the tool runs. */
 	result: string | null;
 	isError: boolean;
 }
 
-/** A sub-agent block, a question for the user or an error, each about one agent. */
 export interface AgentItem extends ThreadItemBase {
 	kind: "agent" | "question" | "error";
 	agentId: string;
@@ -73,7 +67,6 @@ export type ThreadItem = UserItem | NoteItem | TextItem | ToolItem | AgentItem;
 export interface RunView {
 	agents: Map<string, AgentNode>;
 	runs: AgentRun[];
-	/** Each agent's own transcript, in event order. */
 	items: Map<string, ThreadItem[]>;
 }
 
@@ -93,7 +86,6 @@ function runEndText(status: RunEndStatus, root: AgentNode | undefined): string {
 	return root ? `Run finished in ${formatDuration(root.durationMs)} · ${formatCost(root.costUsd)}` : "Run finished";
 }
 
-/** Plays a session's run events into its agent trees and each agent's transcript. */
 export function buildRunView(events: RunEvent[]): RunView {
 	const agents = new Map<string, AgentNode>();
 	const runs: AgentRun[] = [];
@@ -201,10 +193,6 @@ export function buildRunView(events: RunEvent[]): RunView {
 	return { agents, runs, items };
 }
 
-/**
- * The chat thread: the user's messages and system notes merged by time with each run's orchestrator transcript. For
- * an agent, its own transcript and the replies sent to it.
- */
 export function buildThread(session: Session, view: RunView, agentId: string | null): ThreadItem[] {
 	const messages: ThreadItem[] = session.messages
 		.filter((message) => (agentId ? message.kind === "user" && message.replyTo === agentId : true))
@@ -219,7 +207,6 @@ export function buildThread(session: Session, view: RunView, agentId: string | n
 	return [...messages, ...transcript].sort((a, b) => a.at - b.at);
 }
 
-/** Every agent of the tree under `root`, the root first. */
 export function listTreeAgents(root: AgentNode): AgentNode[] {
 	return [root, ...root.children.flatMap(listTreeAgents)];
 }

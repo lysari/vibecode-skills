@@ -5,8 +5,6 @@ import type { Skill, SkillInstall } from "../shared/skill.interface";
 
 const SKILL_FILE = "SKILL.md";
 const DEFAULT_SOURCE = join(".claude", "skills");
-// The folders agent tools read skills from, as `<folder>/<name>/SKILL.md`: Claude Code; Codex, Gemini CLI and
-// OpenCode (`.agents`); then older Codex, Cursor, GitHub Copilot, Gemini CLI, OpenCode and Windsurf.
 const SKILL_SOURCES = [
 	DEFAULT_SOURCE,
 	join(".agents", "skills"),
@@ -17,7 +15,6 @@ const SKILL_SOURCES = [
 	join(".opencode", "skills"),
 	join(".windsurf", "skills"),
 ];
-// Skill folders are also found in nested packages of a monorepo, down to this many folders below the root.
 const MAX_SCAN_DEPTH = 3;
 const SKIPPED_DIRS = new Set(["node_modules", ".git", ".devbox", ".hutch", "dist", "build"]);
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/;
@@ -36,7 +33,6 @@ function findRepoRoot(): string | null {
 	return null;
 }
 
-/** The skills repository the app runs from in development; a packaged app has none and uses the library folder from Settings. */
 export const defaultLibraryRoot = findRepoRoot();
 
 function isInside(parent: string, child: string): boolean {
@@ -102,7 +98,6 @@ async function findSkillDirs(root: string, dir = root, depth = 0): Promise<strin
 	return found;
 }
 
-/** Paths of every file in a skill folder, relative to it, in a stable order. */
 async function listSkillFiles(skillDir: string, dir = skillDir): Promise<string[]> {
 	const files: string[] = [];
 	for (const entry of await readdir(dir, { withFileTypes: true })) {
@@ -113,7 +108,6 @@ async function listSkillFiles(skillDir: string, dir = skillDir): Promise<string[
 	return files.sort();
 }
 
-/** The fields of a skill's SKILL.md frontmatter the app shows. */
 interface SkillFrontmatter {
 	name: string;
 	description: string;
@@ -148,7 +142,6 @@ function installedCopyDir(projectRoot: string, librarySkillDir: string): string 
 	return join(projectRoot, DEFAULT_SOURCE, basename(librarySkillDir));
 }
 
-/** Compares a library skill with its copy in the project's `.claude/skills`: by `metadata.version` when both have one, else by content. */
 async function readInstall(skillDir: string, version: string | null, projectRoot: string): Promise<SkillInstall> {
 	const copyDir = installedCopyDir(projectRoot, skillDir);
 	// A copy reached through a symlink that leaves the project is not the project's own.
@@ -162,7 +155,6 @@ async function readInstall(skillDir: string, version: string | null, projectRoot
 	return isSame ? "installed" : "outdated";
 }
 
-/** Reads the library's skills, each with its install state in the project. */
 export async function listSkills({ project, library }: SkillRoots): Promise<Skill[]> {
 	if (!library || !existsSync(library)) return [];
 	const skills = await Promise.all(
@@ -174,7 +166,6 @@ export async function listSkills({ project, library }: SkillRoots): Promise<Skil
 	return skills.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** Copies a library skill folder to the project's `.claude/skills`, moving an existing copy to the Trash first. */
 export async function installSkill(
 	{ project, library }: SkillRoots,
 	{ dir }: { dir: string },

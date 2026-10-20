@@ -7,7 +7,6 @@ import {
 	type RunRequest,
 } from "../shared/run.interface";
 
-/** The time source of a mock run, injected so tests can step through a run without waiting. */
 export interface RunnerClock {
 	now(): number;
 	setTimeout(callback: () => void, ms: number): unknown;
@@ -16,7 +15,6 @@ export interface RunnerClock {
 
 export interface MockAgentRunnerOptions {
 	clock?: RunnerClock;
-	/** Fixes the run's random choices; by default they follow from the prompt, agent and skills. */
 	seed?: number;
 }
 
@@ -35,7 +33,6 @@ const WORDS_PER_DELTA = 3;
 const DELTA_MS = { min: 50, max: 120 };
 const TOOL_MS = { min: 600, max: 1800 };
 const TOKENS = { min: 600, max: 4200 };
-// Mock prices per token, only so cost totals move like a real run's.
 const PRICE_PER_TOKEN = { deep: 15e-6, balanced: 3e-6, fast: 0.8e-6 };
 const MODELS = { deep: "opus", balanced: "sonnet", fast: "haiku" };
 
@@ -60,18 +57,14 @@ interface MockRun {
 	cli: string;
 	agents: Map<string, MockAgent>;
 	timers: Set<unknown>;
-	/** Agents waiting in "needs-input", resolved by `reply`. */
 	replies: Map<string, (text: string) => void>;
-	/** Failed agents waiting for `retry`, resolved with their replacement. */
 	retries: Map<string, (replacement: MockAgent) => void>;
 	nextId: number;
 	isStopped: boolean;
 }
 
-/** A failure the mock plays out: the agent fails and waits for a retry. */
 class MockFailure extends Error {}
 
-// mulberry32: a small seeded generator, so a run with the same seed always plays out the same way.
 function createRandom(seed: number): () => number {
 	let state = seed >>> 0;
 	return () => {
@@ -97,16 +90,10 @@ function pickAreas(random: () => number, count: number): string[] {
 	return Array.from({ length: count }, () => left.splice(Math.floor(random() * left.length), 1)[0]);
 }
 
-/** The request without the slash commands in front, as the agents quote it. */
 function readTask(prompt: string): string {
 	return prompt.replace(/^(\/[\w-]+\s+)+/, "").trim() || prompt;
 }
 
-/**
- * Plays a realistic orchestration without starting any CLI: an orchestrator, a planner, parallel coders with their
- * own test runners, and a reviewer per selected skill. A question in the prompt makes a coder ask the user; some
- * seeds make a test runner fail until it is retried.
- */
 export class MockAgentRunner implements AgentRunner {
 	private readonly runs = new Map<string, MockRun>();
 	private readonly clock: RunnerClock;
@@ -179,7 +166,6 @@ export class MockAgentRunner implements AgentRunner {
 	}
 
 	private sleep(run: MockRun, ms: number): Promise<void> {
-		// A stopped run's timers are cleared, so its scripts never resume.
 		return new Promise((resolve) => {
 			const timer = this.clock.setTimeout(() => {
 				run.timers.delete(timer);
@@ -247,7 +233,6 @@ export class MockAgentRunner implements AgentRunner {
 		return answer;
 	}
 
-	/** Runs an agent's script to "done"; a failure waits for a retry, which runs the script again on the replacement. */
 	private async runAgent(run: MockRun, agent: MockAgent, script: (agent: MockAgent, attempt: number) => Promise<void>): Promise<void> {
 		let current = agent;
 		for (let attempt = 0; ; attempt++) {
