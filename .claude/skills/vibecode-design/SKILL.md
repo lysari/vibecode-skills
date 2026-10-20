@@ -2,7 +2,7 @@
 name: vibecode-design
 description: Use when building or changing user interface screens, components, layouts, or styles, so the UI reuses the project's existing components and design values, looks consistent across screens, and stays accessible
 metadata:
-  version: "0.0.1-20261019.1"
+  version: "0.0.1-20261020.1"
 ---
 
 # Vibecode design
@@ -14,6 +14,7 @@ Build UI that looks as if one careful designer and developer made every screen: 
 ## Reference images
 
 - When the user gives a reference image, write every design value it shows into the project's design tokens before building any screen: colours, spacing and gaps, padding, radii, font sizes, weights, line heights, letter spacing, control and icon sizes, border widths, shadows and breakpoints, e.g. `space-section = 32` measured between two stacked cards.
+- Partition design tokens into the specific files required by the project's styling framework rules; never combine colors, spacing, radii, and global rules into a single unpartitioned token file, e.g. store colors in the palette file and spacing in the variables file, never in a catch-all tokens file.
 - Take each value from the reference's pixels: sample colours from flat fills and glyph cores, and measure edges and text boxes at the image's scale. Never estimate a value by eye, e.g. a heading colour sampled from the glyph core, never "dark grey".
 - When a reference image shows a cropped or partial capture of a screen, expand the layout to the full screen and complete the cut-off grid with the same tokens; never crop the built screen to the image's pixel bounds, e.g. a half-cropped two-column grid builds as a full two-column grid.
 - When a surface sits over a background with backdrop blur, define its colour token with alpha below `1` so the blurred background shows through; never use the opaque composite RGB sampled from the image, e.g. `rgb(255 255 255 / 0.7)` with blur, never `#ffffff`.

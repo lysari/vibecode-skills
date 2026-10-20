@@ -2,7 +2,7 @@
 name: use-vibecode
 description: "Use for end-to-end coding and UI tasks to run the complete Vibecode lifecycle: build clean code with vibecode, apply design tokens and layout rules with vibecode-design, and verify compliance with vibecode-review"
 metadata:
-  version: "0.0.1-20261020.1"
+  version: "0.0.1-20261020.3"
 ---
 
 # Use Vibecode
@@ -49,15 +49,17 @@ Execute software and UI engineering tasks through the complete, end-to-end Vibec
 
 Before modifying or writing any file:
 
-1. **Determine Task Scope**:
+1. **Determine Task Scope & Project Maturity**:
    - Is this logic/backend-only, UI/frontend-only, or fullstack?
+   - Check if the project is a newly created, template-generated, or freshly scaffolded repository versus an established codebase. In a newly scaffolded project, never preserve CLI starter boilerplate, placeholder files, or co-located demo tests as legacy code; purge or restructure them immediately to conform to Vibecode rules.
    - If UI is touched, `vibecode-design` rules are automatically activated.
 2. **Detect Matching Frameworks**:
-   - Inspect the project root against the framework table in `vibecode/SKILL.md`:
+   - Inspect both the project root and all file types to be touched against the framework table in `vibecode/SKILL.md`. A project routinely matches multiple rows:
      - `angular.json` → `frameworks/angular/rules.md`
      - `tsconfig.json` → `frameworks/typescript/rules.md`
      - `firebase.json` → `frameworks/firebase/rules.md`
      - `.css`, `.scss`, `.sass`, `.less` → `frameworks/css/rules.md`
+   - When UI or styling is involved, the matching stylesheet framework rules (e.g. `frameworks/css/rules.md`) are **mandatory** alongside `vibecode-design`. Never stop scanning after finding the first framework match.
 3. **Read Project Overrides & Onboarding**:
    - Check for `.claude/project-rules.md`, `AGENTS.md`, or `CLAUDE.md`.
    - **If no project rules exist**: The repository has not yet been profiled for Vibecode. Stop before implementing and follow `vibecode-init`: profile the codebase, ask the user to keep the current structure or restructure it to follow the Vibecode rules (on restructure, ask about each difference, always offering "Keep current"), and generate `.claude/project-rules.md` from the answers. Start the task only after the file exists.
@@ -112,7 +114,7 @@ Write changes adhering strictly to both code and design principles:
 Do **not** present the task as done or ask the user to test until the post-implementation review has completed and passed.
 
 1. **Re-read skills from disk**:
-   - Re-read `vibecode/SKILL.md`, `vibecode-design/SKILL.md` (if UI touched), `vibecode-review/SKILL.md`, and applicable framework/reference files. Never rely on memory.
+   - Re-read `vibecode/SKILL.md`, `vibecode-design/SKILL.md` (if UI touched), `vibecode-review/SKILL.md`, and all applicable framework and reference files matching the modified files and project root (e.g., CSS framework rules if stylesheets were modified). Never rely on memory.
 2. **Collect actual session changes**:
    - Inspect `git status -s` and `git diff`.
    - Verify file lifecycles: check newly added files, deleted code, and untracked files.
