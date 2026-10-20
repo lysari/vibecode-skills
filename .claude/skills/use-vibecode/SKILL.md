@@ -1,8 +1,8 @@
 ---
 name: use-vibecode
-description: Use for end-to-end coding and UI tasks to run the complete Vibecode lifecycle: build clean code with vibecode, apply design tokens and layout rules with vibecode-design, and verify compliance with vibecode-review
+description: "Use for end-to-end coding and UI tasks to run the complete Vibecode lifecycle: build clean code with vibecode, apply design tokens and layout rules with vibecode-design, and verify compliance with vibecode-review"
 metadata:
-  version: "0.0.1-20261019.2"
+  version: "0.0.1-20261020.1"
 ---
 
 # Use Vibecode
@@ -60,7 +60,7 @@ Before modifying or writing any file:
      - `.css`, `.scss`, `.sass`, `.less` → `frameworks/css/rules.md`
 3. **Read Project Overrides & Onboarding**:
    - Check for `.claude/project-rules.md`, `AGENTS.md`, or `CLAUDE.md`.
-   - **If no project rules exist**: The repository has not yet been profiled for Vibecode. Run or follow `vibecode-init` to scan the codebase anatomy, detect import aliases, shared helpers, and naming conventions, and generate `.claude/project-rules.md` to safeguard the project before implementing changes.
+   - **If no project rules exist**: The repository has not yet been profiled for Vibecode. Stop before implementing and follow `vibecode-init`: profile the codebase, ask the user to keep the current structure or restructure it to follow the Vibecode rules (on restructure, ask about each difference, always offering "Keep current"), and generate `.claude/project-rules.md` from the answers. Start the task only after the file exists.
 4. **Precedence Hierarchy**:
    - **Level 1 (Highest)**: Project instructions (`AGENTS.md` / `CLAUDE.md`).
    - **Level 2**: Project-specific rules (`.claude/project-rules.md`).

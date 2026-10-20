@@ -27,10 +27,16 @@
 - Never add a parameter, option, or branch that no caller uses today.
 - Use the project's existing libraries and patterns before adding a dependency.
 
-## Comments
-- Comment why, not what: a hidden constraint, a workaround, a surprising choice.
+## Comments and docs
+- Write code comments only in reusable component or library files shared across features, e.g. a shared button or date helper.
+- Never write a comment in a page or screen, its markup, its styles or its test, nor in an interface or type file.
+- Explain every file that may not hold comments in `docs/<file-name>.md`, and a page in `docs/<page-name>.md`, grouped by topic, e.g. `docs/order-list.md`.
+- Never write section banners, such as a `Handlers` divider line between blocks of code.
+- When you edit a file that holds comments it may not have, move what they explain into its `docs/<file-name>.md` or `docs/<page-name>.md` and delete them from the file.
+- Add a `docs/<file-name>.md` or `docs/<page-name>.md` without being asked. It is the one kind of doc you may add unasked.
+- In a reusable file, comment why, not what: a hidden constraint, a workaround, a surprising choice.
 - Let names carry the meaning of the code. Delete comments that restate it.
-- Never copy the comment density of nearby code. Write a comment only where the project's rules allow one, and only for a why.
+- Never copy the comment density of nearby code.
 - When the project's `AGENTS.md`, its `.claude/project-rules.md` or its framework rules set where comments and docs go, follow them.
 
 ## Errors and values
