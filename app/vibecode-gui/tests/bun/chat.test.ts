@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { realpathSync } from "node:fs";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Chat } from "../../src/bun/chat";
@@ -31,17 +31,16 @@ class StubRunner implements AgentRunner {
 }
 
 let tempRoot = "";
-let roots: SkillRoots = { project: "", library: null };
+let roots: SkillRoots = { project: "", home: "" };
 let sessionsRoot = "";
 let runner = new StubRunner();
 let messages: RunEventMessage[] = [];
 let chat: Chat;
 
-async function writeSkill(root: string, name: string, version: string, body = ""): Promise<string> {
-	const dir = join(root, ".claude/skills", name);
+async function writeSkill(root: string, source: string, name: string): Promise<void> {
+	const dir = join(root, source, name);
 	await mkdir(dir, { recursive: true });
-	await writeFile(join(dir, "SKILL.md"), `---\nname: ${name}\ndescription: Test.\nmetadata:\n  version: "${version}"\n---\n${body}`);
-	return dir;
+	await writeFile(join(dir, "SKILL.md"), `---\nname: ${name}\ndescription: Test.\n---\n`);
 }
 
 function emit(event: Partial<RunEvent> & { type: RunEvent["type"] }): void {
@@ -51,48 +50,49 @@ function emit(event: Partial<RunEvent> & { type: RunEvent["type"] }): void {
 
 beforeEach(async () => {
 	tempRoot = realpathSync(await mkdtemp(join(tmpdir(), "vibecode-gui-chat-")));
-	roots = { project: join(tempRoot, "project"), library: join(tempRoot, "library") };
+	roots = { project: join(tempRoot, "project"), home: join(tempRoot, "home") };
 	sessionsRoot = join(tempRoot, "user-data", "sessions");
 	await mkdir(roots.project);
 	runner = new StubRunner();
 	messages = [];
-	chat = new Chat({ sessionsRoot, runner, moveToTrash: () => false, onEvent: (message) => messages.push(message) });
-	await writeSkill(roots.library ?? "", "fresh", "1.0.0", "Library copy.");
-	await writeSkill(roots.library ?? "", "newer", "2.0.0", "Library copy.");
-	await writeSkill(roots.library ?? "", "same", "1.0.0");
-	await writeSkill(roots.project, "newer", "1.0.0", "Project copy.");
-	await writeSkill(roots.project, "same", "1.0.0");
+	chat = new Chat({ sessionsRoot, runner, onEvent: (message) => messages.push(message) });
+	await writeSkill(roots.project, ".claude/skills", "own");
+	await writeSkill(roots.home, ".claude/skills", "claude-only");
+	await writeSkill(roots.home, ".gemini/config/skills", "agy-only");
 });
 
 afterEach(() => rm(tempRoot, { recursive: true, force: true }));
 
 describe("sending a message", () => {
-	test("installs the selected skills the project lacks, leaves differing copies, and starts the run", async () => {
+	test("puts the selected skills the agent can use in front of the message, copies nothing, and starts the run", async () => {
 		const session = await chat.create(roots.project);
 		const sent = await chat.send(roots, session.id, {
 			text: "fix the header",
 			agent: "use-cursor",
-			skills: ["fresh", "newer", "same", "unknown"],
+			skills: ["agy-only", "claude-only", "own", "unknown"],
 		});
-		expect(await readFile(join(roots.project, ".claude/skills/fresh/SKILL.md"), "utf8")).toContain("Library copy.");
-		expect(await readFile(join(roots.project, ".claude/skills/newer/SKILL.md"), "utf8")).toContain("Project copy.");
-		expect(sent.messages.map((message) => [message.kind, message.text])).toEqual([
-			["note", "Installed fresh into .claude/skills"],
-			["user", "/fresh /newer /same fix the header"],
-		]);
+		expect(sent.messages.map((message) => [message.kind, message.text])).toEqual([["user", "/claude-only /own fix the header"]]);
 		expect(sent.title).toBe("fix the header");
 		expect(sent.agent).toBe("use-cursor");
+		expect(sent.skills).toEqual(["agy-only", "claude-only", "own", "unknown"]);
 		expect(runner.started.map(({ request }) => request)).toEqual([
 			{
-				runId: sent.messages[1].kind === "user" ? sent.messages[1].runId : "",
+				runId: sent.messages[0].kind === "user" ? sent.messages[0].runId : "",
 				projectRoot: roots.project,
-				prompt: "/fresh /newer /same fix the header",
+				prompt: "/claude-only /own fix the header",
 				agent: "use-cursor",
-				skills: ["fresh", "newer", "same"],
+				skills: ["claude-only", "own"],
 			},
 		]);
+		expect(await readdir(join(roots.project, ".claude/skills"))).toEqual(["own"]);
 		await chat.flush();
-		expect((await readSession(sessionsRoot, roots.project, session.id)).messages).toHaveLength(2);
+		expect((await readSession(sessionsRoot, roots.project, session.id)).messages).toHaveLength(1);
+	});
+
+	test("offers the default agent the skills of every agent's global folder", async () => {
+		const session = await chat.create(roots.project);
+		await chat.send(roots, session.id, { text: "fix", agent: null, skills: ["agy-only", "claude-only"] });
+		expect(runner.started[0].request.prompt).toBe("/agy-only /claude-only fix");
 	});
 
 	test("refuses an empty message and a second run while one is in progress", async () => {
@@ -167,8 +167,27 @@ describe("sending a message", () => {
 	test("rejects an unknown agent and keeps the composer choices", async () => {
 		const session = await chat.create(roots.project);
 		await expect(chat.choose(roots.project, session.id, { agent: "use-nothing", skills: [] })).rejects.toThrow("Unknown agent");
-		await chat.choose(roots.project, session.id, { agent: "use-claude-code", skills: ["same"] });
+		await chat.choose(roots.project, session.id, { agent: "use-claude-code", skills: ["own"] });
 		await chat.rename(roots.project, session.id, "  Header work ");
-		expect(await chat.load(roots.project, session.id)).toMatchObject({ agent: "use-claude-code", skills: ["same"], title: "Header work" });
+		expect(await chat.load(roots.project, session.id)).toMatchObject({ agent: "use-claude-code", skills: ["own"], title: "Header work" });
+	});
+
+	test("starts a new session with vibecode-workflow and keeps it removed once the user removes it", async () => {
+		const session = await chat.create(roots.project);
+		expect(session.skills).toEqual(["vibecode-workflow"]);
+		await chat.choose(roots.project, session.id, { agent: null, skills: [] });
+		expect((await chat.load(roots.project, session.id)).skills).toEqual([]);
+		expect((await chat.create(roots.project)).skills).toEqual([]);
+	});
+
+	test("sends the default skill when the agent can use it and leaves it out of the prompt when it cannot", async () => {
+		const session = await chat.create(roots.project);
+		const sent = await chat.send(roots, session.id, { text: "fix", agent: null, skills: session.skills });
+		expect(runner.started[0].request).toMatchObject({ prompt: "fix", skills: [] });
+		expect(sent.skills).toEqual(["vibecode-workflow"]);
+		emit({ type: "run.finished", status: "done" });
+		await writeSkill(roots.home, ".claude/skills", "vibecode-workflow");
+		await chat.send(roots, session.id, { text: "again", agent: "use-claude-code", skills: sent.skills });
+		expect(runner.started[1].request).toMatchObject({ prompt: "/vibecode-workflow again", skills: ["vibecode-workflow"] });
 	});
 });

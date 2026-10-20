@@ -1,3 +1,5 @@
+import type { GlobalSkillFolder } from "./skill.interface";
+
 export const AGENT_STATUSES = ["running", "done", "needs-input", "failed", "stopped"] as const;
 export type AgentStatus = (typeof AGENT_STATUSES)[number];
 
@@ -7,12 +9,13 @@ export type RunEndStatus = (typeof RUN_END_STATUSES)[number];
 export interface AgentCli {
 	label: string;
 	command: string;
+	skillFolders: GlobalSkillFolder[];
 }
 
 export const AGENT_CLIS: Record<string, AgentCli> = {
-	"use-claude-code": { label: "Claude Code", command: "claude" },
-	"use-cursor": { label: "Cursor", command: "agent" },
-	"use-antigravity": { label: "Antigravity", command: "agy" },
+	"use-claude-code": { label: "Claude Code", command: "claude", skillFolders: [".claude/skills"] },
+	"use-cursor": { label: "Cursor", command: "agent", skillFolders: [".cursor/skills", ".claude/skills", ".codex/skills"] },
+	"use-antigravity": { label: "Antigravity", command: "agy", skillFolders: [".gemini/config/skills", ".gemini/antigravity/skills"] },
 };
 
 interface RunEventBase {

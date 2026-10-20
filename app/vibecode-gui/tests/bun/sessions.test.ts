@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
 	createSession,
+	DEFAULT_SKILLS,
 	DEFAULT_TITLE,
 	deleteSession,
 	listSessions,
@@ -32,7 +33,7 @@ afterEach(() => rm(join(sessionsRoot, ".."), { recursive: true, force: true }));
 describe("sessions store", () => {
 	test("creates a session file per project and reads it back", async () => {
 		const session = await createSession(sessionsRoot, PROJECT);
-		expect(session).toMatchObject({ projectRoot: PROJECT, title: DEFAULT_TITLE, agent: null, skills: [], messages: [], events: [] });
+		expect(session).toMatchObject({ projectRoot: PROJECT, title: DEFAULT_TITLE, agent: null, skills: ["vibecode-workflow"], messages: [], events: [] });
 		expect(await readdir(await projectFolder())).toEqual([`${session.id}.json`]);
 		expect(await readSession(sessionsRoot, PROJECT, session.id)).toEqual(session);
 		expect(await listSessions(sessionsRoot, "/projects/other")).toEqual([]);
@@ -40,9 +41,18 @@ describe("sessions store", () => {
 
 	test("reuses the latest session while nothing was sent in it", async () => {
 		const first = await createSession(sessionsRoot, PROJECT);
-		expect((await createSession(sessionsRoot, PROJECT)).id).toBe(first.id);
+		expect(await createSession(sessionsRoot, PROJECT)).toEqual(first);
 		await writeSession(sessionsRoot, { ...first, messages: [{ kind: "note", id: "n1", at: 1, text: "Hi" }] });
 		expect((await createSession(sessionsRoot, PROJECT)).id).not.toBe(first.id);
+	});
+
+	test("keeps the skills chosen in a session instead of the default skills", async () => {
+		const session = await createSession(sessionsRoot, PROJECT);
+		await writeSession(sessionsRoot, { ...session, skills: [] });
+		expect((await createSession(sessionsRoot, PROJECT)).skills).toEqual([]);
+		await writeSession(sessionsRoot, { ...session, skills: ["vibecode"], messages: [{ kind: "note", id: "n1", at: 1, text: "Hi" }] });
+		expect((await readSession(sessionsRoot, PROJECT, session.id)).skills).toEqual(["vibecode"]);
+		expect((await createSession(sessionsRoot, PROJECT)).skills).toEqual(DEFAULT_SKILLS);
 	});
 
 	test("lists sessions most recently updated first and renames by rewriting the file", async () => {

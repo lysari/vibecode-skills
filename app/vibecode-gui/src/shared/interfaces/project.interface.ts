@@ -13,7 +13,5 @@ export interface OpenProject extends Project {
 
 export interface Workspace {
 	projects: Project[];
-	libraryRoot: string | null;
-	defaultLibraryRoot: string | null;
 	project: OpenProject | null;
 }

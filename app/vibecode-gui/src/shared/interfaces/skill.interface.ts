@@ -1,9 +1,18 @@
-export type SkillInstall = "available" | "installed" | "outdated";
+export const GLOBAL_SKILL_FOLDERS = [
+	".claude/skills",
+	".agents/skills",
+	".codex/skills",
+	".cursor/skills",
+	".gemini/config/skills",
+	".gemini/antigravity/skills",
+] as const;
+export type GlobalSkillFolder = (typeof GLOBAL_SKILL_FOLDERS)[number];
+
+export type SkillSource = "global" | "project";
 
 export interface Skill {
-	dir: string;
 	name: string;
 	description: string;
-	version: string | null;
-	install: SkillInstall;
+	source: SkillSource;
+	globalFolders: GlobalSkillFolder[];
 }

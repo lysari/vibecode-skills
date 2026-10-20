@@ -3,13 +3,13 @@ import { BrowserView, BrowserWindow, Updater, Utils } from "electrobun/main";
 import type { SkillsRPC } from "../shared/interfaces/skills-rpc.interface";
 import { Chat } from "./chat";
 import { MockAgentRunner } from "./mock-agent-runner";
-import { installSkill } from "./skills";
-import { assertRecentProject, openProject, readRoots, readWorkspace, removeProject, setLibraryRoot } from "./workspace";
+import { assertRecentProject, openProject, readRoots, readWorkspace, removeProject } from "./workspace";
 
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
 const STORE_PATH = join(Utils.paths.userData, "projects.json");
 const SESSIONS_ROOT = join(Utils.paths.userData, "sessions");
+const HOME = Utils.paths.home;
 
 async function getMainViewUrl(): Promise<string> {
 	const channel = await Updater.localInfo.channel();
@@ -30,7 +30,6 @@ async function getMainViewUrl(): Promise<string> {
 const chat = new Chat({
 	sessionsRoot: SESSIONS_ROOT,
 	runner: new MockAgentRunner(),
-	moveToTrash: Utils.moveToTrash,
 	onEvent: (message) => rpc.send.runEvent(message),
 });
 
@@ -50,14 +49,9 @@ const rpc = BrowserView.defineRPC<SkillsRPC>({
 				});
 				return paths.find(Boolean) ?? null;
 			},
-			readWorkspace: () => readWorkspace(STORE_PATH),
-			openProject: ({ root }) => openProject(STORE_PATH, root),
-			removeProject: ({ root }) => removeProject(STORE_PATH, root),
-			setLibraryRoot: ({ root }) => setLibraryRoot(STORE_PATH, root),
-			installSkill: async (params) => {
-				await installSkill(await readRoots(STORE_PATH), params, Utils.moveToTrash);
-				return readWorkspace(STORE_PATH);
-			},
+			readWorkspace: () => readWorkspace(STORE_PATH, HOME),
+			openProject: ({ root }) => openProject(STORE_PATH, HOME, root),
+			removeProject: ({ root }) => removeProject(STORE_PATH, HOME, root),
 			listSessions: ({ projectRoot }) => inRecentProject(projectRoot, () => chat.list(projectRoot)),
 			createSession: ({ projectRoot }) => inRecentProject(projectRoot, () => chat.create(projectRoot)),
 			readSession: ({ projectRoot, id }) => inRecentProject(projectRoot, () => chat.load(projectRoot, id)),
@@ -66,10 +60,10 @@ const rpc = BrowserView.defineRPC<SkillsRPC>({
 			saveSessionChoices: ({ projectRoot, id, ...choices }) =>
 				inRecentProject(projectRoot, () => chat.choose(projectRoot, id, choices)),
 			sendMessage: async ({ projectRoot, id, ...message }) => {
-				const roots = await readRoots(STORE_PATH);
+				const roots = await readRoots(STORE_PATH, HOME);
 				if (roots.project !== projectRoot) throw new Error("Open the session's project first.");
 				const session = await chat.send(roots, id, message);
-				return { session, workspace: await readWorkspace(STORE_PATH) };
+				return { session, workspace: await readWorkspace(STORE_PATH, HOME) };
 			},
 			replyToAgent: ({ projectRoot, id, agentId, text }) =>
 				inRecentProject(projectRoot, () => chat.reply(projectRoot, id, agentId, text)),

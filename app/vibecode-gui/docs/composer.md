@@ -12,12 +12,12 @@ The message box pinned below both views, with its skill and agent pickers.
 
 ## `src/mainview/features/composer/SkillPicker.tsx`
 
-The **Skills** popover: the library's skills, filtered by name and description, each with a checkbox and its `InstallBadge`. A newly picked skill is added after the ones already picked.
+The **Skills** popover: the skills the session's agent can use, filtered by name and description, each with a checkbox and its `SkillSourceBadge`. A newly picked skill is added after the ones already picked. A new session starts with `vibecode-workflow` picked (`DEFAULT_SKILLS` in `src/bun/sessions.ts`); its chip is removed like any other.
 
 ## `src/mainview/features/composer/AgentPicker.tsx`
 
-`agents` are the library's agent skills: the `use-*` skills listed in `AGENT_CLIS`. The list offers **Default** (the built-in agent) and one entry per agent skill, with its CLI command.
+`agents` are the agent skills found in the project or in any agent's global folder: the `use-*` skills listed in `AGENT_CLIS`. The list offers **Default** (the built-in agent) and one entry per agent skill, with its CLI command.
 
-## `src/mainview/features/composer/InstallBadge.tsx`
+## `src/mainview/features/composer/SkillSourceBadge.tsx`
 
-Shows how a library skill relates to the open project: **Installed**, **Update** when the project's copy differs (the badge opens the update confirmation), or **Not installed** (it is installed into `.claude/skills` on send).
+Shows where a skill comes from: **Project** for the open project's own skill, **Global** for a skill in an agent's global folder. Its tooltip names the global folders, e.g. `In ~/.claude/skills, ~/.cursor/skills`, also for a project skill that has a global copy.

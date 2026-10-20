@@ -21,8 +21,6 @@ export interface SkillsRPC {
 			readWorkspace: { params: undefined; response: Workspace };
 			openProject: { params: { root: string }; response: Workspace };
 			removeProject: { params: { root: string }; response: Workspace };
-			setLibraryRoot: { params: { root: string | null }; response: Workspace };
-			installSkill: { params: { dir: string }; response: Workspace };
 			listSessions: { params: { projectRoot: string }; response: SessionSummary[] };
 			createSession: { params: { projectRoot: string }; response: Session };
 			readSession: { params: SessionRef; response: Session };

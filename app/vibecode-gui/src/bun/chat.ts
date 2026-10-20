@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { AGENT_CLIS, type AgentRunner, type RunEvent } from "../shared/interfaces/run.interface";
+import { GLOBAL_SKILL_FOLDERS } from "../shared/interfaces/skill.interface";
 import type { Session, SessionChoices, SessionSummary } from "../shared/interfaces/session.interface";
 import type { RunEventMessage } from "../shared/interfaces/skills-rpc.interface";
 import {
@@ -13,12 +14,11 @@ import {
 	titleFromText,
 	writeSession,
 } from "./sessions";
-import { installSkill, listSkills, type SkillRoots } from "./skills";
+import { listSkills, type SkillRoots } from "./skills";
 
 interface ChatOptions {
 	sessionsRoot: string;
 	runner: AgentRunner;
-	moveToTrash: (path: string) => boolean;
 	onEvent: (message: RunEventMessage) => void;
 }
 
@@ -97,19 +97,17 @@ export class Chat {
 		if (!message) throw new Error("Write a message first.");
 		const session = await this.load(roots.project, id);
 		if (this.live.get(id)?.runId) throw new Error("Wait for the current run to finish, or stop it.");
-		const library = await listSkills(roots);
-		const chosen = skills.flatMap((name) => library.filter((skill) => skill.name === name));
-		for (const skill of chosen) {
-			if (skill.install !== "available") continue;
-			await installSkill(roots, { dir: skill.dir }, this.options.moveToTrash);
-			session.messages.push({ kind: "note", id: randomUUID(), at: Date.now(), text: `Installed ${skill.name} into .claude/skills` });
-		}
+		const runAgent = agent !== null && AGENT_CLIS[agent] ? agent : null;
+		const folders = runAgent ? AGENT_CLIS[runAgent].skillFolders : GLOBAL_SKILL_FOLDERS;
+		const usable = (await listSkills(roots)).filter(
+			(skill) => skill.source === "project" || skill.globalFolders.some((folder) => folders.includes(folder)),
+		);
+		const names = skills.filter((name) => usable.some((skill) => skill.name === name));
 		const runId = randomUUID();
-		const names = chosen.map((skill) => skill.name);
 		const prompt = [...names.map((name) => `/${name}`), message].join(" ");
 		session.messages.push({ kind: "user", id: randomUUID(), at: Date.now(), text: prompt, runId, replyTo: null });
 		if (session.title === DEFAULT_TITLE) session.title = titleFromText(message);
-		session.agent = agent !== null && AGENT_CLIS[agent] ? agent : null;
+		session.agent = runAgent;
 		session.skills = skills;
 		session.updatedAt = Date.now();
 		const live = this.track(session, runId);

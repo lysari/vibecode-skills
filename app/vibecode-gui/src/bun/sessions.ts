@@ -6,6 +6,7 @@ import { AGENT_STATUSES, RUN_END_STATUSES, type AgentStatus, type RunEndStatus, 
 import type { ChatMessage, Session, SessionStatus, SessionSummary } from "../shared/interfaces/session.interface";
 
 export const DEFAULT_TITLE = "New session";
+export const DEFAULT_SKILLS = ["vibecode-workflow"];
 const TITLE_LENGTH = 60;
 const SESSION_FILE = /^(.+)\.json$/;
 const SESSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -140,7 +141,7 @@ export async function createSession(sessionsRoot: string, projectRoot: string): 
 		createdAt: now,
 		updatedAt: now,
 		agent: null,
-		skills: [],
+		skills: [...DEFAULT_SKILLS],
 		messages: [],
 		events: [],
 	};

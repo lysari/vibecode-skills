@@ -2,16 +2,15 @@ import { useRef, useState } from "react";
 import type { Skill } from "../../../shared/interfaces/skill.interface";
 import { useDismiss } from "../../hooks/use-dismiss";
 import { Icon } from "../../components/Icon";
-import { InstallBadge } from "./InstallBadge";
+import { SkillSourceBadge } from "./SkillSourceBadge";
 
 interface SkillPickerProps {
 	skills: Skill[];
 	selected: string[];
 	onChange: (selected: string[]) => void;
-	onUpdate: (skill: Skill) => void;
 }
 
-export function SkillPicker({ skills, selected, onChange, onUpdate }: SkillPickerProps) {
+export function SkillPicker({ skills, selected, onChange }: SkillPickerProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState("");
 	const ref = useRef<HTMLDivElement>(null);
@@ -62,13 +61,15 @@ export function SkillPicker({ skills, selected, onChange, onUpdate }: SkillPicke
 					<ul className="max-h-picker overflow-y-auto p-rail-gap">
 						{visible.length === 0 && (
 							<li className="px-stack py-stack text-body text-muted">
-								{skills.length === 0 ? "No skills in the library. Choose its folder in Settings." : `No skills match “${query.trim()}”.`}
+								{skills.length === 0
+									? "No skills for this agent in the project or your home folder."
+									: `No skills match “${query.trim()}”.`}
 							</li>
 						)}
 						{visible.map((skill) => {
 							const isSelected = selected.includes(skill.name);
 							return (
-								<li key={skill.dir} className="flex items-center gap-stack rounded-control px-stack py-rail-gap hover:bg-field">
+								<li key={skill.name} className="flex items-center gap-stack rounded-control px-stack py-rail-gap hover:bg-field">
 									<label className="flex min-w-0 flex-1 cursor-pointer items-start gap-stack">
 										<input
 											type="checkbox"
@@ -81,7 +82,7 @@ export function SkillPicker({ skills, selected, onChange, onUpdate }: SkillPicke
 											<span className="line-clamp-2 text-meta text-muted">{skill.description}</span>
 										</span>
 									</label>
-									<InstallBadge skill={skill} onUpdate={onUpdate} />
+									<SkillSourceBadge skill={skill} />
 								</li>
 							);
 						})}

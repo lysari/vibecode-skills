@@ -5,7 +5,6 @@ interface RailProps {
 	isDark: boolean;
 	onTogglePanel: () => void;
 	onNewSession: () => void;
-	onOpenSettings: () => void;
 	onToggleTheme: () => void;
 }
 
@@ -14,7 +13,7 @@ const ITEM_CLASS =
 const CURRENT_ITEM_CLASS =
 	"flex h-rail-item-h w-rail-item-w flex-col items-center justify-center gap-rail-gap rounded-rail bg-accent-soft text-rail text-accent-text";
 
-export function Rail({ isPanelOpen, isDark, onTogglePanel, onNewSession, onOpenSettings, onToggleTheme }: RailProps) {
+export function Rail({ isPanelOpen, isDark, onTogglePanel, onNewSession, onToggleTheme }: RailProps) {
 	return (
 		<nav
 			aria-label="App"
@@ -37,11 +36,7 @@ export function Rail({ isPanelOpen, isDark, onTogglePanel, onNewSession, onOpenS
 				<Icon name="plus" />
 				New
 			</button>
-			<button type="button" onClick={onOpenSettings} className={`mt-auto ${ITEM_CLASS}`}>
-				<Icon name="settings" />
-				Settings
-			</button>
-			<button type="button" onClick={onToggleTheme} aria-pressed={isDark} className={ITEM_CLASS}>
+			<button type="button" onClick={onToggleTheme} aria-pressed={isDark} className={`mt-auto ${ITEM_CLASS}`}>
 				<Icon name={isDark ? "sun" : "moon"} />
 				{isDark ? "Light" : "Dark"}
 			</button>

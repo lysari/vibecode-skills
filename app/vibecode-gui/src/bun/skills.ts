@@ -1,12 +1,11 @@
 import { existsSync, realpathSync } from "node:fs";
-import { cp, mkdir, readFile, readdir } from "node:fs/promises";
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import type { Skill, SkillInstall } from "../shared/interfaces/skill.interface";
+import { readFile, readdir } from "node:fs/promises";
+import { basename, isAbsolute, join, relative, sep } from "node:path";
+import { GLOBAL_SKILL_FOLDERS, type Skill } from "../shared/interfaces/skill.interface";
 
 const SKILL_FILE = "SKILL.md";
-const DEFAULT_SOURCE = join(".claude", "skills");
 const SKILL_SOURCES = [
-	DEFAULT_SOURCE,
+	join(".claude", "skills"),
 	join(".agents", "skills"),
 	join(".codex", "skills"),
 	join(".cursor", "skills"),
@@ -21,42 +20,12 @@ const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/;
 
 export interface SkillRoots {
 	project: string;
-	library: string | null;
+	home: string;
 }
-
-function findRepoRoot(): string | null {
-	for (const start of [import.meta.dir, process.cwd()]) {
-		for (let dir = start; dirname(dir) !== dir; dir = dirname(dir)) {
-			if (existsSync(join(dir, DEFAULT_SOURCE))) return realpathSync(dir);
-		}
-	}
-	return null;
-}
-
-export const defaultLibraryRoot = findRepoRoot();
 
 function isInside(parent: string, child: string): boolean {
 	const rel = relative(parent, child);
 	return rel !== "" && rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
-}
-
-// The nearest existing ancestor is resolved, so a symlink above a folder that does not exist yet is checked too.
-function realPath(path: string): string {
-	if (existsSync(path)) return realpathSync(path);
-	const parent = dirname(path);
-	return parent === path ? path : join(realPath(parent), basename(path));
-}
-
-function resolveInRoot(root: string, path: string): string {
-	const real = realPath(resolve(root, path));
-	if (!isInside(root, real)) throw new Error(`Path is outside ${root}: ${path}`);
-	return real;
-}
-
-function resolveSkillDir(root: string, dir: string): string {
-	const absolute = resolveInRoot(root, dir);
-	if (!existsSync(join(absolute, SKILL_FILE))) throw new Error(`No ${SKILL_FILE} in ${dir}`);
-	return absolute;
 }
 
 function parseFrontmatter(frontmatter: string): Record<string, unknown> | null {
@@ -79,103 +48,58 @@ function textField(record: Record<string, unknown>, key: string): string {
 	return typeof value === "string" ? value.trim() : "";
 }
 
-async function listSourceSkillDirs(root: string, sourceDir: string): Promise<string[]> {
-	if (!existsSync(sourceDir) || !isInside(root, realpathSync(sourceDir))) return [];
+// Skill folders are often symlinks (e.g. ~/.claude/skills/<name> into a skills repository), which a Dirent reports as links, not folders.
+async function listSourceSkillDirs(sourceDir: string): Promise<string[]> {
+	if (!existsSync(sourceDir)) return [];
 	const entries = await readdir(sourceDir, { withFileTypes: true });
 	return entries
-		.filter((entry) => entry.isDirectory() && existsSync(join(sourceDir, entry.name, SKILL_FILE)))
-		.map((entry) => join(sourceDir, entry.name));
+		.filter((entry) => entry.isDirectory() || entry.isSymbolicLink())
+		.map((entry) => join(sourceDir, entry.name))
+		.filter((dir) => existsSync(join(dir, SKILL_FILE)));
 }
 
-async function findSkillDirs(root: string, dir = root, depth = 0): Promise<string[]> {
+// A project skill reached through a symlink that leaves the project is not the project's own, so it is skipped.
+async function findProjectSkillDirs(root: string, dir = root, depth = 0): Promise<string[]> {
 	const found: string[] = [];
-	for (const source of SKILL_SOURCES) found.push(...(await listSourceSkillDirs(root, join(dir, source))));
+	for (const source of SKILL_SOURCES) {
+		found.push(...(await listSourceSkillDirs(join(dir, source))).filter((skillDir) => isInside(root, realpathSync(skillDir))));
+	}
 	if (depth === MAX_SCAN_DEPTH) return found;
 	for (const entry of await readdir(dir, { withFileTypes: true })) {
 		if (!entry.isDirectory() || entry.name.startsWith(".") || SKIPPED_DIRS.has(entry.name)) continue;
-		found.push(...(await findSkillDirs(root, join(dir, entry.name), depth + 1)));
+		found.push(...(await findProjectSkillDirs(root, join(dir, entry.name), depth + 1)));
 	}
 	return found;
-}
-
-async function listSkillFiles(skillDir: string, dir = skillDir): Promise<string[]> {
-	const files: string[] = [];
-	for (const entry of await readdir(dir, { withFileTypes: true })) {
-		const path = join(dir, entry.name);
-		if (entry.isDirectory() && !SKIPPED_DIRS.has(entry.name)) files.push(...(await listSkillFiles(skillDir, path)));
-		else if (entry.isFile()) files.push(relative(skillDir, path));
-	}
-	return files.sort();
 }
 
 interface SkillFrontmatter {
 	name: string;
 	description: string;
-	version: string | null;
 }
 
 async function readFrontmatter(skillDir: string): Promise<SkillFrontmatter> {
 	const text = await readFile(join(skillDir, SKILL_FILE), "utf8");
 	const frontmatter = FRONTMATTER.exec(text)?.[1] ?? "";
 	const fields = parseFrontmatter(frontmatter) ?? readTopLevelLines(frontmatter);
-	const metadata = fields.metadata;
-	const version =
-		metadata && typeof metadata === "object" ? textField(metadata as Record<string, unknown>, "version") : "";
 	return {
 		name: textField(fields, "name") || basename(skillDir),
 		description: textField(fields, "description"),
-		version: version || null,
 	};
 }
 
-async function hashSkillFolder(skillDir: string): Promise<string> {
-	const hasher = new Bun.CryptoHasher("sha256");
-	for (const path of await listSkillFiles(skillDir)) {
-		hasher.update(`${path}\0`);
-		hasher.update(await readFile(join(skillDir, path)));
-		hasher.update("\0");
+export async function listSkills({ project, home }: SkillRoots): Promise<Skill[]> {
+	const skills = new Map<string, Skill>();
+	for (const dir of await findProjectSkillDirs(project)) {
+		const { name, description } = await readFrontmatter(dir);
+		if (!skills.has(name)) skills.set(name, { name, description, source: "project", globalFolders: [] });
 	}
-	return hasher.digest("hex");
-}
-
-function installedCopyDir(projectRoot: string, librarySkillDir: string): string {
-	return join(projectRoot, DEFAULT_SOURCE, basename(librarySkillDir));
-}
-
-async function readInstall(skillDir: string, version: string | null, projectRoot: string): Promise<SkillInstall> {
-	const copyDir = installedCopyDir(projectRoot, skillDir);
-	// A copy reached through a symlink that leaves the project is not the project's own.
-	if (!existsSync(join(copyDir, SKILL_FILE)) || !isInside(projectRoot, realpathSync(copyDir))) return "available";
-	const realCopyDir = realpathSync(copyDir);
-	const copyVersion = (await readFrontmatter(realCopyDir)).version;
-	const isSame =
-		version && copyVersion
-			? version === copyVersion
-			: (await hashSkillFolder(skillDir)) === (await hashSkillFolder(realCopyDir));
-	return isSame ? "installed" : "outdated";
-}
-
-export async function listSkills({ project, library }: SkillRoots): Promise<Skill[]> {
-	if (!library || !existsSync(library)) return [];
-	const skills = await Promise.all(
-		(await findSkillDirs(library)).map(async (dir): Promise<Skill> => {
-			const frontmatter = await readFrontmatter(dir);
-			return { dir, ...frontmatter, install: await readInstall(dir, frontmatter.version, project) };
-		}),
-	);
-	return skills.sort((a, b) => a.name.localeCompare(b.name));
-}
-
-export async function installSkill(
-	{ project, library }: SkillRoots,
-	{ dir }: { dir: string },
-	moveToTrash: (path: string) => boolean,
-): Promise<void> {
-	if (!library) throw new Error("Choose a skill library folder in Settings first.");
-	const source = resolveSkillDir(library, dir);
-	const target = resolveInRoot(project, installedCopyDir(project, source));
-	if (target === source) throw new Error("This project is the skill library.");
-	if (existsSync(target) && !moveToTrash(target)) throw new Error(`Could not move ${target} to the Trash.`);
-	await mkdir(dirname(target), { recursive: true });
-	await cp(source, target, { recursive: true });
+	for (const folder of GLOBAL_SKILL_FOLDERS) {
+		for (const dir of await listSourceSkillDirs(join(home, folder))) {
+			const { name, description } = await readFrontmatter(dir);
+			const known = skills.get(name);
+			if (!known) skills.set(name, { name, description, source: "global", globalFolders: [folder] });
+			else if (!known.globalFolders.includes(folder)) known.globalFolders.push(folder);
+		}
+	}
+	return [...skills.values()].sort((a, b) => a.name.localeCompare(b.name));
 }

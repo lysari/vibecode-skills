@@ -17,7 +17,6 @@ interface ComposerProps {
 	onSend: (text: string) => Promise<boolean>;
 	onStop: () => void;
 	onCancelReply: () => void;
-	onUpdateSkill: (skill: Skill) => void;
 }
 
 export function Composer(props: ComposerProps) {
@@ -108,7 +107,6 @@ export function Composer(props: ComposerProps) {
 						skills={skills}
 						selected={choices.skills}
 						onChange={(selected) => props.onChoose({ ...choices, skills: selected })}
-						onUpdate={props.onUpdateSkill}
 					/>
 					<AgentPicker agents={agents} agent={choices.agent} onChange={(agent) => props.onChoose({ ...choices, agent })} />
 					<span className="ml-auto flex items-center gap-stack">
