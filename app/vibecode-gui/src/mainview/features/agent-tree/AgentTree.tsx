@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { wrapMapRows } from "./map-rows";
-import { formatCost, formatDuration, listTreeAgents, type AgentNode, type AgentRun } from "../../utils/run-view";
+import type { AgentNode, AgentRun } from "../../../shared/interfaces/run-view.interface";
+import { formatCost, formatDuration, listTreeAgents } from "../../utils/run-view";
 import { AgentTreeToolbar, type TreeZoomChange } from "./AgentTreeToolbar";
 import { Icon } from "../../components/Icon";
 import { StatusPill } from "../../components/StatusPill";

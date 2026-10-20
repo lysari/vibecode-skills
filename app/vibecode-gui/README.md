@@ -87,10 +87,10 @@ When you run `hutch run dev` (without HMR):
 │   │   ├── skills.ts            # Library skill discovery, install status and install, restricted to the project and library folders
 │   │   └── workspace.ts         # Projects store: recent projects, open project, library folder
 │   ├── shared/
-│   │   └── interfaces/          # Project, skill, session, run and RPC types, used by both processes
+│   │   └── interfaces/          # Project, skill, session, run and RPC types used by both processes; run-view types used by the webview's views
 │   └── mainview/
 │       ├── features/            # One folder per feature with its own components and helpers
-│       │   ├── app-shell/       # App (app state and layout shell), Header, Rail, the session views and the Electroview RPC client
+│       │   ├── app-shell/       # App (app state and layout shell), Header, Rail and the session views
 │       │   ├── projects/        # The projects panel and its age labels
 │       │   ├── chat/            # ChatView, the session thread
 │       │   ├── agent-tree/      # AgentTree, its toolbar, the agent drawer and the row wrapping
@@ -98,6 +98,7 @@ When you run `hutch run dev` (without HMR):
 │       │   └── settings/        # The settings dialog
 │       ├── components/          # Shared by 2 or more features: Icon, Dialog, StatusPill, ThreadEntry, Markdown
 │       ├── hooks/               # Shared hooks: useDismiss for popovers and pickers
+│       ├── services/            # App-wide services: rpc, the Electroview RPC client
 │       ├── utils/               # Shared helpers: run-view plays run events into agent trees and transcripts
 │       ├── styles/              # Palette (light/dark colours), fonts, global styles
 │       ├── main.tsx             # React entry point

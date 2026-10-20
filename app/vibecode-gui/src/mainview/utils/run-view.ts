@@ -1,74 +1,10 @@
-import type { AgentStatus, RunEndStatus, RunEvent } from "../../shared/interfaces/run.interface";
-import type { Session, UserMessage } from "../../shared/interfaces/session.interface";
+import type { RunEndStatus, RunEvent } from "../../shared/interfaces/run.interface";
+import type { AgentNode, AgentRun, RunView, TextItem, ThreadItem, ToolItem } from "../../shared/interfaces/run-view.interface";
+import type { Session } from "../../shared/interfaces/session.interface";
 
 const SECOND_MS = 1000;
 const MINUTE_SECONDS = 60;
 const CENTS = 0.01;
-
-export interface AgentNode {
-	id: string;
-	runId: string;
-	parentId: string | null;
-	name: string;
-	model: string;
-	task: string;
-	status: AgentStatus;
-	costUsd: number;
-	durationMs: number;
-	replaces: string | null;
-	question: string | null;
-	error: string | null;
-	children: AgentNode[];
-}
-
-export interface AgentRun {
-	id: string;
-	rootId: string | null;
-	status: RunEndStatus | "running";
-}
-
-interface ThreadItemBase {
-	key: string;
-	at: number;
-}
-
-export interface UserItem extends ThreadItemBase {
-	kind: "user";
-	message: UserMessage;
-}
-
-export interface NoteItem extends ThreadItemBase {
-	kind: "note";
-	text: string;
-}
-
-export interface TextItem extends ThreadItemBase {
-	kind: "text";
-	agentId: string;
-	text: string;
-}
-
-export interface ToolItem extends ThreadItemBase {
-	kind: "tool";
-	name: string;
-	input: string;
-	result: string | null;
-	isError: boolean;
-}
-
-export interface AgentItem extends ThreadItemBase {
-	kind: "agent" | "question" | "error";
-	agentId: string;
-	text: string;
-}
-
-export type ThreadItem = UserItem | NoteItem | TextItem | ToolItem | AgentItem;
-
-export interface RunView {
-	agents: Map<string, AgentNode>;
-	runs: AgentRun[];
-	items: Map<string, ThreadItem[]>;
-}
 
 export function formatCost(costUsd: number): string {
 	return costUsd > 0 && costUsd < CENTS ? "<$0.01" : `$${costUsd.toFixed(2)}`;

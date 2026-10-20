@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { formatCost, type AgentNode } from "../../utils/run-view";
+import type { AgentNode } from "../../../shared/interfaces/run-view.interface";
+import { formatCost } from "../../utils/run-view";
 import { useDismiss } from "../../hooks/use-dismiss";
 import { Icon } from "../../components/Icon";
 

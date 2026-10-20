@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import type { RunView, ThreadItem } from "../../utils/run-view";
+import type { RunView, ThreadItem } from "../../../shared/interfaces/run-view.interface";
 import { Icon } from "../../components/Icon";
 import { ThreadEntry } from "../../components/ThreadEntry";
 

@@ -13,7 +13,7 @@ import { Icon } from "../../components/Icon";
 import { Projects } from "../projects/Projects";
 import { Rail } from "./Rail";
 import { SettingsDialog } from "../settings/SettingsDialog";
-import { onRunEvent, skillsApi } from "./rpc";
+import { onRunEvent, skillsApi } from "../../services/rpc";
 import { buildRunView, buildThread } from "../../utils/run-view";
 import type { SessionView } from "./session-view";
 

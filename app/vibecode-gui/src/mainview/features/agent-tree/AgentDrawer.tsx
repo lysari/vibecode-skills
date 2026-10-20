@@ -1,4 +1,5 @@
-import { formatCost, formatDuration, type AgentNode, type RunView, type ThreadItem } from "../../utils/run-view";
+import type { AgentNode, RunView, ThreadItem } from "../../../shared/interfaces/run-view.interface";
+import { formatCost, formatDuration } from "../../utils/run-view";
 import { Icon } from "../../components/Icon";
 import { StatusPill } from "../../components/StatusPill";
 import { ThreadEntry } from "../../components/ThreadEntry";

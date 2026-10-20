@@ -27,7 +27,3 @@ The app's navigation: Projects (shows or hides the projects panel), New, Setting
 ## `src/mainview/features/app-shell/session-view.ts`
 
 `SESSION_VIEW_LABELS` lists the session's two views with their labels; `SessionView` is one of its keys.
-
-## `src/mainview/features/app-shell/rpc.ts`
-
-The webview's Electroview RPC client. `skillsApi` holds the request functions of `SkillsRPC`; a request fails after `MAX_REQUEST_MS`. `onRunEvent(listener)` calls the listener with every run event the main process streams and returns the unsubscribe function.
