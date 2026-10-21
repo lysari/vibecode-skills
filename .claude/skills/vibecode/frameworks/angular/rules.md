@@ -32,6 +32,7 @@ src/
 │   │   ├── constants/                  # Shared UI layout presets and animation tokens
 │   │   ├── directives/                 # Shared element behavior modifiers
 │   │   ├── interfaces/                 # Component options, table column definitions
+│   │   ├── layout/                     # Route-group shells, one folder each (main-layout, auth-layout)
 │   │   ├── pipes/                      # Pure template transform pipes
 │   │   ├── utils/                      # Pure helper functions and calculation utilities
 │   │   └── validators/                 # Custom form and control validators
@@ -49,6 +50,10 @@ src/
 - Put singleton infrastructure services, guards, interceptors, and app configuration in `src/app/core/`, e.g. `src/app/core/services/token.service.ts`.
 - Put app-wide global signal stores in `src/app/core/stores/`, e.g. `src/app/core/stores/auth.store.ts`; never put feature-specific state in `core/`.
 - Put reusable UI primitives (buttons, inputs, dialogs), shared pipes, directives, validators, and pure utility helpers in `src/app/shared/components/`, `src/app/shared/pipes/`, `src/app/shared/directives/`, `src/app/shared/validators/`, or `src/app/shared/utils/`; never put domain-specific business components, stateful domain services, or route guards in `shared/`.
+- Put each layout shell component in its own folder at `src/app/shared/layout/<name>-layout/`, e.g. `src/app/shared/layout/main-layout/main-layout.component.ts` and `src/app/shared/layout/auth-layout/auth-layout.component.ts`; never put a layout shell in `core/`, a feature folder, or loose in `src/app/`.
+- Keep every part that only one layout uses (its subcomponents, directives and stores) inside that layout's folder, e.g. `src/app/shared/layout/main-layout/sidebar/sidebar.component.ts`.
+- Keep the directives and stores that pages use to fill one layout's regions inside that layout's folder too, e.g. `src/app/shared/layout/main-layout/header-actions.directive.ts` and `src/app/shared/layout/main-layout/header-actions.store.ts`.
+- Move a layout part to `shared/components/`, `shared/directives/` or `core/stores/` when a second layout uses it, or when a feature renders one of the layout's components on its own.
 - Write data transformations, formatters, and value conversions as pure functions in `src/app/shared/utils/` (or `src/app/shared/pipes/` for HTML templates); never create `@Injectable()` services for pure mappings or calculations.
 - Structure each feature module under `src/app/features/<feature>/` into `pages/`, `components/`, `stores/`, `services/`, and route definitions:
   - `pages/` holds route-level screen components, e.g. `src/app/features/billing/pages/invoice-list.page.ts`.
@@ -70,7 +75,7 @@ src/
 ## Routing and layouts
 - Give each feature its own route definitions file at `src/app/features/<feature>/<feature>.routes.ts`, and mount it in the root `app.routes.ts` with `loadChildren: () => import(...)`.
 - Lazy-load screen components with `loadComponent: () => import(...)` on route entries; never use eager `component: ...` in routable page definitions (reserve `component: ...` only for layout shell wrappers).
-- Create a distinct layout wrapper component for each route group that has different chrome, structure, or navigation shell, e.g. `AuthLayout` for unauthenticated routes and `Layout` for authenticated app pages.
+- Create a distinct layout wrapper component in `src/app/shared/layout/<name>-layout/` for each route group that has different chrome, structure, or navigation shell, e.g. `AuthLayout` in `shared/layout/auth-layout/` for unauthenticated routes and `MainLayout` in `shared/layout/main-layout/` for authenticated app pages.
 - Never write route-checking flags or URL conditionals inside a shared layout component to hide or toggle shells with `@if` or `ngClass`; configure dedicated layout wrapper components with `<router-outlet />` as parent routes in the route definition instead.
 
 ## Services

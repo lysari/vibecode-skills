@@ -2,7 +2,7 @@
 name: vibecode-workflow
 description: Orchestrates multi-task development using dedicated, ephemeral sub-agents per task. Each sub-agent starts fresh by reading use-vibecode, executes clean implementation and compliance audit via vibecode-review, returns its report to the main agent, and terminates to prevent context dilution and skill forgetting.
 metadata:
-  version: "0.0.1-20261019.2"
+  version: "0.0.1-20261021.1"
 ---
 
 # Vibecode Workflow
@@ -101,23 +101,32 @@ When dispatching, use this standard brief:
 You are an ephemeral task worker running under the vibecode-workflow lifecycle.
 Task: <EXPLICIT_DESCRIPTION_OF_THE_TASK>
 
-MANDATORY PROTOCOL:
-1. START WITH SKILL: Read `use-vibecode/SKILL.md` and any matching framework rules (e.g., TypeScript, Angular, CSS) from disk before writing any code.
-2. IMPLEMENT: Follow Vibecode Stage 2 rules:
+=== MANDATORY FIRST ACTION (DO NOT SKIP OR DELAY) ===
+Before any planning, searching, or writing code, you MUST:
+
+1. Call the read_file tool on `use-vibecode/SKILL.md` (full absolute path if needed).
+2. Also read any matching framework skills that apply (TypeScript, Angular, CSS, etc.).
+3. Confirm in your first response: "SKILL LOADED: use-vibecode + [other skills]"
+
+Only after the skill content is actually in context may you proceed.
+
+=== REST OF PROTOCOL ===
+2. IMPLEMENT (Vibecode Stage 2):
    - Search for existing functions/types before adding new ones.
-   - Edit existing code in place; leave zero dead code, `_old`, or `V2` remnants.
+   - Edit existing code in place. Leave zero dead code, `_old`, or `V2` remnants.
    - If UI or styles are touched, apply `vibecode-design` tokens and viewport rules.
-3. AUDIT GATE: Before finishing, run Stage 3 (`vibecode-review`):
-   - Re-read skill files directly from disk.
-   - Inspect `git status` and `git diff`.
-   - Fix all [FAIL] or [SKIPPED] items in-place.
-4. REPORT & TERMINATE: Output your final response in this exact format:
+
+3. AUDIT GATE (Stage 3 – vibecode-review):
+   - Re-read the skill files from disk again.
+   - Run `git status` and `git diff`.
+   - Fix every [FAIL] or [SKIPPED] item in-place.
+
+4. REPORT & TERMINATE – output ONLY this format, then stop:
    - Status: [PASS]
    - Summary of Changes: <brief bullet points>
    - Files Modified/Created: <list of file paths>
    - Tests/Verification: <commands run and results>
    - Vibecode Review Verdict: <paste the review checklist>
-   Once this report is sent, your task is complete. Terminate immediately.
 ```
 
 ---

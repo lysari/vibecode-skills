@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, or adding features to a project, so changes stay clean, minimal, and easy to maintain
 metadata:
-  version: "0.0.1-20261020.11"
+  version: "0.0.1-20261021.5"
 ---
 
 # Vibecode
@@ -26,6 +26,7 @@ Where a brittle "vibe coded" structure cracks and fails under load, resilient, w
 5. Keep secrets and environment-specific values out of source files.
 6. Before finishing, remove debug output, unused code, and scratch files you created.
 7. Prefer simple, direct code. Create no new abstraction or helper unless the same logic already exists in 3+ places or the user asked for it.
+8. Never write section banners (e.g. `// Handlers`, `// State`, `<!-- Sidebar -->`, `/* Styles */`) or comments that restate code. Write code comments only in shared utility (helper function) files: a doc comment of one or two lines on each exported function saying what it is for and how to use it, and a one-line note for a hidden constraint or workaround.
 
 ## Framework rules
 

@@ -2,7 +2,7 @@
 name: vibecode-review
 description: Use after an agent finishes implementing a task or when reviewing work done in the current session, to re-read all skills used, verify compliance against every rule, detect skipped or violated rules, and produce a checklist review
 metadata:
-  version: "0.0.1-20261020.1"
+  version: "0.0.1-20261021.2"
 ---
 
 # Vibecode review
@@ -61,6 +61,8 @@ Gather the exact footprint of what the agent did in the session:
    - Inspect deleted or replaced code: Was old code cleaned up in place, or left commented out / suffixed (`_old`, `New`, `V2`)?
 3. **Hygiene checks**:
    - Check for leftover debug statements (`console.log`, `print`, `debugger`, `dump`).
+   - Check for section banners or divider comments (e.g. `// Handlers`, `// State`, `/* Styles */`, `<!-- Section -->`) and restating comments in modified files, and for any comment outside shared utility files.
+   - Check that a `docs/` folder created in this change has a `docs/.gitignore` holding only `*`.
    - Check for temporary/scratch files, test artifacts, or leftover scripts.
    - Check for hardcoded secrets, environment variables, or bypasses of validations/guards/tests.
 
@@ -99,6 +101,8 @@ Output the review formatted as a clear checklist:
 - [x] Search before creating: Verified no existing helper for X existed ([file.ts:20](file:///...))
 - [x] In-place edit: Replaced old logic directly; no `_old`, `New`, `V2`, or commented-out code
 - [x] Single concept, single name: No duplicate mapping or renamed proxy models
+- [x] No section banners or redundant comments: Zero banner dividers or restating comments; comments only in shared utility files (code-structure.md)
+- [x] Docs folder: new `docs/` created with `docs/.gitignore` holding `*` (code-structure.md)
 - [x] Guards & validations preserved: No guards, permissions, or tests disabled
 - [x] No secrets in source: Environment variables used properly
 - [x] Cleanup completed: No leftover debug statements, unused imports, or scratch files
