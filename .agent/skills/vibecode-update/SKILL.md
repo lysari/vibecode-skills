@@ -25,11 +25,11 @@ This skill works in any project. When you change it, write no framework, project
 1. **Decide whether it changes `vibecode`.** Write a rule only for a correction that is a general coding habit no line covers yet. Test it: picture a project in another language and framework, and ask whether following the rule there makes the agent work and write code the way a careful developer would. A generic rule passes only on yes; a stack rule passes only on yes for every project on that stack. Write nothing for:
    - A correction an existing line already covers. You missed the rule; it does not need a new one, e.g. you skipped a caller check the skill already asks for.
    - A fix to this session's bug or a design choice for one feature, e.g. which way a counter should roll.
-   - A rule for one feature or one project, e.g. a project's own folder, alias or helper. It goes to that feature's skill or the project's `.claude/project-rules.md`, never `vibecode`.
+   - A rule for one feature or one project, e.g. a project's own folder, alias or helper. It goes to that feature's skill or the project's `.agent/project-rules.md`, never `vibecode`.
    When no correction passes, change no file, bump no version, run no test, and report each correction with the reason it was skipped.
 2. **Place it.** Holds for every project on one technology and names its path, suffix, API or tool → `frameworks/<technology>/rules.md`, in the section for its topic. Otherwise → the generic file from the References table in `vibecode/SKILL.md`.
    - Create a `frameworks/<technology>/` folder only when a correction for that technology passes step 1. Never write rules for a technology ahead of time.
-3. **Search before writing.** Grep `.agent/skills/vibecode/`, `.claude/project-rules.md`, `AGENTS.md` and the memory folder for the topic.
+3. **Search before writing.** Grep `.agent/skills/vibecode/`, `.agent/project-rules.md`, `AGENTS.md` and the memory folder for the topic.
    - Same rule exists → tighten that line in place.
    - Contradicts a line → replace it. Never keep the old line next to the new one.
    - Read `git status` first; build on uncommitted edits, not on HEAD.
@@ -56,7 +56,7 @@ This skill works in any project. When you change it, write no framework, project
 | Same rule kept in memory and in vibecode | Memory keeps only the why |
 | "Never X unless it matters" | Ask for the exception, write it as its own line |
 | Technology path in a generic file | Move it to `frameworks/<technology>/rules.md` |
-| Project's own folder or helper in a framework file | Move it to the project's `.claude/project-rules.md` |
+| Project's own folder or helper in a framework file | Move it to the project's `.agent/project-rules.md` |
 | Version not bumped, test skipped | Steps 7 and 9 are part of done when a file changed |
 | No-rule run lists AGENTS.md or memory rules and asks which to add | Use only this session's corrections, and decide each with step 1 |
 | Every correction turned into a rule | Step 1 skips the ones a rule already covers, the one-off fixes and the feature-only ones |

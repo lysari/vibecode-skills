@@ -115,7 +115,7 @@ flowchart TD
         SubAgent -->|Activates Lifecycle| UseVibecode["use-vibecode"]
         
         subgraph ThreeStageExecution ["3-Stage Execution Pipeline"]
-            UseVibecode --> Stage1["Stage 1: Preparation\nCheck .claude/project-rules.md\n(Run vibecode-init if missing)"]
+            UseVibecode --> Stage1["Stage 1: Preparation\nCheck .agent/project-rules.md\n(Run vibecode-init if missing)"]
             Stage1 --> Stage2["Stage 2: Implementation"]
             
             subgraph Implementation ["Implementation Disciplines"]
@@ -147,7 +147,7 @@ flowchart TD
 |---|---|---|
 | **`vibecode-workflow`** | `/vibecode-workflow` | **Multi-task Orchestrator.** Decomposes complex engineering goals into modular tasks executed by isolated, ephemeral sub-agents. Prevents context degradation and skill decay over long sessions. |
 | **`use-vibecode`** | `/use-vibecode` | **End-to-End Task Runner.** Glues the complete 3-stage lifecycle together: Stage 1 (Preparation & Rule Discovery) → Stage 2 (Implementation) → Stage 3 (Mandatory `vibecode-review` compliance audit). |
-| **`vibecode-init`** | `/vibecode-init` | **Repository Profiler & Onboarding.** Inspects directory architecture, path aliases, code conventions, and test setups to generate `.claude/project-rules.md` and configure root `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md`. |
+| **`vibecode-init`** | `/vibecode-init` | **Repository Profiler & Onboarding.** Inspects directory architecture, path aliases, code conventions, and test setups to generate `.agent/project-rules.md` and configure root `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md`. |
 | **`vibecode`** | `/vibecode` | **Clean Code Standards.** Enforces surgical, minimal changes that address root causes without code bloat, wrapper sprawl, or naming duplication. Includes language- and framework-specific rules (TypeScript, Angular, CSS, Firebase). |
 | **`vibecode-design`** | `/vibecode-design` | **Pixel-Faithful UI Engineering.** Extracts measured design tokens (colors, spacing, typography, radii, blur) from reference images and designs. Enforces layout consistency, keyboard navigation, and accessibility standards. |
 | **`vibecode-review`** | `/vibecode-review` | **Mandatory Post-Implementation Compliance Gate.** Audits session diffs directly against disk-loaded skill files. Evaluates every applicable rule with a pass/fail checklist before work is declared complete. |
@@ -336,8 +336,8 @@ Before developing in any new or existing repository, run:
 ```
 - **How it works**:
   1. Scans your codebase for directory structure, framework conventions, test frameworks, path aliases, and build setups.
-  2. Generates `.claude/project-rules.md` capturing project-specific conventions.
-  3. Creates `AGENTS.md` (and links `CLAUDE.md` and `GEMINI.md`) directing all AI tools to abide by `.claude/project-rules.md` and execute tasks using the Vibecode lifecycle.
+  2. Generates `.agent/project-rules.md` capturing project-specific conventions.
+  3. Creates `AGENTS.md` (and links `CLAUDE.md` and `GEMINI.md`) directing all AI tools to abide by `.agent/project-rules.md` and execute tasks using the Vibecode lifecycle.
 
 ---
 
@@ -360,7 +360,7 @@ Use this for any non-trivial task or multi-file feature:
   1. **Orchestrator Planning**: The main agent acts strictly as an orchestrator. It maintains a live progress dashboard (`task-progress.md`) and decomposes the request into sequential sub-tasks. It does not read massive source files or edit code directly.
   2. **Fresh Ephemeral Sub-Agents**: Spawns a dedicated sub-agent per task with an isolated, clean context window (eliminating context rot and rule degradation).
   3. **Automated 3-Stage Lifecycle (`use-vibecode`)**: Each sub-agent runs:
-     - **Stage 1 (Preparation)**: Discovers local rules in `.claude/project-rules.md` and checks for existing helpers.
+     - **Stage 1 (Preparation)**: Discovers local rules in `.agent/project-rules.md` and checks for existing helpers.
      - **Stage 2 (Implementation)**: Writes clean, minimal code using `vibecode` and measured UI tokens using `vibecode-design`.
      - **Stage 3 (Mandatory Review Gate)**: Executes `vibecode-review` directly against rule files on disk, inspects its own diffs, and remediates any rule violations until the checklist achieves a `[PASS]`.
   4. **Deliver & Terminate**: The sub-agent reports diffs and audit results to the orchestrator, and is terminated immediately to keep context clean.

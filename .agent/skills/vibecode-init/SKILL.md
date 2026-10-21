@@ -1,23 +1,23 @@
 ---
 name: vibecode-init
-description: Use when onboarding an existing or new project to the Vibecode ecosystem, to inspect repository architecture, code styles, path aliases, shared helpers, and test tooling, generate a tailored .claude/project-rules.md, and configure AGENTS.md to enforce /vibecode-workflow across all AI tools
+description: Use when onboarding an existing or new project to the Vibecode ecosystem, to inspect repository architecture, code styles, path aliases, shared helpers, and test tooling, generate a tailored .agent/project-rules.md, and configure AGENTS.md to enforce /vibecode-workflow across all AI tools
 metadata:
-  version: "0.0.1-20261020.2"
+  version: "0.0.1-20261021.1"
 ---
 
 # Vibecode Init
 
 ## Overview
 
-Profile an existing or new repository and generate a tailored `.claude/project-rules.md` file. In addition, configure the root `AGENTS.md` to enforce the `/vibecode-workflow` skill for all coding tasks, and safely point auxiliary client files (`CLAUDE.md`, `GEMINI.md`) to `AGENTS.md`. This establishes a unified, project-specific contract that all AI tools follow. For every place the project differs from the Vibecode rules, the contract records the user's answer: keep the project's current way, or change it to follow the rule.
+Profile an existing or new repository and generate a tailored `.agent/project-rules.md` file. In addition, configure the root `AGENTS.md` to enforce the `/vibecode-workflow` skill for all coding tasks, and safely point auxiliary client files (`CLAUDE.md`, `GEMINI.md`) to `AGENTS.md`. This establishes a unified, project-specific contract that all AI tools follow. For every place the project differs from the Vibecode rules, the contract records the user's answer: keep the project's current way, or change it to follow the rule.
 
-Vibecode skills treat `.claude/project-rules.md` and `AGENTS.md` as higher precedence than all generic and framework rules. Generating these files upfront is the primary safeguard when introducing Vibecode to legacy or established repositories.
+Vibecode skills treat `.agent/project-rules.md` and `AGENTS.md` as higher precedence than all generic and framework rules. Generating these files upfront is the primary safeguard when introducing Vibecode to legacy or established repositories.
 
 ---
 
 ## When to use
 
-- **First-time repository onboarding**: Whenever working on a project that does not yet have `.claude/project-rules.md`.
+- **First-time repository onboarding**: Whenever working on a project that does not yet have `.agent/project-rules.md`.
 - **Pre-flight in `use-vibecode`**: Triggered automatically during Stage 1 (Preparation & Rule Discovery) if no project rules or agent instructions are found.
 - **On-demand initialization (`/vibecode-init`)**: When the user explicitly asks to profile, initialize, or adapt Vibecode to the current project.
 - **After major refactors**: When directory structures, core utilities, or path aliases have changed and project rules need recalibration.
@@ -48,7 +48,8 @@ Scan the tree to identify where responsibilities live:
 - Where do backend/API services live? (e.g. `src/services/`, `src/api/`, `src/lib/server/`)
 - Where do state management stores live? (e.g. `src/store/`, `src/context/`, `src/state/`)
 - Where do data models/types live? (e.g. co-located with features vs centralized in `src/types/`)
-- Where do tests live? (e.g. adjacent `*.spec.ts` vs dedicated `tests/` directory)
+- Where do tests live? (e.g. adjacent `*.spec.ts` vs dedicated `tests/` or `specs/` directory)
+- Generate a visual ASCII directory structure tree showing where each layer and responsibility lives (matching the project's actual structure on "Keep current", or the framework's Vibecode structure on "Restructure").
 
 ### 4. Sample Existing Code Style & Naming Conventions
 Sample 5–10 representative files across different folders to determine dominant idioms:
@@ -93,15 +94,15 @@ After profiling, and before drafting anything:
    - Also list each place where the rules are silent and the project made its own choice, e.g. a folder name the rules do not set.
    - Ask the user about every item, e.g. "Tests live beside the source files: keep them there, or move them to a mirrored test folder?". Ask in batches of up to 4 questions until every item has an answer.
    - Give every question a "Keep current" option. Put the recommended option first and mark it "(Recommended)"; never drop "Keep current" from a question.
-   - Never draft or write `.claude/project-rules.md` before every item has an answer.
-4. When `.claude/project-rules.md` already exists, read it first, keep every answer listed under its "Decisions", and ask only the questions it does not answer, the first question included.
+   - Never draft or write `.agent/project-rules.md` before every item has an answer.
+4. When `.agent/project-rules.md` already exists, read it first, keep every answer listed under its "Decisions", and ask only the questions it does not answer, the first question included.
 5. Init never moves or rewrites project code. Record each "change" answer as a rule and list the moves it needs under "Pending Restructure", then offer to run that restructure as a separate task.
 
 ---
 
-## Output Template for `.claude/project-rules.md`
+## Output Template for `.agent/project-rules.md`
 
-Generate `.claude/project-rules.md` using this standard structure, populated with project facts:
+Generate `.agent/project-rules.md` using this standard structure, populated with project facts:
 
 ```markdown
 # Project Rules
@@ -111,6 +112,16 @@ Generate `.claude/project-rules.md` using this standard structure, populated wit
 - Package Manager: <npm | pnpm | yarn | bun | cargo | etc.>
 
 ## Architecture & Directory Map
+
+```text
+<source-root>/
+├── <directory-1>/                      # <responsibility>
+│   ├── <sub-directory>/                # <responsibility>
+│   └── ...
+├── <directory-2>/                      # <responsibility>
+└── ...
+```
+
 - `<folder-1>`: <responsibility>
 - `<folder-2>`: <responsibility>
 - New feature code belongs in: `<feature-path>`
@@ -157,7 +168,7 @@ Write every section above from the user's answers and observed facts. Remove "Pe
 
 ## Agent Instructions & Cross-Agent Alignment
 
-After profiling the codebase and drafting `.claude/project-rules.md`, configure the unified agent instruction files so all coding tools adhere to the same workflow:
+After profiling the codebase and drafting `.agent/project-rules.md`, configure the unified agent instruction files so all coding tools adhere to the same workflow:
 
 ### 8. Configure `AGENTS.md` (Unified Directive)
 Ensure `AGENTS.md` at the project root contains the top-level directive to use `vibecode-workflow`:
@@ -166,7 +177,7 @@ Ensure `AGENTS.md` at the project root contains the top-level directive to use `
   # Agent Instructions
 
   - Always use skill `/vibecode-workflow` to write code in this project.
-  - Follow project architecture, aliases, and conventions documented in `.claude/project-rules.md`.
+  - Follow project architecture, aliases, and conventions documented in `.agent/project-rules.md`.
   ```
 - **Preservation Rule**: If `AGENTS.md` already exists, append or merge the `/vibecode-workflow` directive without overwriting or deleting any existing owner notes or rules. If it does not exist, create it with the standard directives.
 
@@ -188,8 +199,8 @@ Different AI tools look for specific root instruction files. Unify them by refer
 1. **Perform read-only scan**: Never alter project files during profiling.
 2. **Ask keep or restructure**: Follow "Compare With Vibecode Rules & Ask the User". On "Keep current", go straight to drafting; on "Restructure", ask until every difference has an answer.
 3. **Draft project rules**: Populate the template from observed repository patterns and the user's answers.
-4. **Present to the user**: Show the detected profile, proposed `.claude/project-rules.md`, and planned `AGENTS.md` directives to the user for review.
-5. **Write `.claude/project-rules.md`**: Create `.claude/` if needed and write the project rules.
+4. **Present to the user**: Show the detected profile, proposed `.agent/project-rules.md`, and planned `AGENTS.md` directives to the user for review.
+5. **Write `.agent/project-rules.md`**: Create `.agent/` if needed and write the project rules.
 6. **Update or create `AGENTS.md`**: Add the `/vibecode-workflow` directive.
 7. **Link auxiliary files (`CLAUDE.md`, `GEMINI.md`)**: Safely reference `@AGENTS.md` without clobbering existing content.
 8. **Verify with Git**: Run `git status -s` to confirm only the intended instruction and rule files were touched.

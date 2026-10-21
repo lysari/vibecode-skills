@@ -26,11 +26,11 @@ This skill works in any project. When you change it, write no framework, project
    - A correction an existing line in `vibecode-design` or `vibecode` already covers. You missed the rule; it does not need a new one, e.g. you added a new color when the skill already says to reuse the project's design values.
    - A coding habit that is not about UI, e.g. function size or naming. Report it and point the user to `/vibecode-update`.
    - A fix to this session's bug or a look chosen for one screen, e.g. which icon a button shows.
-   - A rule for one brand, feature or project, e.g. a project's own colors, fonts or component names. It goes to that project's `.claude/project-rules.md`, never `vibecode-design`.
+   - A rule for one brand, feature or project, e.g. a project's own colors, fonts or component names. It goes to that project's `.agent/project-rules.md`, never `vibecode-design`.
    When no correction passes, change no file, bump no version, run no test, and report each correction with the reason it was skipped.
 2. **Place it.** Holds for every project on one UI technology and names its path, suffix, API or tool → `vibecode-design/frameworks/<technology>/rules.md`, in the section for its topic. Otherwise → the section or `references/` file for its topic in `vibecode-design`.
    - Create a `frameworks/<technology>/` folder or a `references/` file only when a correction for it passes step 1, and add its row to the matching table in `vibecode-design/SKILL.md` in the same edit. Never write rules ahead of time.
-3. **Search before writing.** Grep `.agent/skills/vibecode-design/`, `.agent/skills/vibecode/`, `.claude/project-rules.md`, `AGENTS.md` and the memory folder for the topic.
+3. **Search before writing.** Grep `.agent/skills/vibecode-design/`, `.agent/skills/vibecode/`, `.agent/project-rules.md`, `AGENTS.md` and the memory folder for the topic.
    - Same rule exists → tighten that line in place.
    - Contradicts a line in `vibecode-design` → replace it. Never keep the old line next to the new one.
    - Contradicts a line in `vibecode` → `vibecode` wins. Tell the user, and write nothing until they say which to change.
@@ -60,7 +60,7 @@ This skill works in any project. When you change it, write no framework, project
 | Same rule kept in memory and in the skill | Memory keeps only the why |
 | "Use consistent spacing where it looks right" | Name the check: `never write a spacing value the project's design values do not define` |
 | Technology path in a generic file | Move it to `vibecode-design/frameworks/<technology>/rules.md` |
-| Project's colors, fonts or components in a skill file | Move them to the project's `.claude/project-rules.md` |
+| Project's colors, fonts or components in a skill file | Move them to the project's `.agent/project-rules.md` |
 | New file added, no row in the `vibecode-design/SKILL.md` table | Add the row in the same edit |
 | Version not bumped, test skipped | Steps 7 and 9 are part of done when a file changed |
 | No-rule run lists AGENTS.md or memory rules and asks which to add | Use only this session's corrections, and decide each with step 1 |
