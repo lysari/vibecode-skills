@@ -20,7 +20,7 @@ Because the `main` branch is locked and protected, all contributions must go thr
 
 ## 📁 Skill Structure Guidelines
 
-Every skill must be located in `.claude/skills/<skill-name>/` and contain at least:
+Every skill must be located in `.agent/skills/<skill-name>/` and contain at least:
 
 - **`SKILL.md`**: Must begin with standard YAML frontmatter:
   ```markdown

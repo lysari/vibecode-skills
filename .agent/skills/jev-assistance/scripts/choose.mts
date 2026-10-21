@@ -326,13 +326,13 @@ try {
   const result = await askJev(request, apiKey);
   const verdict = decide(request, result.answers);
   await writeLog({ request, verdict, model: result.model, usage: result.usage, ms: Date.now() - startedAt });
-  const afterTask = `When the task is implemented, run \`node .claude/skills/jev-assistance/scripts/report.mts ${SESSION_ID}\` and paste its output under "Jev picks" at the end of your final message.`;
-  const afterAnswer = `When you ask the user instead of taking the pick, log their answer with \`JEV_SESSION_ID=${SESSION_ID} node .claude/skills/jev-assistance/scripts/choose.mts --user-pick "<their answer>"\`.`;
+  const afterTask = `When the task is implemented, run \`node .agent/skills/jev-assistance/scripts/report.mts ${SESSION_ID}\` and paste its output under "Jev picks" at the end of your final message.`;
+  const afterAnswer = `When you ask the user instead of taking the pick, log their answer with \`JEV_SESSION_ID=${SESSION_ID} node .agent/skills/jev-assistance/scripts/choose.mts --user-pick "<their answer>"\`.`;
   console.log(JSON.stringify({ ...verdict, afterAnswer, afterTask }, null, 2));
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);
   await writeLog({ request, error: message, ms: Date.now() - startedAt });
   console.error(message);
-  console.error(`After the user answers, log it with \`JEV_SESSION_ID=${SESSION_ID} node .claude/skills/jev-assistance/scripts/choose.mts --user-pick "<their answer>"\`.`);
+  console.error(`After the user answers, log it with \`JEV_SESSION_ID=${SESSION_ID} node .agent/skills/jev-assistance/scripts/choose.mts --user-pick "<their answer>"\`.`);
   process.exit(1);
 }

@@ -61,11 +61,11 @@ Before modifying or writing any file:
      - `.css`, `.scss`, `.sass`, `.less` → `frameworks/css/rules.md`
    - When UI or styling is involved, the matching stylesheet framework rules (e.g. `frameworks/css/rules.md`) are **mandatory** alongside `vibecode-design`. Never stop scanning after finding the first framework match.
 3. **Read Project Overrides & Onboarding**:
-   - Check for `.claude/project-rules.md`, `AGENTS.md`, or `CLAUDE.md`.
-   - **If no project rules exist**: The repository has not yet been profiled for Vibecode. Stop before implementing and follow `vibecode-init`: profile the codebase, ask the user to keep the current structure or restructure it to follow the Vibecode rules (on restructure, ask about each difference, always offering "Keep current"), and generate `.claude/project-rules.md` from the answers. Start the task only after the file exists.
+   - Check for `.agent/project-rules.md`, `AGENTS.md`, or `CLAUDE.md`.
+   - **If no project rules exist**: The repository has not yet been profiled for Vibecode. Stop before implementing and follow `vibecode-init`: profile the codebase, ask the user to keep the current structure or restructure it to follow the Vibecode rules (on restructure, ask about each difference, always offering "Keep current"), and generate `.agent/project-rules.md` from the answers. Start the task only after the file exists.
 4. **Precedence Hierarchy**:
    - **Level 1 (Highest)**: Project instructions (`AGENTS.md` / `CLAUDE.md`).
-   - **Level 2**: Project-specific rules (`.claude/project-rules.md`).
+   - **Level 2**: Project-specific rules (`.agent/project-rules.md`).
    - **Level 3**: `vibecode` core and topic references.
    - **Level 4**: `vibecode-design` rules. Where `vibecode` and `vibecode-design` conflict, `vibecode` wins.
 

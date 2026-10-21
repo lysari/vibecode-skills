@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "vibecode-skills",
+  "version": "1.0.0",
+  "description": "Agent Skills Suite for Claude Code — human-like vibe coding, lifecycle orchestrators, and automated reviews.",
+  "owner": {
+    "name": "lysari",
+    "url": "https://github.com/lysari/vibecode-skills"
+  },
+  "metadata": {
+    "description": "Agent Skills Suite for Claude Code",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "vibecode-skills",
+      "description": "Full Vibecode Skills Suite for Claude Code (workflows, design system, rules, and reviews)",
+      "version": "1.0.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./.agent/skills/vibecode",
+        "./.agent/skills/vibecode-workflow",
+        "./.agent/skills/vibecode-design",
+        "./.agent/skills/vibecode-review",
+        "./.agent/skills/vibecode-init",
+        "./.agent/skills/vibecode-update",
+        "./.agent/skills/vibecode-design-update",
+        "./.agent/skills/use-vibecode"
+      ],
+      "keywords": [
+        "vibecode",
+        "skills",
+        "code-review",
+        "workflow",
+        "subagents",
+        "design-tokens"
+      ]
+    },
+    {
+      "name": "vibecode-suite",
+      "description": "Complete Vibecode Agent Skills Suite including workflows, design system, and compliance reviews",
+      "version": "1.0.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./.agent/skills/vibecode",
+        "./.agent/skills/vibecode-workflow",
+        "./.agent/skills/vibecode-design",
+        "./.agent/skills/vibecode-review",
+        "./.agent/skills/vibecode-init",
+        "./.agent/skills/vibecode-update",
+        "./.agent/skills/vibecode-design-update",
+        "./.agent/skills/use-vibecode"
+      ],
+      "keywords": [
+        "vibecode",
+        "skills",
+        "code-review",
+        "workflow",
+        "subagents",
+        "design-tokens"
+      ]
+    },
+    {
+      "name": "vibecode",
+      "description": "Core human-like vibe coding standard, in-place edits, and automated review compliance",
+      "version": "1.0.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./.agent/skills/vibecode",
+        "./.agent/skills/use-vibecode",
+        "./.agent/skills/vibecode-review",
+        "./.agent/skills/vibecode-init"
+      ],
+      "keywords": [
+        "vibecode",
+        "clean-code",
+        "review"
+      ]
+    },
+    {
+      "name": "vibecode-workflow",
+      "description": "Ephemeral sub-agent workflow orchestrator that prevents context dilution and rule forgetting",
+      "version": "1.0.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./.agent/skills/vibecode-workflow"
+      ],
+      "keywords": [
+        "orchestrator",
+        "subagents",
+        "workflow"
+      ]
+    },
+    {
+      "name": "vibecode-design",
+      "description": "UI design tokens, layouts, accessibility, and visual consistency rules",
+      "version": "1.0.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./.agent/skills/vibecode-design",
+        "./.agent/skills/vibecode-design-update"
+      ],
+      "keywords": [
+        "design",
+        "ui",
+        "tokens",
+        "accessibility"
+      ]
+    }
+  ]
+}

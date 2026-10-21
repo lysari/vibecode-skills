@@ -1,449 +1,347 @@
-<div align="center">
+<p align="center">
+  <img src="assets/Cute%20Vibecode%20Developer%20Diorama.png" width="260" alt="Vibecode logo: a developer and a robot coding together at a desk">
+</p>
 
-<img src="assets/Cute%20Vibecode%20Developer%20Diorama.png" alt="Cute Vibecode Developer Diorama" width="280" />
+<h1 align="center">Vibecode Skills</h1>
 
-# 🧠 Agent Skills Suite (Vibecode Ecosystem)
+<p align="center">
+  <b>Agent skills that make AI write code like a careful human would</b><br>
+  Small in-place changes, real design tokens, and a review against your rules before anything is called done.
+</p>
 
-> **"Vibe coding that writes code like a thoughtful human—simple, clean, and effortless to read and maintain with AI."**
+<p align="center">
+  <img src="https://img.shields.io/badge/Claude%20Code-skills-D97757?logo=claude&logoColor=white" alt="Claude Code">
+  <img src="https://img.shields.io/badge/Antigravity-skills-4285F4?logo=google&logoColor=white" alt="Google Antigravity">
+  <img src="https://img.shields.io/badge/Cursor-skills-000000?logo=cursor&logoColor=white" alt="Cursor">
+  <img src="https://img.shields.io/badge/skills-13-8A63D2" alt="13 skills">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs welcome"></a>
+</p>
 
-A collection of modular agent skills engineered for **Claude Code**, **Google Antigravity**, and **Cursor**.
-
-</div>
-
----
-
-## 🎯 What Our Skills Mean & What They Aim To Do
-
-### The Meaning: Vibe Coding That Feels Human-Written
-When developers "vibe code" with AI, two big problems usually happen:
-1. **Sloppy AI Shortcuts**: The AI dumps duplicate functions, creates `_v2` files, patches symptoms with messy wrappers, or hallucinates styling.
-2. **Robotic Over-Engineering**: The AI gets "too professional"—adding 10 layers of unnecessary abstraction, cryptic boilerplate, and complex enterprise patterns that make the code impossible for a human to quickly read, understand, or maintain.
-
-**Our skills aim for the sweet spot: Code that looks and feels like a careful human wrote it by hand.**
-- **Human-Readable First**: Code should be obvious, simple, and clean. A human should be able to open any file, understand what it does in 10 seconds, and edit it without fear.
-- **Easy to Co-Maintain with AI**: Built so humans and AI agents can collaborate smoothly without fighting overly complex architecture or untangling messy spaghetti.
-- **Minimal & In-Place**: Make the smallest, cleanest change in the files the project already uses. Delete what you replace. Don't add unnecessary layers.
-
-### What Our Skills Aim To Achieve
-
-| Core Aim | What We Want to Avoid | How Our Skills Achieve It | Key Skills |
-|---|---|---|---|
-| ✍️ **Human-Like, Readable Code** | Over-engineered abstractions, robotic boilerplate, or impenetrable patterns | Writes straightforward, natural code that reads like a human wrote it with care; keeps logic flat, obvious, and clean. | `vibecode`, `use-vibecode` |
-| 🤝 **Effortless Human + AI Co-Maintenance** | Codebases only the AI understands (or that break the moment a human edits them) | Reuses existing project functions, constants, and patterns so human devs and AI stay completely in sync. | `vibecode-init`, `vibecode` |
-| 🛡 **Zero Context Rot in Long Sessions** | AI forgetting rules, getting lazy, or degrading in quality over long chats | Breaks work into discrete tasks handled by fresh, ephemeral sub-agents that do one job cleanly and exit. | `vibecode-workflow` |
-| 🎨 **Natural, Consistent UI & Tokens** | Eyeballed colors, random margins, or bloated CSS that doesn't match the design | Pulls clean, reusable design tokens directly from references; keeps layouts consistent, accessible, and simple to tweak. | `vibecode-design` |
-| 📋 **No Guesswork: Automated Self-Checking** | AI claiming "done" without checking if the code actually follows project standards | Runs an automated checklist directly against project rules on disk before handing the work back to you. | `vibecode-review` |
-| 🧠 **Learns Your Personal Style** | Having to repeat the same corrections over and over across sessions | Distills your feedback into simple, permanent rules so the AI naturally adapts to how you like to write code. | `vibecode-update`, `vibecode-design-update` |
-| ⚖️ **Right Tool & Model for the Job** | Overkilling small edits with giant slow models or starving complex tasks | Automatically benchmarks and routes each task to the most proportional CLI tool and model tier. | `auto-mode-workflow`, `jev-assistance` |
-| 👥 **Dual-Agent Operator / Coder Flow** | Human getting stuck waiting and watching text stream in terminal | Operator agent plans and reviews while external headless CLI agents do the writing. | `use-claude-code`, `use-antigravity`, `use-cursor` |
+<p align="center">
+  <a href="#why-vibecode">Why</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#showcase">Showcase</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#skills">Skills</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
 
 ---
 
-## 📑 Table of Contents
+## Why Vibecode
 
-- [What Our Skills Mean & What They Aim To Do](#-what-our-skills-mean--what-they-aim-to-do)
-- [System Architecture](#-system-architecture)
-- [Skills Catalog](#-skills-catalog)
-  - [Vibecode Engineering Lifecycle](#1-vibecode-engineering-lifecycle)
-  - [Continuous Learning & Rule Updates](#2-continuous-learning--rule-updates)
-  - [Decision Intelligence & Task Routing](#3-decision-intelligence--task-routing)
-  - [Dual-Agent CLI Runners](#4-dual-agent-cli-runners)
-- [Core Workflows & Philosophies](#-core-workflows--philosophies)
-  - [The Vibecode Philosophy: Writing Code Like a Human, Not a Machine](#the-vibecode-philosophy-writing-code-like-a-human-not-a-machine)
-  - [Ephemeral Sub-Agent Architecture](#ephemeral-sub-agent-architecture)
-  - [Decision Layer: TypeSafe Jev Model](#decision-layer-typesafe-jev-model)
-- [Installation & Setup](#-installation--setup)
-  - [Agent Skill Paths](#agent-skill-paths)
-  - [Link All Skills (Recommended)](#link-all-skills-recommended)
-  - [Link by Agent](#link-by-agent)
-  - [Link a Single Skill](#link-a-single-skill)
-  - [Verification](#verification)
-  - [Unlinking](#unlinking)
-- [Usage Guide: How It Works & Ways to Use](#-usage-guide-how-it-works--ways-to-use)
-- [Repository Structure](#-repository-structure)
+When you "vibe code" with an AI agent, the code usually goes wrong in one of two ways:
 
----
+- **Sloppy shortcuts.** Duplicate functions, `_v2` files, commented-out old code, `@ts-ignore` to make errors go away, and colours picked by eye.
+- **Over-engineering.** Layers of wrappers, factories and boilerplate that nobody asked for, so a person can no longer read the code quickly.
 
-## 🏛 System Architecture
+Vibecode aims for the middle: **code that reads as if a careful developer wrote it by hand.** You should be able to open any file, see what it does in a few seconds, and change it without fear, whether you or an agent wrote it.
 
-The following diagram illustrates how the skills interact across orchestrators, ephemeral sub-agents, decision gates, and CLI runners:
+The skills are plain Markdown. They work in **Claude Code**, **Google Antigravity** and **Cursor**, and they learn the rules of each project you use them in.
 
-```mermaid
-flowchart TD
-    User([User Request / Task]) --> Router{Routing Method}
+## Quick start
 
-    %% Routing
-    Router -->|Smart Auto-Dispatch| AutoMode["auto-mode-workflow\n(Jev Decision Engine)"]
-    Router -->|Manual / Direct| Orchestrator["vibecode-workflow\n(Main Orchestrator)"]
+### Requirements
 
-    AutoMode -->|Discovers Available Models & Providers| JevGate["jev-assistance\n(TypeSafe Jev Scoring)"]
-    JevGate -->|Selects Provider & Tier| Orchestrator
-    JevGate -.->|Or Dispatches Direct CLI| CLIRunners["Dual-Agent CLI Runners\n(use-claude-code / use-antigravity / use-cursor)"]
+- One or more of: [Claude Code](https://claude.com/claude-code), [Google Antigravity](https://antigravity.google), or [Cursor](https://cursor.com)
+- `git`, and a shell that supports `ln -s` (macOS, Linux or WSL)
 
-    %% Vibecode Orchestration Loop
-    subgraph VibecodeLifecycle ["Vibecode Task Orchestration"]
-        Orchestrator -->|Decomposes Task & Spawns| SubAgent["Ephemeral Sub-Agent\n(Fresh Context)"]
-        
-        SubAgent -->|Activates Lifecycle| UseVibecode["use-vibecode"]
-        
-        subgraph ThreeStageExecution ["3-Stage Execution Pipeline"]
-            UseVibecode --> Stage1["Stage 1: Preparation\nCheck .claude/project-rules.md\n(Run vibecode-init if missing)"]
-            Stage1 --> Stage2["Stage 2: Implementation"]
-            
-            subgraph Implementation ["Implementation Disciplines"]
-                Stage2 --> Code["Logic & Architecture:\nvibecode\n(+ framework rules)"]
-                Stage2 --> UI["UI, Layout & Tokens:\nvibecode-design\n(+ reference extraction)"]
-            end
-            
-            Code --> Stage3["Stage 3: Compliance Gate\nvibecode-review\n(Direct disk audit of all rules)"]
-            UI --> Stage3
-        end
-        
-        Stage3 -->|Pass Checklist & Report| SubAgent
-        SubAgent -->|Deliver Result & Terminate| Orchestrator
-    end
+### 1. Install
 
-    %% Continuous Learning
-    User -.->|Provides Feedback / Rule Corrections| UpdateLoop["Continuous Learning Loop\n(vibecode-update / vibecode-design-update)"]
-    UpdateLoop -.->|Updates Persistent Rule Files| Code
-    UpdateLoop -.->|Updates Persistent Design Files| UI
+On **Claude Code**, add this repository as a plugin marketplace and install the suite:
+
+```text
+/plugin marketplace add lysari/vibecode-skills
+/plugin install vibecode-suite@vibecode-skills
 ```
 
----
-
-## 📦 Skills Catalog
-
-### 1. Vibecode Engineering Lifecycle
-
-| Skill | Trigger / Command | Description |
-|---|---|---|
-| **`vibecode-workflow`** | `/vibecode-workflow` | **Multi-task Orchestrator.** Decomposes complex engineering goals into modular tasks executed by isolated, ephemeral sub-agents. Prevents context degradation and skill decay over long sessions. |
-| **`use-vibecode`** | `/use-vibecode` | **End-to-End Task Runner.** Glues the complete 3-stage lifecycle together: Stage 1 (Preparation & Rule Discovery) → Stage 2 (Implementation) → Stage 3 (Mandatory `vibecode-review` compliance audit). |
-| **`vibecode-init`** | `/vibecode-init` | **Repository Profiler & Onboarding.** Inspects directory architecture, path aliases, code conventions, and test setups to generate `.claude/project-rules.md` and configure root `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md`. |
-| **`vibecode`** | `/vibecode` | **Clean Code Standards.** Enforces surgical, minimal changes that address root causes without code bloat, wrapper sprawl, or naming duplication. Includes language- and framework-specific rules (TypeScript, Angular, CSS, Firebase). |
-| **`vibecode-design`** | `/vibecode-design` | **Pixel-Faithful UI Engineering.** Extracts measured design tokens (colors, spacing, typography, radii, blur) from reference images and designs. Enforces layout consistency, keyboard navigation, and accessibility standards. |
-| **`vibecode-review`** | `/vibecode-review` | **Mandatory Post-Implementation Compliance Gate.** Audits session diffs directly against disk-loaded skill files. Evaluates every applicable rule with a pass/fail checklist before work is declared complete. |
-
----
-
-### 2. Continuous Learning & Rule Updates
-
-| Skill | Trigger / Command | Description |
-|---|---|---|
-| **`vibecode-update`** | `/vibecode-update [rule]` | **Distills User Coding Corrections.** Translates user complaints, feedback, or coding conventions into permanent, stack-agnostic checkable rules inside `vibecode/SKILL.md` or framework rules. |
-| **`vibecode-design-update`** | `/vibecode-design-update [rule]` | **Distills User UI Corrections.** Captures UI and styling corrections (spacing, tokens, contrast, layout behaviors) into persistent checkable rules inside `vibecode-design/SKILL.md`. |
-
----
-
-### 3. Decision Intelligence & Task Routing
-
-| Skill | Trigger / Command | Description |
-|---|---|---|
-| **`auto-mode-workflow`** | `/auto-mode-workflow` | **Adaptive Provider & Model Router.** Discovers active CLI tools and model tiers (lightweight vs. deep reasoning), profiles task complexity, and routes the work via Jev to the most proportional, cost-effective provider. |
-| **`jev-assistance`** | `/jev-assistance` | **Probabilistic Decision Gate.** Uses TypeSafe's Jev model (`scripts/choose.mts`) to score options on fit, simplicity, and safety. Decides whether to auto-select the best option or present a typed ranking to the user. |
-
----
-
-### 4. Dual-Agent CLI Runners
-
-These skills split complex tasks between an **Operator** (who plans, builds, reviews, and tests) and a headless **Coder** process running in an external CLI.
-
-| Skill | Trigger / Command | Target CLI | Key Modes |
-|---|---|---|---|
-| **`use-claude-code`** | `/use-claude-code` | `claude -p` | Direct session, sub-agent runner, remote SSH host (`--host`) |
-| **`use-antigravity`** | `/use-antigravity` | `agy` | Headless accept-edits mode (`--mode accept-edits`), streaming JSON |
-| **`use-cursor`** | `/use-cursor` | `agent` | Cursor Agent CLI (`agent -p --force --trust`) with streaming JSON |
-
----
-
-## 💡 Core Workflows & Philosophies
-
-### The Vibecode Philosophy: Writing Code Like a Human, Not a Machine
-
-When AI is asked to write code, it often swings between two extremes:
-- **Sloppy AI Hacks**: Writing quick patches, duplicating logic, leaving commented-out code, or adding `_v2` files.
-- **Robotic Over-Engineering**: Trying to be "too professional" by introducing 5 layers of abstraction, unnecessary factory patterns, verbose boilerplate, and convoluted architecture that make it painful for a human to read or maintain.
-
-**Vibecode demands code that reads as if a careful, thoughtful human developer wrote it by hand:**
-1. **Readable in 10 Seconds**: Logic should be flat, obvious, and natural. Any developer jumping in should understand it immediately.
-2. **Find Before Creating**: Search the codebase for existing functions and helpers before inventing new ones. Edit what exists instead of adding duplicate layers.
-3. **In-Place Surgery**: Change existing code directly and delete what it replaces. Never leave `_old`, `_new`, or commented-out ghosts beside it.
-4. **Single Source of Truth**: Define each concept once with one clear name. Never add translation wrappers that just rename variables across layers.
-5. **No Fake Fixes**: Never disable guards, types, validations, or tests just to make code run. Fix the real issue at the source.
-6. **Token-Driven UI**: Measure real design tokens (colors, padding, radii) from references instead of guessing margins and colors by eye.
-
----
-
-### Ephemeral Sub-Agent Architecture
-
-Long-running agent conversations suffer from **context rot**: prompt context fills up, earlier instructions get diluted, and strict compliance rules are forgotten.
-
-`vibecode-workflow` solves this with an ephemeral worker pattern:
-1. The **Orchestrator (Main Agent)** maintains high-level awareness of the project plan.
-2. Each sub-task is delegated to a **fresh, isolated Sub-Agent**.
-3. The Sub-Agent loads `use-vibecode`, applies clean code and design guidelines, runs `vibecode-review`, and returns a structured completion report.
-4. The Sub-Agent is **terminated immediately**, returning clean results without polluting parent context.
-
----
-
-### Decision Layer: TypeSafe Jev Model
-
-When multiple execution paths or scope decisions arise, `jev-assistance` steps in:
-- Executes `scripts/choose.mts` against TypeSafe's System One (Jev) decision model.
-- Analyzes candidate choices across simplicity, reversibility, and alignment.
-- **Auto-executes** when the confidence margin is high and the operation is safe.
-- **Surfaces a ranked recommendation** when high-stakes human approval is required.
-
----
-
-## 🚀 Installation & Setup
-
-Skills can be linked into your agent tools globally (available in every project) or locally (scoped to one repository).
-
-### Agent Skill Paths
-
-| Agent | Global Skills Directory | Project Skills Directory |
-|---|---|---|
-| **Claude Code** | `~/.claude/skills/` | `.claude/skills/` |
-| **Google Antigravity** | `~/.gemini/config/skills/` | `.agents/skills/` |
-| **Cursor** | `~/.cursor/skills/` | `.cursor/skills/` |
-
-> [!CAUTION]
-> For Cursor, link skills into `~/.cursor/skills/`. **Never** link into `~/.cursor/skills-cursor/`, which is reserved exclusively for Cursor's internal system skills.
-
----
-
-### Link All Skills (Recommended)
-
-Run this one-liner from the root of this repository to link all skills to Claude Code, Antigravity, and Cursor simultaneously:
+On **any of the three agents**, clone the repository and link the skills:
 
 ```bash
+git clone https://github.com/lysari/vibecode-skills.git
+cd vibecode-skills
+
 for target in ~/.claude/skills ~/.gemini/config/skills ~/.cursor/skills; do
   mkdir -p "$target"
-  for d in "$PWD"/.claude/skills/*/; do
+  for d in "$PWD"/.agent/skills/*/; do
     ln -s "${d%/}" "$target/"
   done
 done
 ```
 
+Running it again is safe: links that already exist print `File exists` and are left alone.
+
+### 2. Describe your task
+
+```text
+/vibecode-workflow add a user authentication modal
+```
+
+The workflow plans the work, runs each task in a fresh sub-agent, writes the code, and reviews it before handing it back. The first time it runs in a repository, it profiles the project for you.
+
+That is the only command you need. The other skills give you finer control when you want it.
+
+## Showcase
+
+The agent was asked to add a role check to an existing login handler.
+
+<table>
+<tr>
+<th width="50%">❌ Without Vibecode</th>
+<th width="50%">✅ With Vibecode</th>
+</tr>
+<tr>
+<td valign="top">
+
+```ts
+// ==========================
+// AUTH HANDLERS
+// ==========================
+
+// Old version, kept just in case
+// export async function handleLogin(req) { ... }
+
+export async function handleLoginV2(req: any) {
+  const user = await authService.login(req.body);
+  // @ts-ignore role missing on type
+  if (user && user.role) {
+    return { ...user, hasAccess: checkRole(user.role) };
+  }
+  return user;
+}
+```
+
+</td>
+<td valign="top">
+
+```ts
+export async function handleLogin(
+  req: LoginRequest,
+): Promise<AuthenticatedUser> {
+  const user = await authService.login(req.body);
+
+  return {
+    ...user,
+    hasAccess: ALLOWED_ROLES.includes(user.role),
+  };
+}
+```
+
+</td>
+</tr>
+<tr>
+<td valign="top">A second handler, a banner, a commented-out copy, <code>any</code> and <code>@ts-ignore</code>. Callers of <code>handleLogin</code> never get the check.</td>
+<td valign="top">The existing handler is changed in place, with the project's own types and role list. Every caller gets the check.</td>
+</tr>
+</table>
+
+**[See the full showcase →](SHOWCASE.md)** for UI tokens, long sessions, review reports and learned rules.
+
+## Features
+
+| | |
+| --- | --- |
+| ✂️ **Small, in-place changes** | The agent searches for existing code before writing new code, edits it where it lives, and deletes what it replaces. No `_new`, `V2` or commented-out copies. |
+| 🧭 **Fits your project** | `vibecode-init` reads your folders, aliases, helpers and test setup once, and writes them to `.agent/project-rules.md` so every agent follows them. |
+| 🎨 **Real design values** | `vibecode-design` reuses your components and tokens, measures values from design references instead of guessing, and keeps the UI accessible. |
+| 🧹 **Fresh context for every task** | `vibecode-workflow` splits a goal into tasks and gives each one a new sub-agent, so rules are not forgotten twenty turns into a long chat. |
+| ✅ **Checked before it is "done"** | `vibecode-review` re-reads the rule files from disk, inspects the actual `git diff`, and marks every rule pass, fail, skipped or not applicable. |
+| 🧠 **Learns your corrections** | Tell it once with `/vibecode-update` or `/vibecode-design-update`, and the correction becomes a checkable rule for every later session. |
+| ⚖️ **Right model for the job** | `auto-mode-workflow` and `jev-assistance` score a task and pick a provider and model tier that fit it, so a two-line fix doesn't go to the slowest model. |
+| 👥 **Operator and coder** | `use-claude-code`, `use-antigravity` and `use-cursor` let one agent plan and review while another agent's CLI writes the code. |
+
+## Skills
+
+### Engineering lifecycle
+
+| Skill | Command | What it does |
+| --- | --- | --- |
+| `vibecode-workflow` | `/vibecode-workflow <goal>` | Splits a goal into tasks and runs each in a new sub-agent that builds, reviews, reports and exits. |
+| `use-vibecode` | `/use-vibecode <task>` | Runs one task in the current chat: prepare, implement, then review. |
+| `vibecode-init` | `/vibecode-init` | Profiles a repository and writes `.agent/project-rules.md`, and sets up `AGENTS.md` to use the workflow. |
+| `vibecode` | `/vibecode` | The coding rules: search first, change in place, one name per concept, no fake fixes. Includes TypeScript, Angular, CSS and Firebase rules. |
+| `vibecode-design` | `/vibecode-design` | The UI rules: reuse components and tokens, measure values from references, keep layouts consistent and accessible. |
+| `vibecode-review` | `/vibecode-review [skill]` | Re-reads the rules from disk, inspects the session's diff, and reports each rule as pass, fail, skipped or N/A. |
+
+### Learning your rules
+
+| Skill | Command | What it does |
+| --- | --- | --- |
+| `vibecode-update` | `/vibecode-update [rule]` | Turns a coding correction into one checkable rule in `vibecode`. With no rule, collects the corrections from this session. |
+| `vibecode-design-update` | `/vibecode-design-update [rule]` | Does the same for UI corrections, writing to `vibecode-design`. |
+
+### Routing and decisions
+
+| Skill | Command | What it does |
+| --- | --- | --- |
+| `auto-mode-workflow` | `/auto-mode-workflow <task>` | Finds the CLIs and model tiers you have, scores the task, and sends it to the one that fits. |
+| `jev-assistance` | `/jev-assistance` | Scores a set of options with TypeSafe's Jev model. Picks automatically when the pick is confident and safe, otherwise shows you the ranking. |
+
+### Operator and coder runners
+
+One agent plans, builds, reviews and tests. The other writes the code through its own CLI.
+
+| Skill | Command | Coder CLI |
+| --- | --- | --- |
+| `use-claude-code` | `/use-claude-code <task>` | `claude -p`, locally or on a remote host |
+| `use-antigravity` | `/use-antigravity <task>` | `agy` in accept-edits mode |
+| `use-cursor` | `/use-cursor <task>` | `agent -p` (Cursor Agent CLI) |
+
+## How it works
+
+```mermaid
+flowchart LR
+    U([Your goal]) --> W[vibecode-workflow<br/>plans the tasks]
+    W --> S1[Sub-agent 1]
+    W --> S2[Sub-agent 2]
+    W --> S3[Sub-agent …]
+
+    subgraph Each["Each sub-agent runs use-vibecode"]
+        P[1 · Prepare<br/>read project-rules.md] --> I[2 · Implement<br/>vibecode + vibecode-design]
+        I --> R[3 · Review<br/>vibecode-review]
+        R -- fail --> I
+    end
+
+    S1 -.-> P
+    R -- pass --> D([Report and exit])
+    D --> W
+
+    F([Your corrections]) -.-> L[vibecode-update<br/>vibecode-design-update]
+    L -.-> I
+```
+
+1. **Prepare.** The sub-agent reads `.agent/project-rules.md` (running `vibecode-init` if it is missing) and looks for helpers it can reuse.
+2. **Implement.** It writes the change with `vibecode`, and with `vibecode-design` for any UI.
+3. **Review.** It runs `vibecode-review` on its own diff and fixes every failed rule before reporting.
+4. **Exit.** It hands its diff and review to the orchestrator and ends, so the next task starts with a clean context.
+
+### Ways to use it
+
+| You want to… | Run | Review included? |
+| --- | --- | --- |
+| Build a feature with several steps | `/vibecode-workflow <goal>` | Yes, in every sub-agent |
+| Do one task in this chat | `/use-vibecode <task>` | Yes, before it reports |
+| Check code that is already written | `/vibecode-review` | It is the review |
+| Keep a correction for next time | `/vibecode-update <rule>` | Tested with two dry-run agents |
+
+Run `/vibecode-review` yourself when code was written outside the workflow, or before you open a pull request.
+
+## Installation
+
+### Claude Code plugin
+
+The marketplace offers these plugins:
+
+| Plugin | Skills |
+| --- | --- |
+| `vibecode-suite` | The full lifecycle: `vibecode`, `vibecode-workflow`, `vibecode-design`, `vibecode-review`, `vibecode-init`, `vibecode-update`, `vibecode-design-update`, `use-vibecode` |
+| `vibecode` | `vibecode`, `use-vibecode`, `vibecode-review`, `vibecode-init` |
+| `vibecode-workflow` | `vibecode-workflow` |
+| `vibecode-design` | `vibecode-design`, `vibecode-design-update` |
+
+```bash
+claude plugin marketplace add lysari/vibecode-skills
+claude plugin install vibecode-suite@vibecode-skills
+```
+
 > [!NOTE]
-> Re-running this command is completely safe. Existing symlinks will output `File exists` and will not be overwritten.
+> The routing skills (`auto-mode-workflow`, `jev-assistance`) and the operator runners (`use-*`) are not in a plugin yet. Link them as shown below.
 
----
+### Linking the skills
 
-### Link by Agent
+| Agent | Global skills folder | Project skills folder |
+| --- | --- | --- |
+| Claude Code | `~/.claude/skills/` | `.claude/skills/` |
+| Google Antigravity | `~/.gemini/config/skills/` | `.agents/skills/` |
+| Cursor | `~/.cursor/skills/` | `.cursor/skills/` |
 
-To link skills to a specific tool only:
+> [!CAUTION]
+> For Cursor, link into `~/.cursor/skills/`, **never** `~/.cursor/skills-cursor/`. That folder is reserved for Cursor's own skills.
+
+<details>
+<summary><b>Link to one agent only</b></summary>
 
 ```bash
 # Claude Code
 mkdir -p ~/.claude/skills
-for d in "$PWD"/.claude/skills/*/; do ln -s "${d%/}" ~/.claude/skills/; done
+for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.claude/skills/; done
 
 # Antigravity
 mkdir -p ~/.gemini/config/skills
-for d in "$PWD"/.claude/skills/*/; do ln -s "${d%/}" ~/.gemini/config/skills/; done
+for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.gemini/config/skills/; done
 
 # Cursor
 mkdir -p ~/.cursor/skills
-for d in "$PWD"/.claude/skills/*/; do ln -s "${d%/}" ~/.cursor/skills/; done
+for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.cursor/skills/; done
 ```
 
----
+</details>
 
-### Link a Single Skill
+<details>
+<summary><b>Link a single skill</b></summary>
 
-Replace `<skill-name>` with the directory name of the skill (e.g., `use-vibecode`):
+Replace `<skill-name>` with a folder name from `.agent/skills/`, such as `use-vibecode`:
 
 ```bash
-# Claude Code
-ln -s "$PWD/.claude/skills/<skill-name>" ~/.claude/skills/<skill-name>
-
-# Antigravity
-ln -s "$PWD/.claude/skills/<skill-name>" ~/.gemini/config/skills/<skill-name>
-
-# Cursor
-ln -s "$PWD/.claude/skills/<skill-name>" ~/.cursor/skills/<skill-name>
+ln -s "$PWD/.agent/skills/<skill-name>" ~/.claude/skills/<skill-name>
+ln -s "$PWD/.agent/skills/<skill-name>" ~/.gemini/config/skills/<skill-name>
+ln -s "$PWD/.agent/skills/<skill-name>" ~/.cursor/skills/<skill-name>
 ```
 
 > [!IMPORTANT]
-> The syntax order is `ln -s <source-in-this-repo> <target-link-in-agent-dir>`. Do not invert the arguments, or a circular symlink will be created inside the repository.
+> The order is `ln -s <source in this repo> <link in the agent folder>`. Swapping them creates a circular link inside the repository.
 
----
+</details>
 
-### Verification
-
-Verify that your symlinks are active and pointing back to this repository:
+<details>
+<summary><b>Check the links</b></summary>
 
 ```bash
-# Verify Claude Code
-ls -l ~/.claude/skills
-
-# Verify Antigravity
-ls -l ~/.gemini/config/skills
-
-# Verify Cursor
-ls -l ~/.cursor/skills
+ls -l ~/.claude/skills ~/.gemini/config/skills ~/.cursor/skills
 ```
 
-Each linked entry should show an arrow pointing to its absolute path inside this repository.
+Each skill should show an arrow pointing into this repository.
 
----
+</details>
 
-### Unlinking
+<details>
+<summary><b>Remove the links</b></summary>
 
-To safely remove the symlinks from an agent (leaving this repository untouched):
+From the root of this repository:
 
 ```bash
-# Remove all linked skills from all three agents
 for target in ~/.claude/skills ~/.gemini/config/skills ~/.cursor/skills; do
-  for d in "$PWD"/.claude/skills/*/; do
+  for d in "$PWD"/.agent/skills/*/; do
     rm -f "$target/$(basename "$d")"
   done
 done
 ```
 
-To remove a single linked skill:
+This removes only the links. The repository is left as it is. If you move or rename the repository, the links break: remove them, then link again from the new location.
 
-```bash
-rm ~/.claude/skills/<skill-name>
-rm ~/.gemini/config/skills/<skill-name>
-rm ~/.cursor/skills/<skill-name>
-```
+</details>
 
-> [!NOTE]
-> If you relocate or rename this repository, existing symlinks will break. Run the unlinking script, then re-run the linking script from the new repository directory.
+## Repository layout
 
----
+| Path | What it holds |
+| --- | --- |
+| [`.agent/skills/vibecode`](.agent/skills/vibecode) | Coding rules, with [`frameworks/`](.agent/skills/vibecode/frameworks) for each technology and [`references/`](.agent/skills/vibecode/references) for each topic |
+| [`.agent/skills/vibecode-design`](.agent/skills/vibecode-design) | UI, token, layout and accessibility rules |
+| [`.agent/skills/vibecode-workflow`](.agent/skills/vibecode-workflow) · [`use-vibecode`](.agent/skills/use-vibecode) | The orchestrator and the three-stage task lifecycle |
+| [`.agent/skills/vibecode-init`](.agent/skills/vibecode-init) · [`vibecode-review`](.agent/skills/vibecode-review) | Project profiling and the compliance review |
+| [`.agent/skills/vibecode-update`](.agent/skills/vibecode-update) · [`vibecode-design-update`](.agent/skills/vibecode-design-update) | Turning corrections into rules |
+| [`.agent/skills/auto-mode-workflow`](.agent/skills/auto-mode-workflow) · [`jev-assistance`](.agent/skills/jev-assistance) | Model routing and the Jev decision scripts |
+| [`.agent/skills/use-claude-code`](.agent/skills/use-claude-code) · [`use-antigravity`](.agent/skills/use-antigravity) · [`use-cursor`](.agent/skills/use-cursor) | Operator and coder runners |
+| [`.claude-plugin/`](.claude-plugin) | Claude Code plugin and marketplace manifests |
+| [`assets/`](assets) | Logo and README images |
 
-## 🛠 Usage Guide: How It Works & Ways to Use
+## Contributing
 
-### Step 1: Onboard Your Repository (One-Time Setup)
+New rules, framework guides and fixes are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), and run `/vibecode-review` on your change before opening a pull request. To report a security issue, see [SECURITY.md](SECURITY.md).
 
-Before developing in any new or existing repository, run:
-```text
-/vibecode-init
-```
-- **How it works**:
-  1. Scans your codebase for directory structure, framework conventions, test frameworks, path aliases, and build setups.
-  2. Generates `.claude/project-rules.md` capturing project-specific conventions.
-  3. Creates `AGENTS.md` (and links `CLAUDE.md` and `GEMINI.md`) directing all AI tools to abide by `.claude/project-rules.md` and execute tasks using the Vibecode lifecycle.
+## License
 
----
-
-### Step 2: Choose Your Execution Mode (3 Ways to Use)
-
-Depending on your task scope, there are **3 distinct ways** to execute work:
-
-| Way | Command | Best For | Review Gate Included? |
-|---|---|---|---|
-| **Way 1: Autonomous Workflow** *(Recommended)* | `/vibecode-workflow <task>` | Complex features, refactors, multi-step tasks | ✅ **Yes, built-in**. Every sub-agent automatically audits and passes `vibecode-review` before exit. |
-| **Way 2: Direct Single-Task** | `/use-vibecode <task>` | Quick, single-turn tasks in the active chat session | ✅ **Yes, built-in**. Runs Stage 1 (Prep) → Stage 2 (Impl) → Stage 3 (`vibecode-review`). |
-| **Way 3: Standalone Audit** | `/vibecode-review [skill]` | Pre-PR verification, manual code audits, diff sanity checks | 🔍 **Audit only**. Evaluates disk rules against current `git diff` without writing new code. |
-
-#### Way 1: Autonomous Multi-Task Workflow (`/vibecode-workflow`) — *Recommended*
-Use this for any non-trivial task or multi-file feature:
-```text
-/vibecode-workflow implement the user authentication modal using liquid design tokens
-```
-- **How it works**:
-  1. **Orchestrator Planning**: The main agent acts strictly as an orchestrator. It maintains a live progress dashboard (`task-progress.md`) and decomposes the request into sequential sub-tasks. It does not read massive source files or edit code directly.
-  2. **Fresh Ephemeral Sub-Agents**: Spawns a dedicated sub-agent per task with an isolated, clean context window (eliminating context rot and rule degradation).
-  3. **Automated 3-Stage Lifecycle (`use-vibecode`)**: Each sub-agent runs:
-     - **Stage 1 (Preparation)**: Discovers local rules in `.claude/project-rules.md` and checks for existing helpers.
-     - **Stage 2 (Implementation)**: Writes clean, minimal code using `vibecode` and measured UI tokens using `vibecode-design`.
-     - **Stage 3 (Mandatory Review Gate)**: Executes `vibecode-review` directly against rule files on disk, inspects its own diffs, and remediates any rule violations until the checklist achieves a `[PASS]`.
-  4. **Deliver & Terminate**: The sub-agent reports diffs and audit results to the orchestrator, and is terminated immediately to keep context clean.
-- **Do you need to run `/vibecode-review` afterward?**
-  **No.** `vibecode-review` is executed automatically inside each sub-agent as part of Stage 3.
-
-#### Way 2: Direct In-Session Task Execution (`/use-vibecode`)
-Use this when you want the active agent in your current chat to complete a single task directly without spawning sub-agents:
-```text
-/use-vibecode add email validation helper with unit tests
-```
-- **How it works**:
-  - Executes the complete 3-stage lifecycle in place within the current conversation thread.
-  - Automatically runs the Stage 3 `vibecode-review` audit gate before marking the task complete.
-
-#### Way 3: Standalone Compliance Audit (`/vibecode-review`)
-Use this to audit code that was **already written**, or as a final gate before merging/pushing:
-```text
-/vibecode-review
-```
-*Or target a specific skill discipline:*
-```text
-/vibecode-review vibecode-design
-```
-- **How it works**:
-  - Does **not** write new feature code.
-  - Re-reads every active skill and rule file **directly from disk** (never relies on conversation memory or cached summaries).
-  - Collects session diffs via `git status` and `git diff`.
-  - Audits against every explicit rule (naming conventions, dead code, leftover logs, missing types, eyeballed tokens) and outputs a pass/fail matrix.
-- **When to run this manually**:
-  - When you or an agent wrote code directly outside of `/vibecode-workflow`.
-  - Before opening a PR or merging to verify cumulative session changes across multiple commits.
-
----
-
-### Step 3: Teach the Agent Permanently (Continuous Learning)
-
-Whenever you correct the agent's code style or UI choices, save it to permanent memory so future sessions and review gates enforce it:
-```text
-# For code hygiene, architecture, or TypeScript rules:
-/vibecode-update always use named exports instead of default exports
-
-# For UI spacing, design tokens, layout, or accessibility:
-/vibecode-design-update always use 8px grid spacing for card headers
-```
-- **How it works**: Distills your feedback into a clean, checkable rule written directly to disk (`vibecode/SKILL.md` or `vibecode-design/SKILL.md`).
-
----
-
-## 📁 Repository Structure
-
-```text
-skills/
-├── .claude/
-│   └── skills/
-│       ├── auto-mode-workflow/     # Intelligent provider & model routing
-│       │   ├── SKILL.md
-│       │   └── config.json
-│       ├── jev-assistance/         # Jev decision model integration
-│       │   ├── SKILL.md
-│       │   └── scripts/            # choose.mts, report.mts, cursor-session.mts
-│       ├── use-antigravity/        # Operator/Coder separation for Antigravity (agy)
-│       │   └── SKILL.md
-│       ├── use-claude-code/        # Operator/Coder separation for Claude Code
-│       │   └── SKILL.md
-│       ├── use-cursor/             # Operator/Coder separation for Cursor agent
-│       │   └── SKILL.md
-│       ├── use-vibecode/           # End-to-end 3-stage Vibecode lifecycle
-│       │   └── SKILL.md
-│       ├── vibecode/               # Core coding hygiene & standards
-│       │   ├── SKILL.md
-│       │   ├── frameworks/         # Angular, CSS, Firebase, TypeScript rules
-│       │   └── references/         # Cleanup, change-scope, naming, project-hygiene
-│       ├── vibecode-design/        # UI, design tokens, layout & accessibility
-│       │   └── SKILL.md
-│       ├── vibecode-design-update/ # UI correction distillation
-│       │   └── SKILL.md
-│       ├── vibecode-init/          # Project profiling & onboarding rules
-│       │   └── SKILL.md
-│       ├── vibecode-review/        # Post-implementation disk compliance gate
-│       │   └── SKILL.md
-│       ├── vibecode-update/        # Code correction distillation
-│       │   └── SKILL.md
-│       └── vibecode-workflow/      # Ephemeral sub-agent multi-task orchestrator
-│           └── SKILL.md
-├── assets/
-│   ├── Cute Vibecode Developer Diorama.png
-│   └── Vibecode AI Coding Mascot Logo.png
-└── README.md                       # Repository documentation
-```
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE) © 2026 SARI. Designed for rapid, reliable, and compliant AI-assisted software engineering.
+Vibecode Skills is released under the [MIT License](LICENSE) © 2026 SARI.

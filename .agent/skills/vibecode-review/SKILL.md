@@ -34,7 +34,7 @@ Scan the session context, project root, and modified files to list every skill t
    - If `angular.json` is present or any Angular component/service was touched, `frameworks/angular/rules.md` is **mandatory**.
    - Never stop after the first framework match. Every matching row must be included.
 3. **Reference files**: Any topic reference files relevant to the changes made (e.g., `file-organization.md`, `naming.md`, `code-structure.md`, `change-scope.md`, `cleanup.md`, `project-hygiene.md`).
-4. **Project rules & instructions**: `.claude/project-rules.md`, `AGENTS.md`, and `CLAUDE.md`.
+4. **Project rules & instructions**: `.agent/project-rules.md`, `AGENTS.md`, and `CLAUDE.md`.
 
 ### 2. Re-read the full skill files from disk
 
@@ -43,7 +43,7 @@ Scan the session context, project root, and modified files to list every skill t
 Use file-reading tools to read the raw files from start to finish:
 - Read `SKILL.md` for each identified skill.
 - Read every relevant file under `references/` and `frameworks/`.
-- Read `.claude/project-rules.md` if present.
+- Read `.agent/project-rules.md` if present.
 - Extract every explicit rule, directive, "Always", and "Never" instruction into a list of verification criteria.
 
 > [!IMPORTANT]
@@ -85,9 +85,9 @@ Output the review formatted as a clear checklist:
 ## 1. Skills Re-read from Disk
 | Skill / File | Path | Status |
 |---|---|---|
-| vibecode | `.claude/skills/vibecode/SKILL.md` | Re-read |
-| vibecode/change-scope | `.claude/skills/vibecode/references/change-scope.md` | Re-read |
-| vibecode/cleanup | `.claude/skills/vibecode/references/cleanup.md` | Re-read |
+| vibecode | `.agent/skills/vibecode/SKILL.md` | Re-read |
+| vibecode/change-scope | `.agent/skills/vibecode/references/change-scope.md` | Re-read |
+| vibecode/cleanup | `.agent/skills/vibecode/references/cleanup.md` | Re-read |
 | ... | ... | ... |
 
 ## 2. Changes Inspected

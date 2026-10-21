@@ -15,7 +15,7 @@
     "generated": ["*.log", "*.map", "*.min.*", ".DS_Store"]
   },
   "countOnly": ["*.woff", "*.woff2", "*.ttf", "*.otf", "*.png", "*.jpg", "*.jpeg", "*.webp", "*.ico"],
-  "keep": [".claude/skills/"],
+  "keep": [".agent/skills/"],
   "frameworks": {
     "angular": {
       "directories": [".angular/"]

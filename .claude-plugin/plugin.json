@@ -1,0 +1,27 @@
+{
+  "name": "vibecode-skills",
+  "version": "1.0.0",
+  "description": "Agent Skills Suite for Claude Code — human-like vibe coding, lifecycle orchestrators, and automated reviews.",
+  "author": {
+    "name": "lysari",
+    "url": "https://github.com/lysari/vibecode-skills"
+  },
+  "skills": [
+    "./.agent/skills/vibecode",
+    "./.agent/skills/vibecode-workflow",
+    "./.agent/skills/vibecode-design",
+    "./.agent/skills/vibecode-review",
+    "./.agent/skills/vibecode-init",
+    "./.agent/skills/vibecode-update",
+    "./.agent/skills/vibecode-design-update",
+    "./.agent/skills/use-vibecode"
+  ],
+  "keywords": [
+    "vibecode",
+    "skills",
+    "code-review",
+    "workflow",
+    "subagents",
+    "design-tokens"
+  ]
+}

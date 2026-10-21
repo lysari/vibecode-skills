@@ -193,7 +193,7 @@ Categorize into:
 2. Pipe the structured request into `choose.mts`:
 
 ```bash
-node .claude/skills/jev-assistance/scripts/choose.mts <<'JSON'
+node .agent/skills/jev-assistance/scripts/choose.mts <<'JSON'
 {
   "goal": "Fix opacity property on dialog component so body is configurable or not opaque",
   "context": "Project uses Angular and SCSS. Task is a localized styling fix touching 1-2 component files.",
