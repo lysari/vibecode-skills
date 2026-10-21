@@ -24,6 +24,34 @@ When developers "vibe code" with AI, two big problems usually happen:
 - **Easy to Co-Maintain with AI**: Built so humans and AI agents can collaborate smoothly without fighting overly complex architecture or untangling messy spaghetti.
 - **Minimal & In-Place**: Make the smallest, cleanest change in the files the project already uses. Delete what you replace. Don't add unnecessary layers.
 
+### ⚡ Quick Start: Just Use `/vibecode-workflow`
+
+> [!TIP]
+> **New here? This is the only command you need.**
+
+**1. Link the skills.** Run this from the root of this repository to link all skills to Claude Code, Antigravity, and Cursor at once:
+
+```bash
+for target in ~/.claude/skills ~/.gemini/config/skills ~/.cursor/skills; do
+  mkdir -p "$target"
+  for d in "$PWD"/.agent/skills/*/; do
+    ln -s "${d%/}" "$target/"
+  done
+done
+```
+
+Re-running it is safe: existing links print `File exists` and are left as they are. To link only one agent or one skill, see [Installation & Setup](#-installation--setup).
+
+**2. Describe your task:**
+
+```text
+/vibecode-workflow implement the user authentication modal
+```
+
+It plans the work, runs each step in a fresh sub-agent, writes clean code, and reviews it before handing back. On first use in a repository it profiles the project for you, so no separate setup is needed.
+
+Every other skill below is optional — explore them when you want finer control (single in-session tasks, standalone audits, teaching your style, model routing, or external CLI runners). See the [Usage Guide](#-usage-guide-how-it-works--ways-to-use) for details.
+
 ### What Our Skills Aim To Achieve
 
 | Core Aim | What We Want to Avoid | How Our Skills Achieve It | Key Skills |
@@ -42,6 +70,7 @@ When developers "vibe code" with AI, two big problems usually happen:
 ## 📑 Table of Contents
 
 - [What Our Skills Mean & What They Aim To Do](#-what-our-skills-mean--what-they-aim-to-do)
+  - [Quick Start: Just Use `/vibecode-workflow`](#-quick-start-just-use-vibecode-workflow)
 - [System Architecture](#-system-architecture)
 - [Skills Catalog](#-skills-catalog)
   - [Vibecode Engineering Lifecycle](#1-vibecode-engineering-lifecycle)
@@ -54,7 +83,6 @@ When developers "vibe code" with AI, two big problems usually happen:
   - [Decision Layer: TypeSafe Jev Model](#decision-layer-typesafe-jev-model)
 - [Installation & Setup](#-installation--setup)
   - [Agent Skill Paths](#agent-skill-paths)
-  - [Link All Skills (Recommended)](#link-all-skills-recommended)
   - [Link by Agent](#link-by-agent)
   - [Link a Single Skill](#link-a-single-skill)
   - [Verification](#verification)
@@ -213,24 +241,6 @@ Skills can be linked into your agent tools globally (available in every project)
 
 ---
 
-### Link All Skills (Recommended)
-
-Run this one-liner from the root of this repository to link all skills to Claude Code, Antigravity, and Cursor simultaneously:
-
-```bash
-for target in ~/.claude/skills ~/.gemini/config/skills ~/.cursor/skills; do
-  mkdir -p "$target"
-  for d in "$PWD"/.agent/skills/*/; do
-    ln -s "${d%/}" "$target/"
-  done
-done
-```
-
-> [!NOTE]
-> Re-running this command is completely safe. Existing symlinks will output `File exists` and will not be overwritten.
-
----
-
 ### Link by Agent
 
 To link skills to a specific tool only:
@@ -312,7 +322,7 @@ rm ~/.cursor/skills/<skill-name>
 ```
 
 > [!NOTE]
-> If you relocate or rename this repository, existing symlinks will break. Run the unlinking script, then re-run the linking script from the new repository directory.
+> If you relocate or rename this repository, existing symlinks will break. Run the unlinking script, then re-run the [linking script](#-quick-start-just-use-vibecode-workflow) from the new repository directory.
 
 ---
 
