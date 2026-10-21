@@ -39,5 +39,5 @@ logs/
 *.swo
 
 # Local decision & execution logs
-.claude/skills/jev-assistance/logs/
+.agent/skills/jev-assistance/logs/
 

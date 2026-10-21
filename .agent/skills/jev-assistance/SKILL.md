@@ -48,7 +48,7 @@ Always ask the user, and show Jev's ranking as the recommendation, when the ques
 2. Run the script from the project root (Node 24+, no install needed):
 
    ```bash
-   node .claude/skills/jev-assistance/scripts/choose.mts <<'JSON'
+   node .agent/skills/jev-assistance/scripts/choose.mts <<'JSON'
    { ...the input above... }
    JSON
    ```
@@ -100,8 +100,8 @@ Weights and thresholds are constants at the top of `scripts/choose.mts`. They ar
   "ranking": [
     { "label": "Signal in an injectable service", "composite": 0.84, "choiceProbability": 0.99, "fit": 0.81, "usability": 0.9, "modern": 0.91, "safety": 0.94, "reliability": 0.88, "simplicity": 0.57, "irreversible": 0.03, "securityRisk": 0.02 }
   ],
-  "afterAnswer": "When you ask the user instead of taking the pick, log their answer with `JEV_SESSION_ID=42ce77e3-8979-4c10-99dd-f7af38787756 node .claude/skills/jev-assistance/scripts/choose.mts --user-pick \"<their answer>\"`.",
-  "afterTask": "When the task is implemented, run `node .claude/skills/jev-assistance/scripts/report.mts 42ce77e3-8979-4c10-99dd-f7af38787756` and paste its output under \"Jev picks\" at the end of your final message."
+  "afterAnswer": "When you ask the user instead of taking the pick, log their answer with `JEV_SESSION_ID=42ce77e3-8979-4c10-99dd-f7af38787756 node .agent/skills/jev-assistance/scripts/choose.mts --user-pick \"<their answer>\"`.",
+  "afterTask": "When the task is implemented, run `node .agent/skills/jev-assistance/scripts/report.mts 42ce77e3-8979-4c10-99dd-f7af38787756` and paste its output under \"Jev picks\" at the end of your final message."
 }
 ```
 
@@ -109,13 +109,13 @@ Weights and thresholds are constants at the top of `scripts/choose.mts`. They ar
 
 ## Logs
 
-Every run, failed or not, appends one JSON line to `.claude/skills/jev-assistance/logs/<session-id>.jsonl` (git-ignored), one file per session. The session id is the first one set of `JEV_SESSION_ID`, Claude Code's `CLAUDE_CODE_SESSION_ID`, Codex's `CODEX_THREAD_ID` and OpenCode's `OPENCODE_RUN_ID`, else `no-session-<YYYY-MM-DD>`. Cursor exposes no session variable, so `.cursor/hooks.json` runs `scripts/cursor-session.mts` on `sessionStart`, which sets `JEV_SESSION_ID` to the chat's `conversation_id` and tells the agent to pass it as a prefix. Any other caller passes its own id, e.g. `JEV_SESSION_ID=<id> node .claude/skills/jev-assistance/scripts/choose.mts`. Each line holds `at`, `request`, then either `verdict`, `model`, `usage` and `ms`, or `error` and `ms`. The API key is never logged.
+Every run, failed or not, appends one JSON line to `.agent/skills/jev-assistance/logs/<session-id>.jsonl` (git-ignored), one file per session. The session id is the first one set of `JEV_SESSION_ID`, Claude Code's `CLAUDE_CODE_SESSION_ID`, Codex's `CODEX_THREAD_ID` and OpenCode's `OPENCODE_RUN_ID`, else `no-session-<YYYY-MM-DD>`. Cursor exposes no session variable, so `.cursor/hooks.json` runs `scripts/cursor-session.mts` on `sessionStart`, which sets `JEV_SESSION_ID` to the chat's `conversation_id` and tells the agent to pass it as a prefix. Any other caller passes its own id, e.g. `JEV_SESSION_ID=<id> node .agent/skills/jev-assistance/scripts/choose.mts`. Each line holds `at`, `request`, then either `verdict`, `model`, `usage` and `ms`, or `error` and `ms`. The API key is never logged.
 
 ```bash
-tail -n 20 ".claude/skills/jev-assistance/logs/$CLAUDE_CODE_SESSION_ID.jsonl"
+tail -n 20 ".agent/skills/jev-assistance/logs/$CLAUDE_CODE_SESSION_ID.jsonl"
 ```
 
-`scripts/report.mts` turns the session's log into Markdown: one `**Q:**` bullet per run with its `*A:*` answer in italics as a sub-bullet (pairs alternate `-` and `*` bullets, so each renders as its own list with a small gap), ending `by Jev` for an auto pick, `by user` when a `userPick` follows the run, `Jev suggested, answer not logged` when it does not, or reading `Jev failed`. A ⚠️ before Jev's pick marks one the script held back for security. It reads the same session id as `choose.mts`; pass another id as its first argument to see an earlier session, e.g. `node .claude/skills/jev-assistance/scripts/report.mts 42ce77e3-8979-4c10-99dd-f7af38787756`.
+`scripts/report.mts` turns the session's log into Markdown: one `**Q:**` bullet per run with its `*A:*` answer in italics as a sub-bullet (pairs alternate `-` and `*` bullets, so each renders as its own list with a small gap), ending `by Jev` for an auto pick, `by user` when a `userPick` follows the run, `Jev suggested, answer not logged` when it does not, or reading `Jev failed`. A ⚠️ before Jev's pick marks one the script held back for security. It reads the same session id as `choose.mts`; pass another id as its first argument to see an earlier session, e.g. `node .agent/skills/jev-assistance/scripts/report.mts 42ce77e3-8979-4c10-99dd-f7af38787756`.
 
 ## Setup
 

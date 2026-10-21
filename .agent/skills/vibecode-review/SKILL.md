@@ -85,9 +85,9 @@ Output the review formatted as a clear checklist:
 ## 1. Skills Re-read from Disk
 | Skill / File | Path | Status |
 |---|---|---|
-| vibecode | `.claude/skills/vibecode/SKILL.md` | Re-read |
-| vibecode/change-scope | `.claude/skills/vibecode/references/change-scope.md` | Re-read |
-| vibecode/cleanup | `.claude/skills/vibecode/references/cleanup.md` | Re-read |
+| vibecode | `.agent/skills/vibecode/SKILL.md` | Re-read |
+| vibecode/change-scope | `.agent/skills/vibecode/references/change-scope.md` | Re-read |
+| vibecode/cleanup | `.agent/skills/vibecode/references/cleanup.md` | Re-read |
 | ... | ... | ... |
 
 ## 2. Changes Inspected

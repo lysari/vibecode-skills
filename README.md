@@ -220,7 +220,7 @@ Run this one-liner from the root of this repository to link all skills to Claude
 ```bash
 for target in ~/.claude/skills ~/.gemini/config/skills ~/.cursor/skills; do
   mkdir -p "$target"
-  for d in "$PWD"/.claude/skills/*/; do
+  for d in "$PWD"/.agent/skills/*/; do
     ln -s "${d%/}" "$target/"
   done
 done
@@ -238,15 +238,15 @@ To link skills to a specific tool only:
 ```bash
 # Claude Code
 mkdir -p ~/.claude/skills
-for d in "$PWD"/.claude/skills/*/; do ln -s "${d%/}" ~/.claude/skills/; done
+for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.claude/skills/; done
 
 # Antigravity
 mkdir -p ~/.gemini/config/skills
-for d in "$PWD"/.claude/skills/*/; do ln -s "${d%/}" ~/.gemini/config/skills/; done
+for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.gemini/config/skills/; done
 
 # Cursor
 mkdir -p ~/.cursor/skills
-for d in "$PWD"/.claude/skills/*/; do ln -s "${d%/}" ~/.cursor/skills/; done
+for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.cursor/skills/; done
 ```
 
 ---
@@ -257,13 +257,13 @@ Replace `<skill-name>` with the directory name of the skill (e.g., `use-vibecode
 
 ```bash
 # Claude Code
-ln -s "$PWD/.claude/skills/<skill-name>" ~/.claude/skills/<skill-name>
+ln -s "$PWD/.agent/skills/<skill-name>" ~/.claude/skills/<skill-name>
 
 # Antigravity
-ln -s "$PWD/.claude/skills/<skill-name>" ~/.gemini/config/skills/<skill-name>
+ln -s "$PWD/.agent/skills/<skill-name>" ~/.gemini/config/skills/<skill-name>
 
 # Cursor
-ln -s "$PWD/.claude/skills/<skill-name>" ~/.cursor/skills/<skill-name>
+ln -s "$PWD/.agent/skills/<skill-name>" ~/.cursor/skills/<skill-name>
 ```
 
 > [!IMPORTANT]
@@ -297,7 +297,7 @@ To safely remove the symlinks from an agent (leaving this repository untouched):
 ```bash
 # Remove all linked skills from all three agents
 for target in ~/.claude/skills ~/.gemini/config/skills ~/.cursor/skills; do
-  for d in "$PWD"/.claude/skills/*/; do
+  for d in "$PWD"/.agent/skills/*/; do
     rm -f "$target/$(basename "$d")"
   done
 done
@@ -404,7 +404,7 @@ Whenever you correct the agent's code style or UI choices, save it to permanent 
 
 ```text
 skills/
-├── .claude/
+├── .agent/
 │   └── skills/
 │       ├── auto-mode-workflow/     # Intelligent provider & model routing
 │       │   ├── SKILL.md

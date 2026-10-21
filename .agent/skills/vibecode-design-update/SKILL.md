@@ -30,7 +30,7 @@ This skill works in any project. When you change it, write no framework, project
    When no correction passes, change no file, bump no version, run no test, and report each correction with the reason it was skipped.
 2. **Place it.** Holds for every project on one UI technology and names its path, suffix, API or tool → `vibecode-design/frameworks/<technology>/rules.md`, in the section for its topic. Otherwise → the section or `references/` file for its topic in `vibecode-design`.
    - Create a `frameworks/<technology>/` folder or a `references/` file only when a correction for it passes step 1, and add its row to the matching table in `vibecode-design/SKILL.md` in the same edit. Never write rules ahead of time.
-3. **Search before writing.** Grep `.claude/skills/vibecode-design/`, `.claude/skills/vibecode/`, `.claude/project-rules.md`, `AGENTS.md` and the memory folder for the topic.
+3. **Search before writing.** Grep `.agent/skills/vibecode-design/`, `.agent/skills/vibecode/`, `.claude/project-rules.md`, `AGENTS.md` and the memory folder for the topic.
    - Same rule exists → tighten that line in place.
    - Contradicts a line in `vibecode-design` → replace it. Never keep the old line next to the new one.
    - Contradicts a line in `vibecode` → `vibecode` wins. Tell the user, and write nothing until they say which to change.

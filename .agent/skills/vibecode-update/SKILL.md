@@ -29,7 +29,7 @@ This skill works in any project. When you change it, write no framework, project
    When no correction passes, change no file, bump no version, run no test, and report each correction with the reason it was skipped.
 2. **Place it.** Holds for every project on one technology and names its path, suffix, API or tool → `frameworks/<technology>/rules.md`, in the section for its topic. Otherwise → the generic file from the References table in `vibecode/SKILL.md`.
    - Create a `frameworks/<technology>/` folder only when a correction for that technology passes step 1. Never write rules for a technology ahead of time.
-3. **Search before writing.** Grep `.claude/skills/vibecode/`, `.claude/project-rules.md`, `AGENTS.md` and the memory folder for the topic.
+3. **Search before writing.** Grep `.agent/skills/vibecode/`, `.claude/project-rules.md`, `AGENTS.md` and the memory folder for the topic.
    - Same rule exists → tighten that line in place.
    - Contradicts a line → replace it. Never keep the old line next to the new one.
    - Read `git status` first; build on uncommitted edits, not on HEAD.
