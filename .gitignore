@@ -38,6 +38,3 @@ logs/
 *.swp
 *.swo
 
-# Local decision & execution logs
-.agent/skills/jev-assistance/logs/
-

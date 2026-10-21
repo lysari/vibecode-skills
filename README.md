@@ -150,8 +150,6 @@ export async function handleLogin(
 | 🧹 **Fresh context for every task** | `vibecode-workflow` splits a goal into tasks and gives each one a new sub-agent, so rules are not forgotten twenty turns into a long chat. |
 | ✅ **Checked before it is "done"** | `vibecode-review` re-reads the rule files from disk, inspects the actual `git diff`, and marks every rule pass, fail, skipped or not applicable. |
 | 🧠 **Learns your corrections** | Tell it once with `/vibecode-update` or `/vibecode-design-update`, and the correction becomes a checkable rule for every later session. |
-| ⚖️ **Right model for the job** | `auto-mode-workflow` and `jev-assistance` score a task and pick a provider and model tier that fit it, so a two-line fix doesn't go to the slowest model. |
-| 👥 **Operator and coder** | `use-claude-code`, `use-antigravity` and `use-cursor` let one agent plan and review while another agent's CLI writes the code. |
 
 ## Skills
 
@@ -172,23 +170,6 @@ export async function handleLogin(
 | --- | --- | --- |
 | `vibecode-update` | `/vibecode-update [rule]` | Turns a coding correction into one checkable rule in `vibecode`. With no rule, collects the corrections from this session. |
 | `vibecode-design-update` | `/vibecode-design-update [rule]` | Does the same for UI corrections, writing to `vibecode-design`. |
-
-### Routing and decisions
-
-| Skill | Command | What it does |
-| --- | --- | --- |
-| `auto-mode-workflow` | `/auto-mode-workflow <task>` | Finds the CLIs and model tiers you have, scores the task, and sends it to the one that fits. |
-| `jev-assistance` | `/jev-assistance` | Scores a set of options with TypeSafe's Jev model. Picks automatically when the pick is confident and safe, otherwise shows you the ranking. |
-
-### Operator and coder runners
-
-One agent plans, builds, reviews and tests. The other writes the code through its own CLI.
-
-| Skill | Command | Coder CLI |
-| --- | --- | --- |
-| `use-claude-code` | `/use-claude-code <task>` | `claude -p`, locally or on a remote host |
-| `use-antigravity` | `/use-antigravity <task>` | `agy` in accept-edits mode |
-| `use-cursor` | `/use-cursor <task>` | `agent -p` (Cursor Agent CLI) |
 
 ## How it works
 
@@ -246,9 +227,6 @@ The marketplace offers these plugins:
 claude plugin marketplace add lysari/vibecode-skills
 claude plugin install vibecode-suite@vibecode-skills
 ```
-
-> [!NOTE]
-> The routing skills (`auto-mode-workflow`, `jev-assistance`) and the operator runners (`use-*`) are not in a plugin yet. Link them as shown below.
 
 ### Linking the skills
 
@@ -333,8 +311,6 @@ This removes only the links. The repository is left as it is. If you move or ren
 | [`.agent/skills/vibecode-workflow`](.agent/skills/vibecode-workflow) · [`use-vibecode`](.agent/skills/use-vibecode) | The orchestrator and the three-stage task lifecycle |
 | [`.agent/skills/vibecode-init`](.agent/skills/vibecode-init) · [`vibecode-review`](.agent/skills/vibecode-review) | Project profiling and the compliance review |
 | [`.agent/skills/vibecode-update`](.agent/skills/vibecode-update) · [`vibecode-design-update`](.agent/skills/vibecode-design-update) | Turning corrections into rules |
-| [`.agent/skills/auto-mode-workflow`](.agent/skills/auto-mode-workflow) · [`jev-assistance`](.agent/skills/jev-assistance) | Model routing and the Jev decision scripts |
-| [`.agent/skills/use-claude-code`](.agent/skills/use-claude-code) · [`use-antigravity`](.agent/skills/use-antigravity) · [`use-cursor`](.agent/skills/use-cursor) | Operator and coder runners |
 | [`.claude-plugin/`](.claude-plugin) | Claude Code plugin and marketplace manifests |
 | [`assets/`](assets) | Logo and README images |
 

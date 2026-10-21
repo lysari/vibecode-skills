@@ -34,7 +34,6 @@ The examples are short and simplified so they fit on one screen, but each one sh
 | 🩹 **Errors** | `@ts-ignore`, an empty `catch`, or a disabled check to make it pass. | Fixes the cause. Never turns off a guard, type or test. | `vibecode` |
 | ✅ **Saying "done"** | "Everything follows best practices!" without looking at the diff. | A rule-by-rule report built from the real `git diff`. | `vibecode-review` |
 | 🧠 **Corrections** | You repeat the same correction every session. | The correction becomes a rule that later reviews check. | `vibecode-update` |
-| ⚖️ **Cost** | The same large model for a typo and for a redesign. | The task is scored and sent to a model tier that fits. | `auto-mode-workflow` |
 
 ```mermaid
 flowchart LR
