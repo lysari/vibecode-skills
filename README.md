@@ -82,6 +82,7 @@ Every other skill below is optional — explore them when you want finer control
   - [Ephemeral Sub-Agent Architecture](#ephemeral-sub-agent-architecture)
   - [Decision Layer: TypeSafe Jev Model](#decision-layer-typesafe-jev-model)
 - [Installation & Setup](#-installation--setup)
+  - [Claude Code Marketplace (One-Step)](#claude-code-marketplace-one-step)
   - [Agent Skill Paths](#agent-skill-paths)
   - [Link by Agent](#link-by-agent)
   - [Link a Single Skill](#link-a-single-skill)
@@ -227,6 +228,42 @@ When multiple execution paths or scope decisions arise, `jev-assistance` steps i
 ## 🚀 Installation & Setup
 
 Skills can be linked into your agent tools globally (available in every project) or locally (scoped to one repository).
+
+### Claude Code Marketplace (One-Step)
+
+If you are using **Claude Code** (v2.1.275 or later), install directly via the built-in marketplace:
+
+```text
+/plugin install vibecode-skills --marketplace lysari/vibecode-skills
+```
+
+Or install specific bundles as needed:
+
+```text
+# Complete suite (all Vibecode lifecycle skills and workflows)
+/plugin install vibecode-suite --marketplace lysari/vibecode-skills
+
+# Core coding hygiene and compliance gates
+/plugin install vibecode --marketplace lysari/vibecode-skills
+
+# Ephemeral sub-agent multi-task orchestrator
+/plugin install vibecode-workflow --marketplace lysari/vibecode-skills
+
+# UI screens, design tokens, and accessibility
+/plugin install vibecode-design --marketplace lysari/vibecode-skills
+```
+
+From terminal CLI:
+
+```bash
+# Add marketplace once
+claude plugin marketplace add lysari/vibecode-skills
+
+# Install the suite
+claude plugin install vibecode-suite@vibecode-skills
+```
+
+---
 
 ### Agent Skill Paths
 
@@ -414,6 +451,9 @@ Whenever you correct the agent's code style or UI choices, save it to permanent 
 
 ```text
 skills/
+├── .claude-plugin/
+│   ├── marketplace.json        # Claude Code Plugin Marketplace catalog
+│   └── plugin.json             # Claude Code root plugin manifest
 ├── .agent/
 │   └── skills/
 │       ├── auto-mode-workflow/     # Intelligent provider & model routing
