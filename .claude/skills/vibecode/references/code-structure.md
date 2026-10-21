@@ -28,13 +28,17 @@
 - Use the project's existing libraries and patterns before adding a dependency.
 
 ## Comments and docs
-- Write code comments only in reusable component or library files shared across features, e.g. a shared button or date helper.
-- Never write a comment in a page or screen, its markup, its styles or its test, nor in an interface or type file.
+- Write code comments only in shared utility files, the files of helper functions reused across features, e.g. a shared date or retry helper.
+- Never write a comment in any other file: components, pages and screens, their markup and styles, state stores, services, constants, interfaces and types, and tests.
 - Explain every file that may not hold comments in `docs/<file-name>.md`, and a page in `docs/<page-name>.md`, grouped by topic, e.g. `docs/order-list.md`.
 - Never write section banners, such as a `Handlers` divider line between blocks of code.
 - When you edit a file that holds comments it may not have, move what they explain into its `docs/<file-name>.md` or `docs/<page-name>.md` and delete them from the file.
 - Add a `docs/<file-name>.md` or `docs/<page-name>.md` without being asked. It is the one kind of doc you may add unasked.
-- In a reusable file, comment why, not what: a hidden constraint, a workaround, a surprising choice.
+- When you create the `docs/` folder, create `docs/.gitignore` holding only `*` in the same change, so the docs stay out of version control.
+- Never add, edit or delete `docs/.gitignore` in a `docs/` folder that already exists.
+- In a utility file, write a doc comment of one or two lines above each exported function that says what it is for and how to use it, e.g. "Formats a date for display. Pass the date and an optional locale."
+- Never describe the steps of an implementation in a comment. Explain them in the file's `docs/<file-name>.md`.
+- Write a comment inside a function body only for a hidden constraint or a workaround, in one line.
 - Let names carry the meaning of the code. Delete comments that restate it.
 - Never copy the comment density of nearby code.
 - When the project's `AGENTS.md`, its `.claude/project-rules.md` or its framework rules set where comments and docs go, follow them.

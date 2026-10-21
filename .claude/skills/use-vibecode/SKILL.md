@@ -2,7 +2,7 @@
 name: use-vibecode
 description: "Use for end-to-end coding and UI tasks to run the complete Vibecode lifecycle: build clean code with vibecode, apply design tokens and layout rules with vibecode-design, and verify compliance with vibecode-review"
 metadata:
-  version: "0.0.1-20261020.3"
+  version: "0.0.1-20261021.1"
 ---
 
 # Use Vibecode
@@ -79,6 +79,7 @@ Write changes adhering strictly to both code and design principles:
 - **Search before creating**: Look for existing files, functions, types, and constants before creating new ones. Extend or edit existing utilities.
 - **In-place replacement**: Edit existing code in place and delete what it replaces. Never leave dead code, commented-out blocks, `_old`, `New`, or `V2` suffixes.
 - **Single concept, single name**: Define each concept once. Never introduce translation layers that duplicate data under new names.
+- **Zero section banners or restating comments**: Never write section headers (e.g. `// Handlers`, `// State`, `<!-- Sidebar -->`, `/* Styles */`) or comments that merely restate what code does. Write code comments only in shared utility (helper function) files: a doc comment of one or two lines on each exported function saying what it is for and how to use it, and a one-line note for a hidden constraint or workaround.
 - **Preserve safeguards**: Never disable a guard, validation, permission check, or test to make code work.
 - **No secrets in code**: Keep environment values and secrets strictly out of source files.
 - **Minimal abstraction**: Do not introduce generic wrappers or helpers unless the exact same logic already occurs in 3+ places or was explicitly requested.
@@ -140,6 +141,7 @@ Before declaring any coding or UI task complete, confirm:
 - [ ] Identified all applicable skills (`vibecode`, `vibecode-design` if UI, frameworks, references).
 - [ ] Searched for existing code/utilities before adding new files or helpers.
 - [ ] Edited existing code in place without leaving `_old`, `New`, `V2`, or commented-out remnants.
+- [ ] Kept code clean of section banners and restating comments.
 - [ ] Extracted and used design tokens if UI was built or changed.
 - [ ] Cleaned up all scratch files, debug logs, and unused imports.
 - [ ] Re-read skills from disk and executed `vibecode-review`.
