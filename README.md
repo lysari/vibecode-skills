@@ -96,6 +96,12 @@ Prefer to do it yourself? On **Claude Code**, add this repository as a plugin ma
 /plugin install vibecode-suite@vibecode-skills
 ```
 
+On **any agent supported by the [skills CLI](https://skills.sh)**, install with one command:
+
+```bash
+npx skills add lysari/vibecode-skills
+```
+
 On **any of the three agents**, clone the repository and link the skills:
 
 ```bash
@@ -276,6 +282,14 @@ The marketplace offers these plugins:
 ```bash
 claude plugin marketplace add lysari/vibecode-skills
 claude plugin install vibecode-suite@vibecode-skills
+```
+
+### Skills CLI
+
+Install every skill with the [skills CLI](https://skills.sh):
+
+```bash
+npx skills add lysari/vibecode-skills
 ```
 
 ### Linking the skills
