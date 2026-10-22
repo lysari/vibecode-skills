@@ -50,6 +50,15 @@
 - Validate input at the boundary (user input, network, files), not on every internal call.
 - When code decides whether a character in user-visible or user-entered text is a digit or a letter, accept every script the app displays, never ASCII alone, e.g. `/\p{Nd}/u` instead of `/[0-9]/`. Test it with a sample in each script, such as `១២៣` beside `123`.
 
+## Data correctness
+- Store and calculate money as an integer count of the currency's smallest unit beside its currency code, or as a decimal type, never as a floating-point number, e.g. `amount: 1999, currency: "USD"`, never `price: 19.99`.
+- Round money once, at the step the business rule names. Never round a value that was already rounded.
+- Store a point in time in UTC or with its offset, and convert it to the user's timezone only to display it, e.g. `2026-10-22T02:00:00Z`, never `2026-10-22 09:00` with no zone.
+- Store an event the user sets in their local time (a reminder, an opening hour) as the local time plus the timezone name, e.g. `09:00` with `Asia/Phnom_Penh`, never a fixed UTC time that shifts when daylight saving changes.
+- Give every request that charges money, sends a message, or creates a record an idempotency key, and return the first result when the same key arrives again, e.g. a retried payment returns the existing charge.
+- Record the id of each processed webhook event and skip an event whose id is already recorded.
+- Disable a submit control while its request is pending, and keep the server-side idempotency check as well.
+
 ## Resources and cleanup
 - Clean up what you start: remove event listeners, cancel timers, and close subscriptions when a component, screen, or service is destroyed, so memory does not leak.
 - Fetch large data in pages or chunks; never pull an unbounded list of records into memory at once.

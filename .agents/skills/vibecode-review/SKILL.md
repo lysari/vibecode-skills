@@ -42,7 +42,7 @@ Scan the session context, project root, and modified files to list every skill t
    - If `tsconfig.json` or any `.ts`/`.tsx` file was modified, `frameworks/typescript/rules.md` is **mandatory**.
    - If `angular.json` is present or any Angular component/service was touched, `frameworks/angular/rules.md` is **mandatory**.
    - Never stop after the first framework match. Every matching row must be included.
-3. **Reference files**: Any topic reference files relevant to the changes made (e.g., `file-organization.md`, `naming.md`, `code-structure.md`, `change-scope.md`, `cleanup.md`, `project-hygiene.md`, `security.md`). If any screen, component, layout, or stylesheet was created or modified, `references/design.md` is **mandatory**.
+3. **Reference files**: Any topic reference files relevant to the changes made (e.g., `file-organization.md`, `naming.md`, `code-structure.md`, `change-scope.md`, `cleanup.md`, `project-hygiene.md`, `security.md`, `database.md`). If any screen, component, layout, or stylesheet was created or modified, `references/design.md` is **mandatory**. If any migration or schema file was created or modified, `references/database.md` is **mandatory**.
 4. **Project rules & instructions**: `.agents/project-rules.md`, `AGENTS.md`, and `CLAUDE.md`.
 
 ### 2. Re-read the full skill files from disk
