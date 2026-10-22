@@ -32,6 +32,10 @@
     },
     "python": {
       "directories": [".pytest_cache/", ".mypy_cache/", ".ruff_cache/"]
+    },
+    "laravel": {
+      "directories": ["storage/", "bootstrap/cache/", "public/build/"],
+      "files": ["public/hot"]
     }
   }
 }

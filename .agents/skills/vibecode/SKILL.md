@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, adding features to a project, or building UI screens, components, layouts, or styles, so changes stay clean, minimal, consistent, and easy to maintain
 metadata:
-  version: "0.0.1-20261022.4"
+  version: "0.0.1-20261022.5"
 ---
 
 # Vibecode
@@ -42,6 +42,7 @@ Check the project root, then read every file whose row matches before writing co
 | `package.json` with `"express"`, `"fastify"`, or `"hono"` | `frameworks/nodejs/rules.md` |
 | `go.mod` | `frameworks/golang/rules.md` |
 | `pyproject.toml`, `requirements.txt`, or `setup.py` | `frameworks/python/rules.md` |
+| `artisan` | `frameworks/laravel/rules.md` |
 | `bunfig.toml` or `bun.lockb` / `bun.lock` | `frameworks/bun/rules.md` |
 | `tsconfig.json` | `frameworks/typescript/rules.md` |
 | `firebase.json` | `frameworks/firebase/rules.md` |
