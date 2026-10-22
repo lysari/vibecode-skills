@@ -112,6 +112,8 @@ done
 
 Running it again is safe: links that already exist print `File exists` and are left alone.
 
+To remove the skills later, see [Uninstall](#uninstall).
+
 ### 2. Set up your project
 
 Start a new session in your project, then run:
@@ -371,6 +373,48 @@ done
 This removes only the links. The repository is left as it is. If you move or rename the repository, the links break: remove them, then link again from the new location.
 
 </details>
+
+### Uninstall
+
+To let your agent remove the skills, copy this prompt and paste it into **Claude Code**, **Antigravity** or **Cursor**:
+
+```text
+Uninstall the Vibecode skills from https://github.com/lysari/vibecode-skills for me.
+
+1. Get the list of Vibecode skill names from the folders in ~/vibecode-skills/.agents/skills/.
+   If ~/vibecode-skills does not exist, clone the repository into a temporary folder made
+   with `mktemp -d` and list the folders in <temporary clone>/.agents/skills/ instead.
+2. Look for skills with those names in these folders, both global and in the current project:
+   - Claude Code: global ~/.claude/skills/, project .claude/skills/
+   - Google Antigravity: global ~/.gemini/config/skills/, project .agents/skills/
+   - Cursor: global ~/.cursor/skills/, project .cursor/skills/
+     (never touch ~/.cursor/skills-cursor/, which is reserved for Cursor)
+   If the current project is the vibecode-skills repository itself, skip its project folders.
+   For each skill you find, note whether it is a symlink or a copied folder.
+3. Show me what you found, grouped by agent and folder, and ask me which to remove.
+   Wait for my answer before removing anything.
+4. Remove only what I picked:
+   - For a symlink, remove the link itself with `rm <link>`. Never delete what it points to.
+   - For a copied folder, delete it with `rm -R <folder>`.
+   Do not remove any other file or folder, and leave the skills folders in place even if empty.
+5. If you are Claude Code, check whether any plugin from the vibecode-skills marketplace is
+   installed. If one is, ask me whether to uninstall it and remove the marketplace too.
+6. If ~/vibecode-skills exists, ask me whether to delete it. Only delete it after every link
+   into it has been removed. Delete the temporary clone, if you made one.
+7. Do not change .agents/project-rules.md or AGENTS.md in any project. Tell me they were left
+   in place so I can remove them myself if I want to.
+8. Run `ls -l` on each skills folder you removed from, then tell me what was removed and what
+   is left.
+```
+
+Prefer to do it yourself? On **Claude Code**, uninstall the plugin and remove the marketplace:
+
+```text
+/plugin uninstall vibecode-suite@vibecode-skills
+/plugin marketplace remove vibecode-skills
+```
+
+If you linked the skills, follow [Remove the links](#linking-the-skills) above, then delete your clone of the repository. If you copied them into a project, delete the copied skill folders from that project's skills folder.
 
 ## Repository layout
 
