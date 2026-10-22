@@ -69,12 +69,12 @@ Install the Vibecode skills from https://github.com/lysari/vibecode-skills for m
    - Cursor: global ~/.cursor/skills/, project .cursor/skills/
      (never ~/.cursor/skills-cursor/, which is reserved for Cursor)
    For each agent I picked, create the chosen folder if needed and symlink every folder
-   in ~/vibecode-skills/.agent/skills/ into it with `ln -s <folder in the repo> <skills folder>/`.
+   in ~/vibecode-skills/.agents/skills/ into it with `ln -s <folder in the repo> <skills folder>/`.
    Skip links that already exist. Do not overwrite, move or delete any file.
 4. Run `ls -l` on each skills folder you linked into, then tell me which skills are linked
    for which agents.
 5. Ask me whether to set up the current project for Vibecode now. If I say yes, read
-   ~/vibecode-skills/.agent/skills/vibecode-init/SKILL.md and follow it for this project.
+   ~/vibecode-skills/.agents/skills/vibecode-init/SKILL.md and follow it for this project.
    If I say no, remind me to start a new session and run /vibecode-init in my project.
 ```
 
@@ -93,7 +93,7 @@ cd vibecode-skills
 
 for target in ~/.claude/skills ~/.gemini/config/skills ~/.cursor/skills; do
   mkdir -p "$target"
-  for d in "$PWD"/.agent/skills/*/; do
+  for d in "$PWD"/.agents/skills/*/; do
     ln -s "${d%/}" "$target/"
   done
 done
@@ -109,7 +109,7 @@ Start a new session in your project, then run:
 /vibecode-init
 ```
 
-It profiles the project, or asks for your stack when the project is new, and writes `.agent/project-rules.md` and `AGENTS.md`. Skip this step if the install prompt already set up the project.
+It profiles the project, or asks for your stack when the project is new, and writes `.agents/project-rules.md` and `AGENTS.md`. Skip this step if the install prompt already set up the project.
 
 ### 3. Describe your task
 
@@ -182,7 +182,7 @@ export async function handleLogin(
 | | |
 | --- | --- |
 | ✂️ **Small, in-place changes** | The agent searches for existing code before writing new code, edits it where it lives, and deletes what it replaces. No `_new`, `V2` or commented-out copies. |
-| 🧭 **Fits your project** | `vibecode-init` reads your folders, aliases, helpers and test setup once, and writes them to `.agent/project-rules.md` so every agent follows them. |
+| 🧭 **Fits your project** | `vibecode-init` reads your folders, aliases, helpers and test setup once, and writes them to `.agents/project-rules.md` so every agent follows them. |
 | 🎨 **Real design values** | `vibecode-design` reuses your components and tokens, measures values from design references instead of guessing, and keeps the UI accessible. |
 | 🧹 **Fresh context for every task** | `vibecode-workflow` splits a goal into tasks and gives each one a new sub-agent, so rules are not forgotten twenty turns into a long chat. |
 | ✅ **Checked before it is "done"** | `vibecode-review` re-reads the rule files from disk, inspects the actual `git diff`, and marks every rule pass, fail, skipped or not applicable. |
@@ -196,7 +196,7 @@ export async function handleLogin(
 | --- | --- | --- |
 | `vibecode-workflow` | `/vibecode-workflow <goal>` | Splits a goal into tasks and runs each in a new sub-agent that builds, reviews, reports and exits. |
 | `use-vibecode` | `/use-vibecode <task>` | Runs one task in the current chat: prepare, implement, then review. |
-| `vibecode-init` | `/vibecode-init` | Profiles a repository and writes `.agent/project-rules.md`, and sets up `AGENTS.md` to use the workflow. |
+| `vibecode-init` | `/vibecode-init` | Profiles a repository and writes `.agents/project-rules.md`, and sets up `AGENTS.md` to use the workflow. |
 | `vibecode` | `/vibecode` | The coding rules: search first, change in place, one name per concept, no fake fixes. Includes TypeScript, Angular, CSS and Firebase rules. |
 | `vibecode-design` | `/vibecode-design` | The UI rules: reuse components and tokens, measure values from references, keep layouts consistent and accessible. |
 | `vibecode-review` | `/vibecode-review [skill]` | Re-reads the rules from disk, inspects the session's diff, and reports each rule as pass, fail, skipped or N/A. |
@@ -231,7 +231,7 @@ flowchart LR
     L -.-> I
 ```
 
-1. **Prepare.** The sub-agent reads `.agent/project-rules.md` (running `vibecode-init` if it is missing) and looks for helpers it can reuse.
+1. **Prepare.** The sub-agent reads `.agents/project-rules.md` (running `vibecode-init` if it is missing) and looks for helpers it can reuse.
 2. **Implement.** It writes the change with `vibecode`, and with `vibecode-design` for any UI.
 3. **Review.** It runs `vibecode-review` on its own diff and fixes every failed rule before reporting.
 4. **Exit.** It hands its diff and review to the orchestrator and ends, so the next task starts with a clean context.
@@ -282,15 +282,15 @@ claude plugin install vibecode-suite@vibecode-skills
 ```bash
 # Claude Code
 mkdir -p ~/.claude/skills
-for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.claude/skills/; done
+for d in "$PWD"/.agents/skills/*/; do ln -s "${d%/}" ~/.claude/skills/; done
 
 # Antigravity
 mkdir -p ~/.gemini/config/skills
-for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.gemini/config/skills/; done
+for d in "$PWD"/.agents/skills/*/; do ln -s "${d%/}" ~/.gemini/config/skills/; done
 
 # Cursor
 mkdir -p ~/.cursor/skills
-for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.cursor/skills/; done
+for d in "$PWD"/.agents/skills/*/; do ln -s "${d%/}" ~/.cursor/skills/; done
 ```
 
 </details>
@@ -298,12 +298,12 @@ for d in "$PWD"/.agent/skills/*/; do ln -s "${d%/}" ~/.cursor/skills/; done
 <details>
 <summary><b>Link a single skill</b></summary>
 
-Replace `<skill-name>` with a folder name from `.agent/skills/`, such as `use-vibecode`:
+Replace `<skill-name>` with a folder name from `.agents/skills/`, such as `use-vibecode`:
 
 ```bash
-ln -s "$PWD/.agent/skills/<skill-name>" ~/.claude/skills/<skill-name>
-ln -s "$PWD/.agent/skills/<skill-name>" ~/.gemini/config/skills/<skill-name>
-ln -s "$PWD/.agent/skills/<skill-name>" ~/.cursor/skills/<skill-name>
+ln -s "$PWD/.agents/skills/<skill-name>" ~/.claude/skills/<skill-name>
+ln -s "$PWD/.agents/skills/<skill-name>" ~/.gemini/config/skills/<skill-name>
+ln -s "$PWD/.agents/skills/<skill-name>" ~/.cursor/skills/<skill-name>
 ```
 
 > [!IMPORTANT]
@@ -329,7 +329,7 @@ From the root of this repository:
 
 ```bash
 for target in ~/.claude/skills ~/.gemini/config/skills ~/.cursor/skills; do
-  for d in "$PWD"/.agent/skills/*/; do
+  for d in "$PWD"/.agents/skills/*/; do
     rm -f "$target/$(basename "$d")"
   done
 done
@@ -343,11 +343,11 @@ This removes only the links. The repository is left as it is. If you move or ren
 
 | Path | What it holds |
 | --- | --- |
-| [`.agent/skills/vibecode`](.agent/skills/vibecode) | Coding rules, with [`frameworks/`](.agent/skills/vibecode/frameworks) for each technology and [`references/`](.agent/skills/vibecode/references) for each topic |
-| [`.agent/skills/vibecode-design`](.agent/skills/vibecode-design) | UI, token, layout and accessibility rules |
-| [`.agent/skills/vibecode-workflow`](.agent/skills/vibecode-workflow) · [`use-vibecode`](.agent/skills/use-vibecode) | The orchestrator and the three-stage task lifecycle |
-| [`.agent/skills/vibecode-init`](.agent/skills/vibecode-init) · [`vibecode-review`](.agent/skills/vibecode-review) | Project profiling and the compliance review |
-| [`.agent/skills/vibecode-update`](.agent/skills/vibecode-update) · [`vibecode-design-update`](.agent/skills/vibecode-design-update) | Turning corrections into rules |
+| [`.agents/skills/vibecode`](.agents/skills/vibecode) | Coding rules, with [`frameworks/`](.agents/skills/vibecode/frameworks) for each technology and [`references/`](.agents/skills/vibecode/references) for each topic |
+| [`.agents/skills/vibecode-design`](.agents/skills/vibecode-design) | UI, token, layout and accessibility rules |
+| [`.agents/skills/vibecode-workflow`](.agents/skills/vibecode-workflow) · [`use-vibecode`](.agents/skills/use-vibecode) | The orchestrator and the three-stage task lifecycle |
+| [`.agents/skills/vibecode-init`](.agents/skills/vibecode-init) · [`vibecode-review`](.agents/skills/vibecode-review) | Project profiling and the compliance review |
+| [`.agents/skills/vibecode-update`](.agents/skills/vibecode-update) · [`vibecode-design-update`](.agents/skills/vibecode-design-update) | Turning corrections into rules |
 | [`.claude-plugin/`](.claude-plugin) | Claude Code plugin and marketplace manifests |
 | [`assets/`](assets) | Logo and README images |
 

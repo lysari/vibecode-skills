@@ -7,14 +7,14 @@
     "url": "https://github.com/lysari/vibecode-skills"
   },
   "skills": [
-    "./.agent/skills/vibecode",
-    "./.agent/skills/vibecode-workflow",
-    "./.agent/skills/vibecode-design",
-    "./.agent/skills/vibecode-review",
-    "./.agent/skills/vibecode-init",
-    "./.agent/skills/vibecode-update",
-    "./.agent/skills/vibecode-design-update",
-    "./.agent/skills/use-vibecode"
+    "./.agents/skills/vibecode",
+    "./.agents/skills/vibecode-workflow",
+    "./.agents/skills/vibecode-design",
+    "./.agents/skills/vibecode-review",
+    "./.agents/skills/vibecode-init",
+    "./.agents/skills/vibecode-update",
+    "./.agents/skills/vibecode-design-update",
+    "./.agents/skills/use-vibecode"
   ],
   "keywords": [
     "vibecode",

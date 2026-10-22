@@ -21,7 +21,7 @@
 
 ---
 
-The examples are short and simplified so they fit on one screen, but each one shows a habit we kept seeing in real sessions. The "with Vibecode" side follows the rules in [`.agent/skills/`](.agent/skills); the skill that enforces each one is named in the table.
+The examples are short and simplified so they fit on one screen, but each one shows a habit we kept seeing in real sessions. The "with Vibecode" side follows the rules in [`.agents/skills/`](.agents/skills); the skill that enforces each one is named in the table.
 
 ## At a glance
 
@@ -239,7 +239,7 @@ Orchestrator writes the plan:
   4. Signature checks and tests
 
 Sub-agent 1 (new context)
-  reads .agent/project-rules.md
+  reads .agents/project-rules.md
   builds task 1 → review PASS → exits
 
 Sub-agent 3 (new context)

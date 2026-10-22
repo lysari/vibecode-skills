@@ -1,6 +1,6 @@
 ---
 name: vibecode-init
-description: Use when onboarding an existing or new project to the Vibecode ecosystem, to inspect repository architecture, code styles, path aliases, shared helpers, and test tooling, generate a tailored .agent/project-rules.md, and configure AGENTS.md to enforce /vibecode-workflow across all AI tools
+description: Use when onboarding an existing or new project to the Vibecode ecosystem, to inspect repository architecture, code styles, path aliases, shared helpers, and test tooling, generate a tailored .agents/project-rules.md, and configure AGENTS.md to enforce /vibecode-workflow across all AI tools
 metadata:
   version: "0.0.1-20261022.1"
 ---
@@ -9,15 +9,15 @@ metadata:
 
 ## Overview
 
-Profile an existing or new repository and generate a tailored `.agent/project-rules.md` file. In addition, configure the root `AGENTS.md` to enforce the `/vibecode-workflow` skill for all coding tasks, and safely point auxiliary client files (`CLAUDE.md`, `GEMINI.md`) to `AGENTS.md`. This establishes a unified, project-specific contract that all AI tools follow. For every place the project differs from the Vibecode rules, the contract records the user's answer: keep the project's current way, or change it to follow the rule.
+Profile an existing or new repository and generate a tailored `.agents/project-rules.md` file. In addition, configure the root `AGENTS.md` to enforce the `/vibecode-workflow` skill for all coding tasks, and safely point auxiliary client files (`CLAUDE.md`, `GEMINI.md`) to `AGENTS.md`. This establishes a unified, project-specific contract that all AI tools follow. For every place the project differs from the Vibecode rules, the contract records the user's answer: keep the project's current way, or change it to follow the rule.
 
-Vibecode skills treat `.agent/project-rules.md` and `AGENTS.md` as higher precedence than all generic and framework rules. Generating these files upfront is the primary safeguard when introducing Vibecode to legacy or established repositories.
+Vibecode skills treat `.agents/project-rules.md` and `AGENTS.md` as higher precedence than all generic and framework rules. Generating these files upfront is the primary safeguard when introducing Vibecode to legacy or established repositories.
 
 ---
 
 ## When to use
 
-- **First-time repository onboarding**: Whenever working on a project that does not yet have `.agent/project-rules.md`.
+- **First-time repository onboarding**: Whenever working on a project that does not yet have `.agents/project-rules.md`.
 - **Pre-flight in `use-vibecode`**: Triggered automatically during Stage 1 (Preparation & Rule Discovery) if no project rules or agent instructions are found.
 - **On-demand initialization (`/vibecode-init`)**: When the user explicitly asks to profile, initialize, or adapt Vibecode to the current project.
 - **After major refactors**: When directory structures, core utilities, or path aliases have changed and project rules need recalibration.
@@ -46,10 +46,10 @@ When the signs are mixed, ask the user which state fits.
 
 1. Skip profiling and the keep-or-restructure question: there is nothing to keep.
 2. Ask the user for the stack: language and framework, package manager, styling approach when there is a UI, and test tool. Ask in batches of up to 4 questions, recommended option first, and record each answer under "Decisions".
-3. Fill `.agent/project-rules.md` from the answers and the matching `vibecode/frameworks/<stack>/rules.md` files. Write "None yet" for sections with no facts, such as aliases, shared helpers, tokens, and verification commands.
+3. Fill `.agents/project-rules.md` from the answers and the matching `vibecode/frameworks/<stack>/rules.md` files. Write "None yet" for sections with no facts, such as aliases, shared helpers, tokens, and verification commands.
 4. Never scaffold the project or install packages. Init writes only the rule and instruction files.
 
-For both new states, start `.agent/project-rules.md` with `> Provisional: generated for a new project. Re-run /vibecode-init once the first features exist.` When init runs on a provisional file, profile the project as Established and remove the note.
+For both new states, start `.agents/project-rules.md` with `> Provisional: generated for a new project. Re-run /vibecode-init once the first features exist.` When init runs on a provisional file, profile the project as Established and remove the note.
 
 ---
 
@@ -123,15 +123,15 @@ After profiling, and before drafting anything:
    - Also list each place where the rules are silent and the project made its own choice, e.g. a folder name the rules do not set.
    - Ask the user about every item, e.g. "Tests live beside the source files: keep them there, or move them to a mirrored test folder?". Ask in batches of up to 4 questions until every item has an answer.
    - Give every question a "Keep current" option. Put the recommended option first and mark it "(Recommended)"; never drop "Keep current" from a question.
-   - Never draft or write `.agent/project-rules.md` before every item has an answer.
-4. When `.agent/project-rules.md` already exists, read it first, keep every answer listed under its "Decisions", and ask only the questions it does not answer, the first question included.
+   - Never draft or write `.agents/project-rules.md` before every item has an answer.
+4. When `.agents/project-rules.md` already exists, read it first, keep every answer listed under its "Decisions", and ask only the questions it does not answer, the first question included.
 5. Init never moves or rewrites project code. Record each "change" answer as a rule and list the moves it needs under "Pending Restructure", then offer to run that restructure as a separate task.
 
 ---
 
-## Output Template for `.agent/project-rules.md`
+## Output Template for `.agents/project-rules.md`
 
-Generate `.agent/project-rules.md` using this standard structure, populated with project facts:
+Generate `.agents/project-rules.md` using this standard structure, populated with project facts:
 
 ```markdown
 # Project Rules
@@ -197,7 +197,7 @@ Write every section above from the user's answers and observed facts. Remove "Pe
 
 ## Agent Instructions & Cross-Agent Alignment
 
-After profiling the codebase and drafting `.agent/project-rules.md`, configure the unified agent instruction files so all coding tools adhere to the same workflow:
+After profiling the codebase and drafting `.agents/project-rules.md`, configure the unified agent instruction files so all coding tools adhere to the same workflow:
 
 ### 8. Configure `AGENTS.md` (Unified Directive)
 Ensure `AGENTS.md` at the project root contains the top-level directive to use `vibecode-workflow`:
@@ -206,7 +206,7 @@ Ensure `AGENTS.md` at the project root contains the top-level directive to use `
   # Agent Instructions
 
   - Always use skill `/vibecode-workflow` to write code in this project.
-  - Follow project architecture, aliases, and conventions documented in `.agent/project-rules.md`.
+  - Follow project architecture, aliases, and conventions documented in `.agents/project-rules.md`.
   ```
 - **Preservation Rule**: If `AGENTS.md` already exists, append or merge the `/vibecode-workflow` directive without overwriting or deleting any existing owner notes or rules. If it does not exist, create it with the standard directives.
 
@@ -228,8 +228,8 @@ Different AI tools look for specific root instruction files. Unify them by refer
 1. **Perform read-only scan**: Detect the project state, then profile without altering project files.
 2. **Ask keep or restructure**: Follow "Compare With Vibecode Rules & Ask the User". On "Keep current", go straight to drafting; on "Restructure", ask until every difference has an answer. For a Scaffolded or Empty project, follow its section under "Detect Project State" instead.
 3. **Draft project rules**: Populate the template from observed repository patterns and the user's answers.
-4. **Present to the user**: Show the detected profile, proposed `.agent/project-rules.md`, and planned `AGENTS.md` directives to the user for review.
-5. **Write `.agent/project-rules.md`**: Create `.agent/` if needed and write the project rules.
+4. **Present to the user**: Show the detected profile, proposed `.agents/project-rules.md`, and planned `AGENTS.md` directives to the user for review.
+5. **Write `.agents/project-rules.md`**: Create `.agents/` if needed and write the project rules.
 6. **Update or create `AGENTS.md`**: Add the `/vibecode-workflow` directive.
 7. **Link auxiliary files (`CLAUDE.md`, `GEMINI.md`)**: Safely reference `@AGENTS.md` without clobbering existing content.
 8. **Verify with Git**: Run `git status -s` to confirm only the intended instruction and rule files were touched. When the project is not a git repository, list the files written instead and offer to run `git init`.

@@ -19,14 +19,14 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agent/skills/vibecode",
-        "./.agent/skills/vibecode-workflow",
-        "./.agent/skills/vibecode-design",
-        "./.agent/skills/vibecode-review",
-        "./.agent/skills/vibecode-init",
-        "./.agent/skills/vibecode-update",
-        "./.agent/skills/vibecode-design-update",
-        "./.agent/skills/use-vibecode"
+        "./.agents/skills/vibecode",
+        "./.agents/skills/vibecode-workflow",
+        "./.agents/skills/vibecode-design",
+        "./.agents/skills/vibecode-review",
+        "./.agents/skills/vibecode-init",
+        "./.agents/skills/vibecode-update",
+        "./.agents/skills/vibecode-design-update",
+        "./.agents/skills/use-vibecode"
       ],
       "keywords": [
         "vibecode",
@@ -44,14 +44,14 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agent/skills/vibecode",
-        "./.agent/skills/vibecode-workflow",
-        "./.agent/skills/vibecode-design",
-        "./.agent/skills/vibecode-review",
-        "./.agent/skills/vibecode-init",
-        "./.agent/skills/vibecode-update",
-        "./.agent/skills/vibecode-design-update",
-        "./.agent/skills/use-vibecode"
+        "./.agents/skills/vibecode",
+        "./.agents/skills/vibecode-workflow",
+        "./.agents/skills/vibecode-design",
+        "./.agents/skills/vibecode-review",
+        "./.agents/skills/vibecode-init",
+        "./.agents/skills/vibecode-update",
+        "./.agents/skills/vibecode-design-update",
+        "./.agents/skills/use-vibecode"
       ],
       "keywords": [
         "vibecode",
@@ -69,10 +69,10 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agent/skills/vibecode",
-        "./.agent/skills/use-vibecode",
-        "./.agent/skills/vibecode-review",
-        "./.agent/skills/vibecode-init"
+        "./.agents/skills/vibecode",
+        "./.agents/skills/use-vibecode",
+        "./.agents/skills/vibecode-review",
+        "./.agents/skills/vibecode-init"
       ],
       "keywords": [
         "vibecode",
@@ -87,7 +87,7 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agent/skills/vibecode-workflow"
+        "./.agents/skills/vibecode-workflow"
       ],
       "keywords": [
         "orchestrator",
@@ -102,8 +102,8 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agent/skills/vibecode-design",
-        "./.agent/skills/vibecode-design-update"
+        "./.agents/skills/vibecode-design",
+        "./.agents/skills/vibecode-design-update"
       ],
       "keywords": [
         "design",

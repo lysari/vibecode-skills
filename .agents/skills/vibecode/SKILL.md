@@ -51,9 +51,9 @@ With no matching row, apply only the generic rules and the references below. A t
 
 ## Project rules
 
-When the project has a `.agent/project-rules.md`, read it after the framework files and follow it. It holds that project's own folders, aliases, helpers and tools, and wins over the framework files where they differ.
+When the project has a `.agents/project-rules.md`, read it after the framework files and follow it. It holds that project's own folders, aliases, helpers and tools, and wins over the framework files where they differ.
 
-When the project has no `.agent/project-rules.md`, do not start the task yet:
+When the project has no `.agents/project-rules.md`, do not start the task yet:
 
 - Run `vibecode-init`. It first asks the user to keep the project's current structure or restructure it to follow these rules, and on "restructure" asks about each difference, always with a "Keep current" option.
 - Never generate the file without the user's answers.
@@ -90,7 +90,7 @@ This skill is for any project. It is not fixed to one language or framework. Fol
 
 - **Keep `SKILL.md` and the files under `references/` language-neutral.** Do not put a language, framework, folder layout, file suffix, or tool name in them (for example Angular, Firebase, TypeScript, `src/app/`, `.scss`). A short example in a neutral word is fine; a rule that only works with one technology is not.
 - **Put each technology's rules in its own folder** at `frameworks/<name>/rules.md`, one folder per technology (`angular`, `firebase`, `django`), never one per combination. A project loads every folder that matches.
-- **Write a framework rule so it holds for every project on that technology.** Never name a project's own folders, aliases, helpers or tools in it. Those go in that project's `.agent/project-rules.md`.
+- **Write a framework rule so it holds for every project on that technology.** Never name a project's own folders, aliases, helpers or tools in it. Those go in that project's `.agents/project-rules.md`.
 - **Never edit a project's `AGENTS.md` or `CLAUDE.md`.** They belong to the project's owner.
 - **Register each technology in the "Framework rules" table in `SKILL.md`**, keyed on a file an agent can check at the project root (for example `angular.json`, `pyproject.toml`). Never load a framework file without a matching row.
 - **Move a rule into a framework file when it names a technology-only path, suffix, API, or tool.** Move it back into a generic file only after you can word it with no technology terms.

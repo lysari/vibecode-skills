@@ -41,7 +41,7 @@
 - Write a comment inside a function body only for a hidden constraint or a workaround, in one line.
 - Let names carry the meaning of the code. Delete comments that restate it.
 - Never copy the comment density of nearby code.
-- When the project's `AGENTS.md`, its `.agent/project-rules.md` or its framework rules set where comments and docs go, follow them.
+- When the project's `AGENTS.md`, its `.agents/project-rules.md` or its framework rules set where comments and docs go, follow them.
 
 ## Errors and values
 - Handle errors at the layer that can act on them. Do not swallow them silently.
