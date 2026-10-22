@@ -5,8 +5,8 @@
 <h1 align="center">Vibecode Skills</h1>
 
 <p align="center">
-  <b>Agent skills that make AI write code like a careful human would</b><br>
-  Small in-place changes, real design tokens, and a review against your rules before anything is called done.
+  <b>Vibe code like you wrote it by hand</b><br>
+  Agent skills for developers who want AI to write code the way they would: no over-engineering, readable and easy to maintain, clean, and written more carefully than usual.
 </p>
 
 <p align="center">
