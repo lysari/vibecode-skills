@@ -202,7 +202,7 @@ export async function handleLogin(
 | --- | --- |
 | ✂️ **Small, in-place changes** | The agent searches for existing code before writing new code, edits it where it lives, and deletes what it replaces. No `_new`, `V2` or commented-out copies. |
 | 🧭 **Fits your project** | `vibecode-init` reads your folders, aliases, helpers and test setup once, and writes them to `.agents/project-rules.md` so every agent follows them. |
-| 🎨 **Real design values** | `vibecode-design` reuses your components and tokens, measures values from design references instead of guessing, and keeps the UI accessible. |
+| 🎨 **Real design values** | `vibecode` reuses your components and tokens, measures values from design references instead of guessing, and keeps the UI accessible. |
 | 🧹 **Fresh context for every task** | `vibecode-workflow` splits a goal into tasks and gives each one a new sub-agent, so rules are not forgotten twenty turns into a long chat. |
 | ✅ **Checked before it is "done"** | `vibecode-review` re-reads the rule files from disk, inspects the actual `git diff`, and marks every rule pass, fail, skipped or not applicable. |
 | 🧠 **Learns your corrections** | Tell it once with `/vibecode-update`, and the correction becomes a checkable rule for every later session. |
@@ -216,15 +216,14 @@ export async function handleLogin(
 | `vibecode-workflow` | `/vibecode-workflow <goal>` | Splits a goal into tasks and runs each in a new sub-agent that builds, reviews, reports and exits. |
 | `use-vibecode` | `/use-vibecode <task>` | Runs one task in the current chat: prepare, implement, then review. |
 | `vibecode-init` | `/vibecode-init` | Profiles a repository and writes `.agents/project-rules.md`, and sets up `AGENTS.md` to use the workflow. |
-| `vibecode` | `/vibecode` | The coding rules: search first, change in place, one name per concept, no fake fixes. Includes TypeScript, Angular, CSS and Firebase rules. |
-| `vibecode-design` | `/vibecode-design` | The UI rules: reuse components and tokens, measure values from references, keep layouts consistent and accessible. |
+| `vibecode` | `/vibecode` | The coding and UI rules: search first, change in place, one name per concept, no fake fixes, reuse components and design tokens. Includes TypeScript, Angular, CSS and Firebase rules. |
 | `vibecode-review` | `/vibecode-review [skill]` | Re-reads the rules from disk, inspects the session's diff, and reports each rule as pass, fail, skipped or N/A. |
 
 ### Learning your rules
 
 | Skill | Command | What it does |
 | --- | --- | --- |
-| `vibecode-update` | `/vibecode-update [rule]` | Turns a coding or UI correction into one checkable rule in `vibecode` or `vibecode-design`. With no rule, collects the corrections from this session. |
+| `vibecode-update` | `/vibecode-update [rule]` | Turns a coding or UI correction into one checkable rule in `vibecode`. With no rule, collects the corrections from this session. |
 
 ## How it works
 
@@ -236,7 +235,7 @@ flowchart LR
     W --> S3[Sub-agent …]
 
     subgraph Each["Each sub-agent runs use-vibecode"]
-        P[1 · Prepare<br/>read project-rules.md] --> I[2 · Implement<br/>vibecode + vibecode-design]
+        P[1 · Prepare<br/>read project-rules.md] --> I[2 · Implement<br/>vibecode]
         I --> R[3 · Review<br/>vibecode-review]
         R -- fail --> I
     end
@@ -250,7 +249,7 @@ flowchart LR
 ```
 
 1. **Prepare.** The sub-agent reads `.agents/project-rules.md` (running `vibecode-init` if it is missing) and looks for helpers it can reuse.
-2. **Implement.** It writes the change with `vibecode`, and with `vibecode-design` for any UI.
+2. **Implement.** It writes the change with `vibecode`, and with its design rules for any UI.
 3. **Review.** It runs `vibecode-review` on its own diff and fixes every failed rule before reporting.
 4. **Exit.** It hands its diff and review to the orchestrator and ends, so the next task starts with a clean context.
 
@@ -273,10 +272,9 @@ The marketplace offers these plugins:
 
 | Plugin | Skills |
 | --- | --- |
-| `vibecode-suite` | The full lifecycle: `vibecode`, `vibecode-workflow`, `vibecode-design`, `vibecode-review`, `vibecode-init`, `vibecode-update`, `use-vibecode` |
-| `vibecode` | `vibecode`, `use-vibecode`, `vibecode-review`, `vibecode-init` |
+| `vibecode-suite` | The full lifecycle: `vibecode`, `vibecode-workflow`, `vibecode-review`, `vibecode-init`, `vibecode-update`, `use-vibecode` |
+| `vibecode` | `vibecode`, `use-vibecode`, `vibecode-review`, `vibecode-init`, `vibecode-update` |
 | `vibecode-workflow` | `vibecode-workflow` |
-| `vibecode-design` | `vibecode-design`, `vibecode-update` |
 
 ```bash
 claude plugin marketplace add lysari/vibecode-skills
@@ -433,8 +431,7 @@ If you linked the skills, follow [Remove the links](#linking-the-skills) above, 
 
 | Path | What it holds |
 | --- | --- |
-| [`.agents/skills/vibecode`](.agents/skills/vibecode) | Coding rules, with [`frameworks/`](.agents/skills/vibecode/frameworks) for each technology and [`references/`](.agents/skills/vibecode/references) for each topic |
-| [`.agents/skills/vibecode-design`](.agents/skills/vibecode-design) | UI, token, layout and accessibility rules |
+| [`.agents/skills/vibecode`](.agents/skills/vibecode) | Coding and UI rules, with [`frameworks/`](.agents/skills/vibecode/frameworks) for each technology and [`references/`](.agents/skills/vibecode/references) for each topic, design included |
 | [`.agents/skills/vibecode-workflow`](.agents/skills/vibecode-workflow) · [`use-vibecode`](.agents/skills/use-vibecode) | The orchestrator and the three-stage task lifecycle |
 | [`.agents/skills/vibecode-init`](.agents/skills/vibecode-init) · [`vibecode-review`](.agents/skills/vibecode-review) | Project profiling and the compliance review |
 | [`.agents/skills/vibecode-update`](.agents/skills/vibecode-update) | Turning corrections into rules |

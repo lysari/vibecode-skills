@@ -2,7 +2,7 @@
 name: vibecode-init
 description: Use when onboarding an existing or new project to the Vibecode ecosystem, to inspect repository architecture, code styles, path aliases, shared helpers, and test tooling, generate a tailored .agents/project-rules.md, and configure AGENTS.md to enforce /vibecode-workflow across all AI tools
 metadata:
-  version: "0.0.1-20261022.1"
+  version: "0.0.1-20261022.2"
 ---
 
 # Vibecode Init
@@ -118,7 +118,7 @@ After profiling, and before drafting anything:
 1. Ask the user one question first: "Keep this project's current structure and conventions, or restructure it to follow the Vibecode rules?", with the options "Keep current (adapt the rules to this project)" and "Restructure to follow Vibecode".
 2. **Keep current**: ask nothing more. Record each observed pattern as the project's rule, record the choice under "Decisions", and go on to drafting.
 3. **Restructure**: compare and ask about each difference.
-   - Read `vibecode/SKILL.md`, every file under `vibecode/references/`, the framework files whose row matches the project, and `vibecode-design/SKILL.md` when the project has a UI.
+   - Read `vibecode/SKILL.md`, every file under `vibecode/references/`, and the framework files whose row matches the project.
    - List each place the project differs from a rule, e.g. folder structure, shared code layout, naming, where tests, types or docs live. For each difference, record the rule (`file:line`) and what the project does (real paths).
    - Also list each place where the rules are silent and the project made its own choice, e.g. a folder name the rules do not set.
    - Ask the user about every item, e.g. "Tests live beside the source files: keep them there, or move them to a mirrored test folder?". Ask in batches of up to 4 questions until every item has an answer.

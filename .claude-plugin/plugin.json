@@ -9,7 +9,6 @@
   "skills": [
     "./.agents/skills/vibecode",
     "./.agents/skills/vibecode-workflow",
-    "./.agents/skills/vibecode-design",
     "./.agents/skills/vibecode-review",
     "./.agents/skills/vibecode-init",
     "./.agents/skills/vibecode-update",

@@ -1,19 +1,18 @@
 ---
 name: use-vibecode
-description: "Use for end-to-end coding and UI tasks to run the complete Vibecode lifecycle: build clean code with vibecode, apply design tokens and layout rules with vibecode-design, and verify compliance with vibecode-review"
+description: "Use for end-to-end coding and UI tasks to run the complete Vibecode lifecycle: build clean code and UI with vibecode, and verify compliance with vibecode-review"
 metadata:
-  version: "0.0.1-20261022.2"
+  version: "0.0.1-20261022.3"
 ---
 
 # Use Vibecode
 
 ## Overview
 
-Execute software and UI engineering tasks through the complete, end-to-end Vibecode lifecycle. It coordinates three interconnected disciplines into a single workflow:
+Execute software and UI engineering tasks through the complete, end-to-end Vibecode lifecycle. It coordinates two interconnected disciplines into a single workflow:
 
-1. **`vibecode`**: Write minimal, clean, maintainable code following strict hygiene and framework rules.
-2. **`vibecode-design`**: Build pixel-consistent, token-driven, accessible UI screens and components whenever user interfaces or styling are touched.
-3. **`vibecode-review`**: Conduct a mandatory post-implementation compliance review directly against the skill files on disk before considering the task complete.
+1. **`vibecode`**: Write minimal, clean, maintainable code following strict hygiene and framework rules, and token-driven, accessible UI through `references/design.md` whenever user interfaces or styling are touched.
+2. **`vibecode-review`**: Conduct a mandatory post-implementation compliance review directly against the skill files on disk before considering the task complete.
 
 ```
        [ Stage 1: Preparation ]
@@ -21,7 +20,7 @@ Execute software and UI engineering tasks through the complete, end-to-end Vibec
                    ▼
        [ Stage 2: Implementation ]
         ├─ Core Logic: vibecode
-        └─ UI / Styling: vibecode-design
+        └─ UI / Styling: vibecode/references/design.md
                    │
                    ▼
        [ Stage 3: Post-Implementation Gate ]
@@ -52,7 +51,7 @@ Before modifying or writing any file:
 1. **Determine Task Scope & Project Maturity**:
    - Is this logic/backend-only, UI/frontend-only, or fullstack?
    - Check if the project is a newly created, template-generated, or freshly scaffolded repository versus an established codebase. In a newly scaffolded project, never preserve CLI starter boilerplate, placeholder files, or co-located demo tests as legacy code; purge or restructure them immediately to conform to Vibecode rules.
-   - If UI is touched, `vibecode-design` rules are automatically activated.
+   - If UI is touched, `vibecode/references/design.md` applies.
 2. **Detect Matching Frameworks**:
    - Check the project root and every file type to be touched against the "Framework rules" table in `vibecode/SKILL.md`, and read every matching row. A project routinely matches several rows; never stop at the first match.
 3. **Read Project Overrides & Onboarding**:
@@ -61,8 +60,7 @@ Before modifying or writing any file:
 4. **Precedence Hierarchy**:
    - **Level 1 (Highest)**: Project instructions (`AGENTS.md` / `CLAUDE.md`).
    - **Level 2**: Project-specific rules (`.agents/project-rules.md`).
-   - **Level 3**: `vibecode` core and topic references.
-   - **Level 4**: `vibecode-design` rules. Where `vibecode` and `vibecode-design` conflict, `vibecode` wins.
+   - **Level 3**: `vibecode` core, framework files, and topic references.
 
 ---
 
@@ -71,7 +69,7 @@ Before modifying or writing any file:
 Read the skill files and follow them. This skill does not restate their rules, so never work from a summary of them.
 
 1. **Code**: `vibecode/SKILL.md`, every framework file whose row matches, and the `references/` file for each topic the change touches, as its "References" table lists.
-2. **UI and styles**: `vibecode-design/SKILL.md` whenever a screen, component, layout, or stylesheet changes.
+2. **UI and styles**: `vibecode/references/design.md` whenever a screen, component, layout, or stylesheet changes.
 
 ---
 
@@ -85,7 +83,7 @@ Do **not** present the task as done or ask the user to test until `vibecode-revi
 
 Before declaring any coding or UI task complete, confirm:
 
-- [ ] Identified all applicable skills (`vibecode`, `vibecode-design` if UI, frameworks, references).
+- [ ] Identified all applicable rules (`vibecode`, frameworks, references, `references/design.md` if UI).
 - [ ] Searched for existing code/utilities before adding new files or helpers.
 - [ ] Edited existing code in place without leaving `_old`, `New`, `V2`, or commented-out remnants.
 - [ ] Kept code clean of section banners and restating comments.
@@ -105,7 +103,7 @@ Before declaring any coding or UI task complete, confirm:
 | Hardcoding CSS spacing or colors instead of tokens | Define tokens first, then reference tokens in components |
 | Leaving `_old` files or commented-out backup code | Delete replaced code completely in the same edit |
 | Skipping framework rules | Check the project root against the "Framework rules" table in `vibecode/SKILL.md` and read every matching file before coding |
-| Working from a summary of the rules | Read `vibecode/SKILL.md` and `vibecode-design/SKILL.md` themselves; this skill only points to them |
+| Working from a summary of the rules | Read `vibecode/SKILL.md` and its matching framework and reference files themselves; this skill only points to them |
 | Reviewing from memory instead of disk | Re-read the raw skill and reference files directly from disk during Stage 3 |
 | Leaving review failures unfixed | Fix every `[ ] FAIL` and `[!] SKIPPED` immediately before reporting done |
 

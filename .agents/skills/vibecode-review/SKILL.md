@@ -2,7 +2,7 @@
 name: vibecode-review
 description: Use after an agent finishes implementing a task or when reviewing work done in the current session, to re-read all skills used, verify compliance against every rule, detect skipped or violated rules, and produce a checklist review
 metadata:
-  version: "0.0.1-20261022.2"
+  version: "0.0.1-20261022.3"
 ---
 
 # Vibecode review
@@ -17,7 +17,7 @@ The reviewer never relies on memory, cached summaries, or assumptions. It must *
 
 - **Automatic post-implementation gate**: Run immediately after finishing a code or UI implementation task, before saying "Done" or asking the user to review.
 - **On-demand session audit** (`/vibecode-review`): When the user asks to review the session's work, verify compliance, or check if any rules were skipped.
-- **Targeted skill review** (`/vibecode-review <skill-name>`): When auditing against a specific skill (e.g. `vibecode`, `vibecode-design`).
+- **Targeted skill review** (`/vibecode-review <skill-name>`): When auditing against a specific skill (e.g. `vibecode`, `use-vibecode`).
 
 ## Short review for a one-file change
 
@@ -36,13 +36,13 @@ When the change edits one existing file and creates no file, run this instead of
 
 Scan the session context, project root, and modified files to list every skill that governed or should have governed the work:
 
-1. **Active session skills**: Any skill loaded, mentioned, or invoked during the session (e.g. `vibecode`, `vibecode-design`).
+1. **Active session skills**: Any skill loaded, mentioned, or invoked during the session (e.g. `vibecode`, `use-vibecode`).
 2. **Project- and diff-matching framework rules**: Check both project root files AND all file extensions created or modified in `git status -s` against the table in `vibecode/SKILL.md`. Projects routinely match multiple rows:
    - If any `.css`, `.scss`, `.sass`, or `.less` file was created or modified, `frameworks/css/rules.md` is **mandatory** in the re-read list.
    - If `tsconfig.json` or any `.ts`/`.tsx` file was modified, `frameworks/typescript/rules.md` is **mandatory**.
    - If `angular.json` is present or any Angular component/service was touched, `frameworks/angular/rules.md` is **mandatory**.
    - Never stop after the first framework match. Every matching row must be included.
-3. **Reference files**: Any topic reference files relevant to the changes made (e.g., `file-organization.md`, `naming.md`, `code-structure.md`, `change-scope.md`, `cleanup.md`, `project-hygiene.md`, `security.md`).
+3. **Reference files**: Any topic reference files relevant to the changes made (e.g., `file-organization.md`, `naming.md`, `code-structure.md`, `change-scope.md`, `cleanup.md`, `project-hygiene.md`, `security.md`). If any screen, component, layout, or stylesheet was created or modified, `references/design.md` is **mandatory**.
 4. **Project rules & instructions**: `.agents/project-rules.md`, `AGENTS.md`, and `CLAUDE.md`.
 
 ### 2. Re-read the full skill files from disk
@@ -56,7 +56,7 @@ Use file-reading tools to read the raw files from start to finish:
 - Extract every explicit rule, directive, "Always", and "Never" instruction into a list of verification criteria.
 
 > [!IMPORTANT]
-> If `AGENTS.md` or `CLAUDE.md` sets a rule that contradicts a skill, follow the project's rule. If `vibecode` and `vibecode-design` conflict, `vibecode` takes precedence.
+> If `AGENTS.md` or `CLAUDE.md` sets a rule that contradicts a skill, follow the project's rule.
 
 ### 3. Collect ground-truth session changes
 
@@ -124,14 +124,14 @@ Output the review formatted as a clear checklist:
 - [ ] Code structure: Function `calculateStats` exceeds 50 lines without sub-helpers ([file.ts:104](file:///...))
 - [-] CSS / Styling: N/A (no styles changed)
 
-### Design Rules (vibecode-design) *(if UI touched)*
+### Design Rules (design.md) *(if UI touched)*
 - [!] Design tokens: Hardcoded `padding: 24px` instead of using project spacing token ([card.component.html:15](file:///...))
 
 ## 4. Discrepancies & Violations
 | Status | File:Line | Violated / Skipped Rule | Remediation |
 |---|---|---|---|
 | `[ ] FAIL` | `src/stats.ts:104` | Function size limit (code-structure.md) | Break helper logic into smaller focused functions |
-| `[!] SKIPPED` | `src/card.html:15` | Never hardcode spacing (vibecode-design) | Replace `24px` with `space-section` token |
+| `[!] SKIPPED` | `src/card.html:15` | Never hardcode spacing (design.md) | Replace `24px` with `space-section` token |
 
 ## 5. Verdict
 - **[ACTION REQUIRED]**: 1 violation, 1 skipped rule. Fix discrepancies before marking done.

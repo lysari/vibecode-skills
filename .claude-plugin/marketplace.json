@@ -21,7 +21,6 @@
       "skills": [
         "./.agents/skills/vibecode",
         "./.agents/skills/vibecode-workflow",
-        "./.agents/skills/vibecode-design",
         "./.agents/skills/vibecode-review",
         "./.agents/skills/vibecode-init",
         "./.agents/skills/vibecode-update",
@@ -45,7 +44,6 @@
       "skills": [
         "./.agents/skills/vibecode",
         "./.agents/skills/vibecode-workflow",
-        "./.agents/skills/vibecode-design",
         "./.agents/skills/vibecode-review",
         "./.agents/skills/vibecode-init",
         "./.agents/skills/vibecode-update",
@@ -70,7 +68,8 @@
         "./.agents/skills/vibecode",
         "./.agents/skills/use-vibecode",
         "./.agents/skills/vibecode-review",
-        "./.agents/skills/vibecode-init"
+        "./.agents/skills/vibecode-init",
+        "./.agents/skills/vibecode-update"
       ],
       "keywords": [
         "vibecode",
@@ -91,23 +90,6 @@
         "orchestrator",
         "subagents",
         "workflow"
-      ]
-    },
-    {
-      "name": "vibecode-design",
-      "description": "UI design tokens, layouts, accessibility, and visual consistency rules",
-      "version": "1.0.0",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./.agents/skills/vibecode-design",
-        "./.agents/skills/vibecode-update"
-      ],
-      "keywords": [
-        "design",
-        "ui",
-        "tokens",
-        "accessibility"
       ]
     }
   ]

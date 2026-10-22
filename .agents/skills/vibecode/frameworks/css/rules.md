@@ -19,6 +19,12 @@ Apply these on top of the generic rules when the project has `.css`, `.scss`, `.
 - Put every other global variable (radius, shadow, layout size) in one variables file, e.g. `--radius-lg`, `--page-width` in `_variables.scss`.
 - Put every global style rule (element defaults, form controls, shared classes such as `.eyebrow`) in one global rules file, e.g. `body { margin: 0; }` in `_global.scss`.
 
+## Layout
+- Give a full-screen application shell `width: 100%`, never a fixed `max-width` such as `max-width: 1200px`.
+- Lock the shell to the viewport on desktop with `height: 100dvh; overflow: hidden`, and give each pane that scrolls on its own `min-height: 0; overflow-y: auto`.
+- Fill the space under a header or toolbar with a flex or grid parent and `flex: 1; min-height: 0; overflow-y: auto` on the main panel, never `margin-top: 86px` or `position: fixed; top: 69px`.
+- Wrap a wide table or grid in a container with `width: 100%; overflow-x: auto`.
+
 ## Nesting in `.scss`, `.sass` and `.less`
 - Nest every selector inside the rule of the element it sits in, as deep as the markup goes. Never write the parent again at the top level, e.g. `.card { ul { … } li { span { … } } }`, not `.card ul { … }` and `.card li span { … }`.
 - Write a state or modifier of the same element with `&` inside its rule, e.g. `.card { &:hover { … } &.is-open { … } }`, never `.card:hover { … }` beside `.card`.

@@ -2,7 +2,7 @@
 name: vibecode-workflow
 description: Orchestrates multi-task development using dedicated, ephemeral sub-agents per task. Each sub-agent starts fresh by reading use-vibecode, executes clean implementation and compliance audit via vibecode-review, returns its report to the main agent, and terminates to prevent context dilution and skill forgetting.
 metadata:
-  version: "0.0.1-20261022.1"
+  version: "0.0.1-20261022.2"
 ---
 
 # Vibecode Workflow
@@ -22,7 +22,7 @@ flowchart TD
         Plan --> Spawn["1. Spawn Ephemeral Sub-Agent"]
         
         subgraph SubAgent ["Ephemeral Sub-Agent (Fresh Context)"]
-            Init["2. Read use-vibecode & Project Rules"] --> Impl["3. Stage 2: Implementation (vibecode + vibecode-design)"]
+            Init["2. Read use-vibecode & Project Rules"] --> Impl["3. Stage 2: Implementation (vibecode)"]
             Impl --> Audit["4. Stage 3: Audit Gate (vibecode-review from disk)"]
             Audit --> Fix{"Verdict == PASS?"}
             Fix -- No --> Remediate["Fix Violations In-Place"] --> Audit
@@ -70,7 +70,7 @@ When the user's request names one existing file to change and needs no new file,
   - Follows Vibecode Stage 1 (Preparation) to inspect existing patterns, utilities, and design tokens.
 - **Follows Vibecode Lifecycle**:
   - **Stage 1 (Preparation & Discovery)**: Investigates code, locates target files, discovers existing utilities and design tokens.
-  - **Stage 2 (Implementation)**: Writes minimal, in-place edits adhering to `vibecode` (and `vibecode-design` if UI is touched).
+  - **Stage 2 (Implementation)**: Writes minimal, in-place edits adhering to `vibecode` (and `vibecode/references/design.md` if UI is touched).
   - **Stage 3 (Verification Gate)**: Re-reads skills from disk, runs `vibecode-review`, and fixes all violations until a `[PASS]` verdict is achieved.
 - **Reports and Exits**: Transmits the structured final report back to the main agent and ends execution immediately.
 
@@ -118,7 +118,7 @@ Only after the skill content is actually in context may you proceed.
 2. IMPLEMENT (Vibecode Stage 2):
    - Search for existing functions/types before adding new ones.
    - Edit existing code in place. Leave zero dead code, `_old`, or `V2` remnants.
-   - If UI or styles are touched, apply `vibecode-design` tokens and viewport rules.
+   - If UI or styles are touched, apply `vibecode/references/design.md` tokens and layout rules.
 
 3. AUDIT GATE (Stage 3 – vibecode-review):
    - Re-read the skill files from disk again.
