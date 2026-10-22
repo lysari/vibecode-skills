@@ -2,7 +2,7 @@
 name: vibecode-init
 description: Use when onboarding an existing or new project to the Vibecode ecosystem, to inspect repository architecture, code styles, path aliases, shared helpers, and test tooling, generate a tailored .agent/project-rules.md, and configure AGENTS.md to enforce /vibecode-workflow across all AI tools
 metadata:
-  version: "0.0.1-20261021.1"
+  version: "0.0.1-20261022.1"
 ---
 
 # Vibecode Init
@@ -24,9 +24,38 @@ Vibecode skills treat `.agent/project-rules.md` and `AGENTS.md` as higher preced
 
 ---
 
+## Detect Project State
+
+Before profiling, decide which state the repository is in from its manifests, file tree, and `git log --oneline` (when it is a git repository):
+
+| State | Signs | Path |
+|-------|-------|------|
+| Established | Domain code beyond a starter template, or a history of real feature commits | "Profiling Procedure", then "Compare With Vibecode Rules & Ask the User" |
+| Scaffolded | A manifest and only the files a generator created (`create-next-app`, `ng new`, `npm create vite`, ...), with one or two commits | "Scaffolded Project" |
+| Empty | No manifest and no source files, possibly no git repository | "Empty Project" |
+
+When the signs are mixed, ask the user which state fits.
+
+### Scaffolded Project
+
+1. Run the "Profiling Procedure" for the stack, aliases, styling, and verification commands. Never record the template's folders, demo files, or naming as project conventions.
+2. Ask the first question with "Restructure to follow Vibecode (Recommended)" first. On "Restructure", take the structure and conventions from the matching `vibecode/frameworks/<stack>/rules.md` files (see the "Framework rules" table in `vibecode/SKILL.md`) without asking about each template difference, and ask only where those rules are silent, e.g. a folder name they do not set.
+3. List the starter boilerplate to remove or move (demo components, placeholder markup, co-located sample tests) under "Pending Restructure".
+
+### Empty Project
+
+1. Skip profiling and the keep-or-restructure question: there is nothing to keep.
+2. Ask the user for the stack: language and framework, package manager, styling approach when there is a UI, and test tool. Ask in batches of up to 4 questions, recommended option first, and record each answer under "Decisions".
+3. Fill `.agent/project-rules.md` from the answers and the matching `vibecode/frameworks/<stack>/rules.md` files. Write "None yet" for sections with no facts, such as aliases, shared helpers, tokens, and verification commands.
+4. Never scaffold the project or install packages. Init writes only the rule and instruction files.
+
+For both new states, start `.agent/project-rules.md` with `> Provisional: generated for a new project. Re-run /vibecode-init once the first features exist.` When init runs on a provisional file, profile the project as Established and remove the note.
+
+---
+
 ## Profiling Procedure
 
-Execute a read-only, non-destructive audit of the repository across seven inspection dimensions. Base every rule on concrete findings from real files in the project—never guess or insert generic placeholders.
+For an Established or Scaffolded project, execute a read-only, non-destructive audit of the repository across seven inspection dimensions. Base every rule on concrete findings from real files in the project—never guess or insert generic placeholders.
 
 ### 1. Detect Core Tech Stack & Build Tooling
 Inspect the root directory:
@@ -196,13 +225,13 @@ Different AI tools look for specific root instruction files. Unify them by refer
 
 ## Workflow & User Safeguards
 
-1. **Perform read-only scan**: Never alter project files during profiling.
-2. **Ask keep or restructure**: Follow "Compare With Vibecode Rules & Ask the User". On "Keep current", go straight to drafting; on "Restructure", ask until every difference has an answer.
+1. **Perform read-only scan**: Detect the project state, then profile without altering project files.
+2. **Ask keep or restructure**: Follow "Compare With Vibecode Rules & Ask the User". On "Keep current", go straight to drafting; on "Restructure", ask until every difference has an answer. For a Scaffolded or Empty project, follow its section under "Detect Project State" instead.
 3. **Draft project rules**: Populate the template from observed repository patterns and the user's answers.
 4. **Present to the user**: Show the detected profile, proposed `.agent/project-rules.md`, and planned `AGENTS.md` directives to the user for review.
 5. **Write `.agent/project-rules.md`**: Create `.agent/` if needed and write the project rules.
 6. **Update or create `AGENTS.md`**: Add the `/vibecode-workflow` directive.
 7. **Link auxiliary files (`CLAUDE.md`, `GEMINI.md`)**: Safely reference `@AGENTS.md` without clobbering existing content.
-8. **Verify with Git**: Run `git status -s` to confirm only the intended instruction and rule files were touched.
+8. **Verify with Git**: Run `git status -s` to confirm only the intended instruction and rule files were touched. When the project is not a git repository, list the files written instead and offer to run `git init`.
 9. **Offer the restructure**: When "Pending Restructure" lists moves, offer to run them as a separate task.
 

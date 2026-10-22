@@ -51,7 +51,34 @@ The skills are plain Markdown. They work in **Claude Code**, **Google Antigravit
 
 ### 1. Install
 
-On **Claude Code**, add this repository as a plugin marketplace and install the suite:
+The easiest way is to let your agent do it. Copy this prompt and paste it into **Claude Code**, **Antigravity** or **Cursor**:
+
+```text
+Install the Vibecode skills from https://github.com/lysari/vibecode-skills for me.
+
+1. Clone the repository to ~/vibecode-skills. If that folder already exists, run `git pull` in it instead.
+2. Check which of these agents I have, by checking whether the folder exists:
+   Claude Code (~/.claude), Google Antigravity (~/.gemini), Cursor (~/.cursor).
+3. Before linking anything, ask me two questions and wait for both answers:
+   - Which of the agents you found should get the skills? Recommend only the agent running
+     this prompt, and let me pick more.
+   - Link globally (every project) or only into the current project?
+   Then show me the exact folders you will link into:
+   - Claude Code: global ~/.claude/skills/, project .claude/skills/
+   - Google Antigravity: global ~/.gemini/config/skills/, project .agents/skills/
+   - Cursor: global ~/.cursor/skills/, project .cursor/skills/
+     (never ~/.cursor/skills-cursor/, which is reserved for Cursor)
+   For each agent I picked, create the chosen folder if needed and symlink every folder
+   in ~/vibecode-skills/.agent/skills/ into it with `ln -s <folder in the repo> <skills folder>/`.
+   Skip links that already exist. Do not overwrite, move or delete any file.
+4. Run `ls -l` on each skills folder you linked into, then tell me which skills are linked
+   for which agents.
+5. Ask me whether to set up the current project for Vibecode now. If I say yes, read
+   ~/vibecode-skills/.agent/skills/vibecode-init/SKILL.md and follow it for this project.
+   If I say no, remind me to start a new session and run /vibecode-init in my project.
+```
+
+Prefer to do it yourself? On **Claude Code**, add this repository as a plugin marketplace and install the suite:
 
 ```text
 /plugin marketplace add lysari/vibecode-skills
@@ -74,13 +101,23 @@ done
 
 Running it again is safe: links that already exist print `File exists` and are left alone.
 
-### 2. Describe your task
+### 2. Set up your project
+
+Start a new session in your project, then run:
+
+```text
+/vibecode-init
+```
+
+It profiles the project, or asks for your stack when the project is new, and writes `.agent/project-rules.md` and `AGENTS.md`. Skip this step if the install prompt already set up the project.
+
+### 3. Describe your task
 
 ```text
 /vibecode-workflow add a user authentication modal
 ```
 
-The workflow plans the work, runs each task in a fresh sub-agent, writes the code, and reviews it before handing it back. The first time it runs in a repository, it profiles the project for you.
+The workflow plans the work, runs each task in a fresh sub-agent, writes the code, and reviews it before handing it back. If you skipped step 2, it runs `vibecode-init` the first time it runs in a repository.
 
 That is the only command you need. The other skills give you finer control when you want it.
 
