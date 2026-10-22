@@ -39,6 +39,7 @@ Every skill must be located in `.agents/skills/<skill-name>/` and contain at lea
 - Adhere to the core philosophies defined in `vibecode`: minimal, surgical changes that address root causes without code bloat.
 - Keep documentation up to date. If adding or updating skills, ensure [README.md](README.md) reflects the additions.
 - Ensure no sensitive credentials, secrets, or temporary logs are committed.
+- When committing changes co-authored by AI assistants (such as Claude or Gemini), include standard `Co-authored-by:` trailers in the commit message to maintain contributor attribution.
 
 ---
 
