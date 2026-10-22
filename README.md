@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Claude%20Code-skills-D97757?logo=claude&logoColor=white" alt="Claude Code">
   <img src="https://img.shields.io/badge/Antigravity-skills-4285F4?logo=google&logoColor=white" alt="Google Antigravity">
   <img src="https://img.shields.io/badge/Cursor-skills-000000?logo=cursor&logoColor=white" alt="Cursor">
-  <img src="https://img.shields.io/badge/skills-13-8A63D2" alt="13 skills">
+  <img src="https://img.shields.io/badge/skills-6-8A63D2" alt="6 skills">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs welcome"></a>
 </p>
