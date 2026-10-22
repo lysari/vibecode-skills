@@ -25,7 +25,6 @@
         "./.agents/skills/vibecode-review",
         "./.agents/skills/vibecode-init",
         "./.agents/skills/vibecode-update",
-        "./.agents/skills/vibecode-design-update",
         "./.agents/skills/use-vibecode"
       ],
       "keywords": [
@@ -50,7 +49,6 @@
         "./.agents/skills/vibecode-review",
         "./.agents/skills/vibecode-init",
         "./.agents/skills/vibecode-update",
-        "./.agents/skills/vibecode-design-update",
         "./.agents/skills/use-vibecode"
       ],
       "keywords": [
@@ -103,7 +101,7 @@
       "strict": false,
       "skills": [
         "./.agents/skills/vibecode-design",
-        "./.agents/skills/vibecode-design-update"
+        "./.agents/skills/vibecode-update"
       ],
       "keywords": [
         "design",

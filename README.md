@@ -205,7 +205,7 @@ export async function handleLogin(
 | 🎨 **Real design values** | `vibecode-design` reuses your components and tokens, measures values from design references instead of guessing, and keeps the UI accessible. |
 | 🧹 **Fresh context for every task** | `vibecode-workflow` splits a goal into tasks and gives each one a new sub-agent, so rules are not forgotten twenty turns into a long chat. |
 | ✅ **Checked before it is "done"** | `vibecode-review` re-reads the rule files from disk, inspects the actual `git diff`, and marks every rule pass, fail, skipped or not applicable. |
-| 🧠 **Learns your corrections** | Tell it once with `/vibecode-update` or `/vibecode-design-update`, and the correction becomes a checkable rule for every later session. |
+| 🧠 **Learns your corrections** | Tell it once with `/vibecode-update`, and the correction becomes a checkable rule for every later session. |
 
 ## Skills
 
@@ -224,8 +224,7 @@ export async function handleLogin(
 
 | Skill | Command | What it does |
 | --- | --- | --- |
-| `vibecode-update` | `/vibecode-update [rule]` | Turns a coding correction into one checkable rule in `vibecode`. With no rule, collects the corrections from this session. |
-| `vibecode-design-update` | `/vibecode-design-update [rule]` | Does the same for UI corrections, writing to `vibecode-design`. |
+| `vibecode-update` | `/vibecode-update [rule]` | Turns a coding or UI correction into one checkable rule in `vibecode` or `vibecode-design`. With no rule, collects the corrections from this session. |
 
 ## How it works
 
@@ -246,7 +245,7 @@ flowchart LR
     R -- pass --> D([Report and exit])
     D --> W
 
-    F([Your corrections]) -.-> L[vibecode-update<br/>vibecode-design-update]
+    F([Your corrections]) -.-> L[vibecode-update]
     L -.-> I
 ```
 
@@ -274,10 +273,10 @@ The marketplace offers these plugins:
 
 | Plugin | Skills |
 | --- | --- |
-| `vibecode-suite` | The full lifecycle: `vibecode`, `vibecode-workflow`, `vibecode-design`, `vibecode-review`, `vibecode-init`, `vibecode-update`, `vibecode-design-update`, `use-vibecode` |
+| `vibecode-suite` | The full lifecycle: `vibecode`, `vibecode-workflow`, `vibecode-design`, `vibecode-review`, `vibecode-init`, `vibecode-update`, `use-vibecode` |
 | `vibecode` | `vibecode`, `use-vibecode`, `vibecode-review`, `vibecode-init` |
 | `vibecode-workflow` | `vibecode-workflow` |
-| `vibecode-design` | `vibecode-design`, `vibecode-design-update` |
+| `vibecode-design` | `vibecode-design`, `vibecode-update` |
 
 ```bash
 claude plugin marketplace add lysari/vibecode-skills
@@ -438,7 +437,7 @@ If you linked the skills, follow [Remove the links](#linking-the-skills) above, 
 | [`.agents/skills/vibecode-design`](.agents/skills/vibecode-design) | UI, token, layout and accessibility rules |
 | [`.agents/skills/vibecode-workflow`](.agents/skills/vibecode-workflow) · [`use-vibecode`](.agents/skills/use-vibecode) | The orchestrator and the three-stage task lifecycle |
 | [`.agents/skills/vibecode-init`](.agents/skills/vibecode-init) · [`vibecode-review`](.agents/skills/vibecode-review) | Project profiling and the compliance review |
-| [`.agents/skills/vibecode-update`](.agents/skills/vibecode-update) · [`vibecode-design-update`](.agents/skills/vibecode-design-update) | Turning corrections into rules |
+| [`.agents/skills/vibecode-update`](.agents/skills/vibecode-update) | Turning corrections into rules |
 | [`.claude-plugin/`](.claude-plugin) | Claude Code plugin and marketplace manifests |
 | [`assets/`](assets) | Logo and README images |
 

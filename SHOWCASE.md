@@ -352,7 +352,7 @@ Dry run: with vibecode → named export ✔
 </tr>
 </table>
 
-`vibecode-update` writes the habit as one checkable line in the right rule file, checks that it doesn't duplicate or contradict an existing rule, and tests it with two dry-run agents. From then on, `vibecode-review` checks it in every session. UI corrections work the same way with `/vibecode-design-update`.
+`vibecode-update` writes the habit as one checkable line in the right rule file, checks that it doesn't duplicate or contradict an existing rule, and tests it with two dry-run agents. From then on, `vibecode-review` checks it in every session. UI corrections work the same way and land in `vibecode-design`.
 
 ---
 
