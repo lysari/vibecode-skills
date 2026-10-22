@@ -56,26 +56,37 @@ The easiest way is to let your agent do it. Copy this prompt and paste it into *
 ```text
 Install the Vibecode skills from https://github.com/lysari/vibecode-skills for me.
 
-1. Clone the repository to ~/vibecode-skills. If that folder already exists, run `git pull` in it instead.
-2. Check which of these agents I have, by checking whether the folder exists:
+1. Check which of these agents I have, by checking whether the folder exists:
    Claude Code (~/.claude), Google Antigravity (~/.gemini), Cursor (~/.cursor).
-3. Before linking anything, ask me two questions and wait for both answers:
+2. Before installing anything, ask me two questions and wait for both answers:
    - Which of the agents you found should get the skills? Recommend only the agent running
      this prompt, and let me pick more.
-   - Link globally (every project) or only into the current project?
-   Then show me the exact folders you will link into:
+   - Install globally (every project) or only into the current project?
+   Then show me the exact folders you will install into:
    - Claude Code: global ~/.claude/skills/, project .claude/skills/
    - Google Antigravity: global ~/.gemini/config/skills/, project .agents/skills/
    - Cursor: global ~/.cursor/skills/, project .cursor/skills/
      (never ~/.cursor/skills-cursor/, which is reserved for Cursor)
-   For each agent I picked, create the chosen folder if needed and symlink every folder
-   in ~/vibecode-skills/.agents/skills/ into it with `ln -s <folder in the repo> <skills folder>/`.
-   Skip links that already exist. Do not overwrite, move or delete any file.
-4. Run `ls -l` on each skills folder you linked into, then tell me which skills are linked
-   for which agents.
-5. Ask me whether to set up the current project for Vibecode now. If I say yes, read
-   ~/vibecode-skills/.agents/skills/vibecode-init/SKILL.md and follow it for this project.
-   If I say no, remind me to start a new session and run /vibecode-init in my project.
+3. If I chose global:
+   - Clone the repository to ~/vibecode-skills. If that folder already exists, run `git pull`
+     in it instead.
+   - For each agent I picked, create the global folder if needed and symlink every folder
+     in ~/vibecode-skills/.agents/skills/ into it with `ln -s <folder in the repo> <skills folder>/`.
+4. If I chose the current project:
+   - Do not create symlinks and do not write anything outside the current project, except
+     a temporary clone.
+   - Clone the repository into a temporary folder made with `mktemp -d`.
+   - For each agent I picked, create the project folder if needed and copy every folder
+     in <temporary clone>/.agents/skills/ into it with `cp -R <folder in the clone> <skills folder>/`.
+   - Delete the temporary clone when you are done.
+   In both cases, skip skills that already exist in the target folder. Apart from the temporary
+   clone, do not overwrite, move or delete any file.
+5. Run `ls -l` on each skills folder you installed into, then tell me which skills are installed
+   for which agents, and whether they are linked or copied.
+6. Ask me whether to set up the current project for Vibecode now. If I say yes, read
+   vibecode-init/SKILL.md from one of the skills folders you installed into and follow it
+   for this project. If I say no, remind me to start a new session and run /vibecode-init
+   in my project.
 ```
 
 Prefer to do it yourself? On **Claude Code**, add this repository as a plugin marketplace and install the suite:
@@ -292,6 +303,28 @@ for d in "$PWD"/.agents/skills/*/; do ln -s "${d%/}" ~/.gemini/config/skills/; d
 mkdir -p ~/.cursor/skills
 for d in "$PWD"/.agents/skills/*/; do ln -s "${d%/}" ~/.cursor/skills/; done
 ```
+
+</details>
+
+<details>
+<summary><b>Install into the current project only</b></summary>
+
+Project installs copy the skills instead of linking them, so the project does not depend on a clone elsewhere on your machine. Run this from your project root:
+
+```bash
+tmp=$(mktemp -d)
+git clone --depth 1 https://github.com/lysari/vibecode-skills.git "$tmp"
+
+# Claude Code: .claude/skills   Antigravity: .agents/skills   Cursor: .cursor/skills
+mkdir -p .claude/skills
+for d in "$tmp"/.agents/skills/*/; do
+  [ -e ".claude/skills/$(basename "$d")" ] || cp -R "${d%/}" .claude/skills/
+done
+
+rm -rf "$tmp"
+```
+
+To update later, delete the copied skill folders and run it again.
 
 </details>
 
