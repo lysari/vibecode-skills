@@ -1,16 +1,12 @@
 # Project Hygiene
 
-## Secrets and config
-- Keep secrets, tokens, API keys, and chat or account ids out of source files. Read them from the project's environment or config mechanism.
-- Commit an example file (`.env.example`) with placeholder values, never the real values.
+## Config
 - Keep each setting in one place. Do not copy the same config into a second file.
 - Check that the production build uses production config. Run the build config or read it to confirm the swap happens.
 
 ## Safeguards
 - Keep auth guards, input validation, permission rules, and tests switched on. When one blocks your change, tell the user instead of commenting it out.
-- Write access rules as narrow as the feature needs. Never add a blanket allow.
-- Check user permissions on the record or resource itself (such as verifying who owns it), not just on the page or route.
-- Never paste raw, untrusted user input directly into database queries, system commands, or HTML templates. Use safe parameters or built-in escaping instead.
+- Follow `references/security.md` for secrets, input handling, access rules, auth, outbound data, and logging.
 
 ## Logging
 - Fix logging where it happens. Do not mute the global logger or console to hide output.

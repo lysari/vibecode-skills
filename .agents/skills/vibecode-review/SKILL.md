@@ -2,7 +2,7 @@
 name: vibecode-review
 description: Use after an agent finishes implementing a task or when reviewing work done in the current session, to re-read all skills used, verify compliance against every rule, detect skipped or violated rules, and produce a checklist review
 metadata:
-  version: "0.0.1-20261021.2"
+  version: "0.0.1-20261022.1"
 ---
 
 # Vibecode review
@@ -33,7 +33,7 @@ Scan the session context, project root, and modified files to list every skill t
    - If `tsconfig.json` or any `.ts`/`.tsx` file was modified, `frameworks/typescript/rules.md` is **mandatory**.
    - If `angular.json` is present or any Angular component/service was touched, `frameworks/angular/rules.md` is **mandatory**.
    - Never stop after the first framework match. Every matching row must be included.
-3. **Reference files**: Any topic reference files relevant to the changes made (e.g., `file-organization.md`, `naming.md`, `code-structure.md`, `change-scope.md`, `cleanup.md`, `project-hygiene.md`).
+3. **Reference files**: Any topic reference files relevant to the changes made (e.g., `file-organization.md`, `naming.md`, `code-structure.md`, `change-scope.md`, `cleanup.md`, `project-hygiene.md`, `security.md`).
 4. **Project rules & instructions**: `.agents/project-rules.md`, `AGENTS.md`, and `CLAUDE.md`.
 
 ### 2. Re-read the full skill files from disk
@@ -65,6 +65,7 @@ Gather the exact footprint of what the agent did in the session:
    - Check that a `docs/` folder created in this change has a `docs/.gitignore` holding only `*`.
    - Check for temporary/scratch files, test artifacts, or leftover scripts.
    - Check for hardcoded secrets, environment variables, or bypasses of validations/guards/tests.
+   - When the change handles input, files, permissions, auth, outbound requests, logs, or dependencies, check it against every rule in `references/security.md`.
 
 ### 4. Evaluate each rule as a checklist
 
@@ -105,6 +106,7 @@ Output the review formatted as a clear checklist:
 - [x] Docs folder: new `docs/` created with `docs/.gitignore` holding `*` (code-structure.md)
 - [x] Guards & validations preserved: No guards, permissions, or tests disabled
 - [x] No secrets in source: Environment variables used properly
+- [x] Security: Input validated and parameterised, ownership checked on the server, nothing sensitive logged (security.md)
 - [x] Cleanup completed: No leftover debug statements, unused imports, or scratch files
 - [x] Minimal abstraction: No unnecessary helper created (<3 call sites)
 

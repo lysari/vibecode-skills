@@ -2,7 +2,7 @@
 name: use-vibecode
 description: "Use for end-to-end coding and UI tasks to run the complete Vibecode lifecycle: build clean code with vibecode, apply design tokens and layout rules with vibecode-design, and verify compliance with vibecode-review"
 metadata:
-  version: "0.0.1-20261021.1"
+  version: "0.0.1-20261022.1"
 ---
 
 # Use Vibecode
@@ -90,6 +90,7 @@ Write changes adhering strictly to both code and design principles:
   - `references/change-scope.md` for keeping diffs minimal.
   - `references/cleanup.md` for removing temporary code and scratch files.
   - `references/project-hygiene.md` for tests, repo cleanliness, and commits.
+  - `references/security.md` for secrets, untrusted input, access control, auth, and outbound data.
 
 #### 2. Design & UI Rules (`vibecode-design`) *(When UI or styles are involved)*
 - **Token-first from reference images**:

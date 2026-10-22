@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, or adding features to a project, so changes stay clean, minimal, and easy to maintain
 metadata:
-  version: "0.0.1-20261021.5"
+  version: "0.0.1-20261022.1"
 ---
 
 # Vibecode
@@ -81,7 +81,8 @@ Read the file for the topic at hand before writing code that touches it.
 | Function/file size, duplication, comments and docs | `references/code-structure.md` |
 | Keeping edits minimal | `references/change-scope.md` |
 | Dead code, temp files, leftovers | `references/cleanup.md` |
-| Secrets, safeguards, repo, tests, README, commits | `references/project-hygiene.md` |
+| Config, safeguards, repo, tests, README, commits | `references/project-hygiene.md` |
+| Secrets, untrusted input, access control, auth, outbound data, logging | `references/security.md` |
 | Directories to skip when reviewing a project | `references/review-excludes.md` |
 
 ## Updating the `vibecode` skill
