@@ -3,7 +3,8 @@
 Apply these on top of the generic rules when the project root has an `angular.json`.
 
 ## Directory structure
-- Organize the application under `src/` into `app/` (`core/`, `features/`, `shared/`), `environments/`, and `specs/`; never place feature components, pages, or domain logic in a flat `src/app/components/` directory or loose in `src/app/`:
+- With one feature, put its pages, components, stores and services in folders by kind directly under `src/app/`, e.g. `src/app/pages/order-list.page.ts`, beside `environments/` and `specs/`. Move them into `features/<feature>/` when a second feature is added.
+- With 2 or more features, organize the application under `src/` into `app/` (`core/`, `features/`, `shared/`), `environments/`, and `specs/`; never place feature components, pages, or domain logic in a flat `src/app/components/` directory or loose in `src/app/`:
 
 ```text
 src/
@@ -18,7 +19,7 @@ src/
 │   │   ├── stores/                     # App-wide global signal stores (session, auth)
 │   │   ├── tokens/                     # InjectionToken definitions
 │   │   └── utils/                      # Core cross-cutting utilities (crypto, token decoders)
-│   ├── features/                       # Domain feature modules (pages > stores > services)
+│   ├── features/                       # Domain feature modules
 │   │   └── <feature>/                  # Bounded domain feature (e.g., billing, catalog)
 │   │       ├── components/             # Feature-private presentational components
 │   │       ├── constants/              # Feature-specific configuration and dropdown options
@@ -55,15 +56,16 @@ src/
 - Keep the directives and stores that pages use to fill one layout's regions inside that layout's folder too, e.g. `src/app/shared/layout/main-layout/header-actions.directive.ts` and `src/app/shared/layout/main-layout/header-actions.store.ts`.
 - Move a layout part to `shared/components/`, `shared/directives/` or `core/stores/` when a second layout uses it, or when a feature renders one of the layout's components on its own.
 - Write data transformations, formatters, and value conversions as pure functions in `src/app/shared/utils/` (or `src/app/shared/pipes/` for HTML templates); never create `@Injectable()` services for pure mappings or calculations.
-- Structure each feature module under `src/app/features/<feature>/` into `pages/`, `components/`, `stores/`, `services/`, and route definitions:
+- Structure each feature module under `src/app/features/<feature>/` into `pages/`, `components/`, `stores/`, `services/`, and route definitions, creating each folder with its first file:
   - `pages/` holds route-level screen components, e.g. `src/app/features/billing/pages/invoice-list.page.ts`.
   - `stores/` holds feature reactive state and signals, e.g. `src/app/features/billing/stores/invoice.store.ts`.
   - `components/` holds private presentational subcomponents, e.g. `src/app/features/billing/components/invoice-row.component.ts`.
   - `services/` holds API clients and data communication, e.g. `src/app/features/billing/services/invoice-api.service.ts`.
 
-## Data flow (pages > stores > services)
-- Enforce the unidirectional data flow: `pages > stores > services`.
-- Inject and read stores from page and component files; never inject or call API data services directly inside a component or page template.
+## Data flow
+- Keep data flowing one way: `pages > stores > services` for a page that holds state, `pages > services` for a page that only loads and shows data.
+- Add a store only when a page or feature holds state it changes, or coordinates two or more async calls, e.g. a filterable list with paging. A page that loads one record and shows it injects the API service directly.
+- Call API services only from a page or a store; never from a component under `components/` or from a template.
 - Write business logic, reactive state transitions, and asynchronous coordination inside stores; stores call services to perform HTTP requests or storage operations.
 - Restrict API services to HTTP calls, payload serialization, and endpoint contracts; never store reactive state or signals in an API service.
 

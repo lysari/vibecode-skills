@@ -13,8 +13,8 @@ Apply these on top of the generic rules when the project root has a `tsconfig.js
 - Use `interface` for object shapes. Use `type` for unions, aliases, and tuples.
 
 ## One interface per use
-- Give each entity 2 to 3 interfaces, one for each way its data is used, and keep them together in the same `<name>.interface.ts`.
-- Always write the first two: retrieved data and form data. Add a third only when a use has a shape of its own (list row, update payload, request body). A fourth means the entity is two concepts, so split it.
+- Give each entity one interface for each way its data is used today, at most 3, and keep them together in the same `<name>.interface.ts`.
+- Write the retrieved-data interface first. Add the form interface only when a form edits the entity, and a third only when a use has a shape of its own (list row, update payload, request body). A fourth means the entity is two concepts, so split it.
 
 | Use | Name | Fields |
 |-----|------|--------|

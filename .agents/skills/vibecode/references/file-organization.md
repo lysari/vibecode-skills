@@ -6,12 +6,15 @@
 - Put the new file in the folder where its siblings of the same kind live (handlers with handlers, tests with tests).
 
 ## Structure
-- Follow the project's existing layout. When the project has no established layout, organize code into the standard three-tier enterprise structure: `core/`, `shared/`, and `features/`.
-- Put app-wide singletons, environment configuration, base network/database clients, and cross-cutting authentication state in `core/`, e.g. `core/config` or `core/auth`.
+- Follow the project's existing layout.
+- When the project has no established layout and holds one feature, put its files in folders by kind under the source root, e.g. `pages/`, `services/`. Never create `core/`, `shared/`, or `features/` in a project with one feature.
+- When a second feature is added to a project with no established layout, organize code into `core/`, `shared/`, and `features/`, and move the first feature into `features/<feature>/` in the same change.
+- In the `core/`, `shared/`, `features/` structure, put app-wide singletons, environment configuration, base network/database clients, and cross-cutting authentication state in `core/`, e.g. `core/config` or `core/auth`.
 - Put reusable, domain-agnostic UI primitives, generic utilities, and cross-feature types in `shared/`, grouped into subfolders by their kind; never put domain business logic in `shared/`, e.g. `shared/components/button` or `shared/utils/date`.
 - Put each distinct business capability in its own self-contained directory under `features/<feature>/` (or `modules/<feature>/`), holding that feature's private UI views, domain services, state stores, and types, e.g. `features/checkout/order-form` and `features/checkout/payment-service`.
 - Keep the root entry file to mounting the layout shell and router; never write header, sidebar, or page content directly in it, e.g. `app` mounts `layout` and `router`.
-- Put each distinct UI region (layout, header, sidebar, content section, card) in its own file instead of combining them in the root or page file, e.g. `layout`, `header`, `sidebar`.
+- In a project with one feature, keep each UI region (header, sidebar, card) in the file that renders it until a second file renders it, e.g. the header written in `layout`.
+- In a project with 2 or more features, put each distinct UI region (layout, header, sidebar, content section, card) in its own file instead of combining them in the root or page file, e.g. `layout`, `header`, `sidebar`.
 - One responsibility per file. Split a file when it covers two unrelated concerns.
 - Keep related files close: a module and its types sit side by side.
 - Move code from a feature into `shared/` only when 2 or more distinct modules consume it.

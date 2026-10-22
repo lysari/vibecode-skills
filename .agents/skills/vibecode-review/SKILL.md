@@ -2,7 +2,7 @@
 name: vibecode-review
 description: Use after an agent finishes implementing a task or when reviewing work done in the current session, to re-read all skills used, verify compliance against every rule, detect skipped or violated rules, and produce a checklist review
 metadata:
-  version: "0.0.1-20261022.1"
+  version: "0.0.1-20261022.2"
 ---
 
 # Vibecode review
@@ -18,6 +18,15 @@ The reviewer never relies on memory, cached summaries, or assumptions. It must *
 - **Automatic post-implementation gate**: Run immediately after finishing a code or UI implementation task, before saying "Done" or asking the user to review.
 - **On-demand session audit** (`/vibecode-review`): When the user asks to review the session's work, verify compliance, or check if any rules were skipped.
 - **Targeted skill review** (`/vibecode-review <skill-name>`): When auditing against a specific skill (e.g. `vibecode`, `vibecode-design`).
+
+## Short review for a one-file change
+
+When the change edits one existing file and creates no file, run this instead of the full procedure:
+
+- Re-read `vibecode/SKILL.md` and the framework files whose row matches that file, and check the diff against them.
+- Run `git status -s` to confirm no other file changed, and check the diff for debug output and commented-out code.
+- Report only the `[ ] FAIL` and `[!] SKIPPED` items and the verdict. Never output the full checklist for it.
+- When the change handles input, files, permissions, auth, outbound requests, logs, or dependencies, run the full procedure.
 
 ---
 

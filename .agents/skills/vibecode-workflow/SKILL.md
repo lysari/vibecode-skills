@@ -2,7 +2,7 @@
 name: vibecode-workflow
 description: Orchestrates multi-task development using dedicated, ephemeral sub-agents per task. Each sub-agent starts fresh by reading use-vibecode, executes clean implementation and compliance audit via vibecode-review, returns its report to the main agent, and terminates to prevent context dilution and skill forgetting.
 metadata:
-  version: "0.0.1-20261021.1"
+  version: "0.0.1-20261022.1"
 ---
 
 # Vibecode Workflow
@@ -46,6 +46,10 @@ In multi-turn conversations, agents suffer from **context dilution and recency d
 - **Problem**: When a skill is loaded on turn 1, its instructions get pushed thousands of tokens back as tool logs, file edits, and chat messages accumulate. By turns 3–5, the model frequently forgets constraints, skips review gates, or introduces sloppy code.
 - **Solution**: Sub-agents run in fresh, isolated contexts. Spawning a sub-agent per task ensures that `use-vibecode` is loaded at the top of its attention window. When the task finishes with a passing review, the sub-agent terminates, keeping the main agent's context clean and lightweight.
 
+## When to skip this workflow
+
+When the user's request names one existing file to change and needs no new file, run no sub-agent and no progress dashboard. Make the edit directly under `use-vibecode` and finish with the short review in `vibecode-review`, e.g. "fix the typo in the README heading". When the request does not name the file, dispatch a sub-agent as below.
+
 ---
 
 ## Roles and Responsibilities
@@ -83,7 +87,7 @@ In multi-turn conversations, agents suffer from **context dilution and recency d
 > - **DO NOT** grep or search the codebase for symbols, styles, or logic.
 > - **DO** write the task brief from the user's description and dispatch the sub-agent immediately. The sub-agent has a clean context specifically meant to absorb code exploration.
 
-1. Read the user request.
+1. Read the user request. When it names one existing file to change and needs no new file, follow "When to skip this workflow".
 2. If multi-part, split into sequential tasks. If single task, formulate the task description immediately.
 3. Spawn the sub-agent using the [Sub-Agent Brief Template](#sub-agent-brief-template).
 

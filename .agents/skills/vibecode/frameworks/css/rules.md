@@ -5,7 +5,8 @@ Apply these on top of the generic rules when the project has `.css`, `.scss`, `.
 ## Custom properties
 - Declare a custom property that reads a custom property callers override on the element they override it on, never on `:root`, e.g. `--cell: calc(var(--line) + 2 * var(--pad))` on the component's host. A custom property resolves its `var()`s where it is declared.
 - Keep a component's own custom properties in that component's stylesheet, named `--<component>-*`, e.g. `--card-gap` in the card's stylesheet.
-- Size every inner part of a component (padding, gap, icon, handle, mark, default font) from the component's size custom properties, e.g. `height: calc(var(--_height) * 3 / 8)` for a handle. Never give an inner part a fixed px value that only fits the default size.
+- When a component offers more than one size, size every inner part (padding, gap, icon, handle, mark, default font) from its size custom properties, e.g. `height: calc(var(--_height) * 3 / 8)` for a handle. Never give such a component's inner part a fixed px value that only fits the default size.
+- Never add size custom properties to a component that has one size.
 
 ## Colours
 - Write every colour value as hex, e.g. `#0066d6`, or as `rgb()` when it has transparency, e.g. `rgb(16 24 40 / 0.08)`. Never write `oklch()`, `oklab()`, `lch()`, `lab()`, `hsl()` or `hwb()`.

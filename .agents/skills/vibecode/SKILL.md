@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, or adding features to a project, so changes stay clean, minimal, and easy to maintain
 metadata:
-  version: "0.0.1-20261022.1"
+  version: "0.0.1-20261022.2"
 ---
 
 # Vibecode
@@ -13,9 +13,9 @@ Write code that reads as if a careful, experienced developer wrote it by hand: t
 
 ## Philosophy
 
-Vibecode contrasts "vibe coders" who fix bugs by adding more code (quick, superficial fixes) with disciplined software developers who address the root cause by improving the underlying architecture.
+Vibecode contrasts "vibe coders", who fix a bug by piling more code around it, with disciplined developers, who find where the bug starts and fix it there with the smallest change.
 
-Where a brittle "vibe coded" structure cracks and fails under load, resilient, well-engineered code flexibly absorbs stress and remains strong. Rather than relying on superficial, intuition-based patches that create fragile systems, Vibecode demands thoughtful engineering that builds clean, resilient code.
+Code that grows by patches cracks under the next change. Code fixed at its cause, with no structure added before it is needed, stays small and easy to read.
 
 ## Always
 

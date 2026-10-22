@@ -2,7 +2,7 @@
 name: use-vibecode
 description: "Use for end-to-end coding and UI tasks to run the complete Vibecode lifecycle: build clean code with vibecode, apply design tokens and layout rules with vibecode-design, and verify compliance with vibecode-review"
 metadata:
-  version: "0.0.1-20261022.1"
+  version: "0.0.1-20261022.2"
 ---
 
 # Use Vibecode
@@ -54,12 +54,7 @@ Before modifying or writing any file:
    - Check if the project is a newly created, template-generated, or freshly scaffolded repository versus an established codebase. In a newly scaffolded project, never preserve CLI starter boilerplate, placeholder files, or co-located demo tests as legacy code; purge or restructure them immediately to conform to Vibecode rules.
    - If UI is touched, `vibecode-design` rules are automatically activated.
 2. **Detect Matching Frameworks**:
-   - Inspect both the project root and all file types to be touched against the framework table in `vibecode/SKILL.md`. A project routinely matches multiple rows:
-     - `angular.json` → `frameworks/angular/rules.md`
-     - `tsconfig.json` → `frameworks/typescript/rules.md`
-     - `firebase.json` → `frameworks/firebase/rules.md`
-     - `.css`, `.scss`, `.sass`, `.less` → `frameworks/css/rules.md`
-   - When UI or styling is involved, the matching stylesheet framework rules (e.g. `frameworks/css/rules.md`) are **mandatory** alongside `vibecode-design`. Never stop scanning after finding the first framework match.
+   - Check the project root and every file type to be touched against the "Framework rules" table in `vibecode/SKILL.md`, and read every matching row. A project routinely matches several rows; never stop at the first match.
 3. **Read Project Overrides & Onboarding**:
    - Check for `.agents/project-rules.md`, `AGENTS.md`, or `CLAUDE.md`.
    - **If no project rules exist**: The repository has not yet been profiled for Vibecode. Stop before implementing and follow `vibecode-init`: profile the codebase, ask the user to keep the current structure or restructure it to follow the Vibecode rules (on restructure, ask about each difference, always offering "Keep current"), and generate `.agents/project-rules.md` from the answers. Start the task only after the file exists.
@@ -73,65 +68,16 @@ Before modifying or writing any file:
 
 ### Stage 2: Implementation
 
-Write changes adhering strictly to both code and design principles:
+Read the skill files and follow them. This skill does not restate their rules, so never work from a summary of them.
 
-#### 1. Code Construction Rules (`vibecode`)
-- **Search before creating**: Look for existing files, functions, types, and constants before creating new ones. Extend or edit existing utilities.
-- **In-place replacement**: Edit existing code in place and delete what it replaces. Never leave dead code, commented-out blocks, `_old`, `New`, or `V2` suffixes.
-- **Single concept, single name**: Define each concept once. Never introduce translation layers that duplicate data under new names.
-- **Zero section banners or restating comments**: Never write section headers (e.g. `// Handlers`, `// State`, `<!-- Sidebar -->`, `/* Styles */`) or comments that merely restate what code does. Write code comments only in shared utility (helper function) files: a doc comment of one or two lines on each exported function saying what it is for and how to use it, and a one-line note for a hidden constraint or workaround.
-- **Preserve safeguards**: Never disable a guard, validation, permission check, or test to make code work.
-- **No secrets in code**: Keep environment values and secrets strictly out of source files.
-- **Minimal abstraction**: Do not introduce generic wrappers or helpers unless the exact same logic already occurs in 3+ places or was explicitly requested.
-- **Consult topic references**:
-  - `references/file-organization.md` for folder structure and placement.
-  - `references/naming.md` for consistent naming conventions.
-  - `references/code-structure.md` for function size, duplication limits, and comments.
-  - `references/change-scope.md` for keeping diffs minimal.
-  - `references/cleanup.md` for removing temporary code and scratch files.
-  - `references/project-hygiene.md` for tests, repo cleanliness, and commits.
-  - `references/security.md` for secrets, untrusted input, access control, auth, and outbound data.
-
-#### 2. Design & UI Rules (`vibecode-design`) *(When UI or styles are involved)*
-- **Token-first from reference images**:
-  - Sample colors from flat fills and glyph cores; measure spacing, radii, font sizes, line heights, and borders at the image scale.
-  - Never estimate by eye or hardcode raw literal values in components (e.g. use `space-section`, never `32px`).
-  - Store sampled values in project design tokens before building components.
-  - For surfaces over blurred backdrops, use alpha below `1` (`rgb(255 255 255 / 0.7)` with blur, never opaque `#ffffff`).
-- **Layout & viewport scaling**:
-  - Stretch app layouts to `100%` width and height. Never constrain the outer container with a fixed `max-width` that leaves dead margins on wide screens.
-  - Lock desktop viewport height (`height: 100dvh; overflow: hidden`) and let sidebar and content areas scroll independently (`min-height: 0; overflow-y: auto`).
-  - Subsection navigation belongs in layout-level split panes/sidebars, never inside scrollable page bodies.
-- **Navigation & controls**:
-  - Never squeeze horizontal tab strips into narrow sidebars where text clips; use vertical lists or scrollable pills.
-  - Never wrap toolbars or badge pills in an outer enclosing pill container; let individual pills sit on transparent containers.
-- **Corner radius calculation**:
-  - Calculate nested radii: `inner_radius = outer_radius - padding`.
-  - Set inner radius to `0` when padding is greater than or equal to outer radius.
+1. **Code**: `vibecode/SKILL.md`, every framework file whose row matches, and the `references/` file for each topic the change touches, as its "References" table lists.
+2. **UI and styles**: `vibecode-design/SKILL.md` whenever a screen, component, layout, or stylesheet changes.
 
 ---
 
 ### Stage 3: Verification Gate & Remediation (`vibecode-review`)
 
-Do **not** present the task as done or ask the user to test until the post-implementation review has completed and passed.
-
-1. **Re-read skills from disk**:
-   - Re-read `vibecode/SKILL.md`, `vibecode-design/SKILL.md` (if UI touched), `vibecode-review/SKILL.md`, and all applicable framework and reference files matching the modified files and project root (e.g., CSS framework rules if stylesheets were modified). Never rely on memory.
-2. **Collect actual session changes**:
-   - Inspect `git status -s` and `git diff`.
-   - Verify file lifecycles: check newly added files, deleted code, and untracked files.
-   - Check hygiene: verify zero debug statements (`console.log`, `print`, `debugger`), no leftover scratch files, no bypassed tests.
-3. **Score against the checklist**:
-   - `[x] PASS`: Rule followed with concrete evidence (file and line).
-   - `[ ] FAIL`: Rule violated (specify file, line, offending code, and broken rule).
-   - `[!] SKIPPED`: Applicable rule was skipped or forgotten.
-   - `[-] N/A`: Rule not applicable to this change.
-4. **Output the Vibecode Review Report**:
-   - Follow the standard checklist layout from `vibecode-review/SKILL.md`.
-5. **Remediate immediately**:
-   - If any item is `[ ] FAIL` or `[!] SKIPPED`, fix it in place immediately.
-   - Re-inspect `git diff` to confirm the fix.
-   - Only conclude when the verdict is `[PASS]`.
+Do **not** present the task as done or ask the user to test until `vibecode-review` has run and its verdict is `[PASS]`. Read `vibecode-review/SKILL.md` and follow its procedure, fixing every `[ ] FAIL` and `[!] SKIPPED` item in place before you conclude. A change that edits one existing file and creates no file gets its short review.
 
 ---
 
@@ -147,7 +93,7 @@ Before declaring any coding or UI task complete, confirm:
 - [ ] Cleaned up all scratch files, debug logs, and unused imports.
 - [ ] Re-read skills from disk and executed `vibecode-review`.
 - [ ] Fixed any violations discovered during review.
-- [ ] Output the final review checklist with verdict `[PASS]`.
+- [ ] Output the review (the full checklist, or the short review for a one-file change) with verdict `[PASS]`.
 
 ---
 
@@ -158,7 +104,8 @@ Before declaring any coding or UI task complete, confirm:
 | Stopping after writing code without running `vibecode-review` | `vibecode-review` is a mandatory gate; never conclude without the review checklist |
 | Hardcoding CSS spacing or colors instead of tokens | Define tokens first, then reference tokens in components |
 | Leaving `_old` files or commented-out backup code | Delete replaced code completely in the same edit |
-| Skipping framework rules | Check project root for `angular.json`, `tsconfig.json`, `firebase.json`, etc., and read the matching rules before coding |
+| Skipping framework rules | Check the project root against the "Framework rules" table in `vibecode/SKILL.md` and read every matching file before coding |
+| Working from a summary of the rules | Read `vibecode/SKILL.md` and `vibecode-design/SKILL.md` themselves; this skill only points to them |
 | Reviewing from memory instead of disk | Re-read the raw skill and reference files directly from disk during Stage 3 |
 | Leaving review failures unfixed | Fix every `[ ] FAIL` and `[!] SKIPPED` immediately before reporting done |
 

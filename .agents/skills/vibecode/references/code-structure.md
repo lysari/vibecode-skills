@@ -6,7 +6,7 @@
 - Do not introduce a new abstraction, helper, service, mapper, factory, or utility unless:
   - The same logic already appears in 3 or more places, **or**
   - The user explicitly asked for it.
-- Keep helper logic inline in the file that uses it until 3 callers share it; never inline distinct UI regions (`layout`, `header`, `sidebar`, `card`) into one file.
+- Keep helper logic inline in the file that uses it until 3 callers share it. Split UI regions into files as `references/file-organization.md` says.
 - Prefer a little duplication over an abstraction that forces the reader to jump between files.
 - Avoid patterns that add indirection without clear benefit (extra mappers, converters, adapters, strategy objects, etc.) unless the project already uses that pattern heavily.
 
@@ -30,7 +30,8 @@
 ## Comments and docs
 - Write code comments only in shared utility files, the files of helper functions reused across features, e.g. a shared date or retry helper.
 - Never write a comment in any other file: components, pages and screens, their markup and styles, state stores, services, constants, interfaces and types, and tests.
-- Explain every file that may not hold comments in `docs/<file-name>.md`, and a page in `docs/<page-name>.md`, grouped by topic, e.g. `docs/order-list.md`.
+- Write a `docs/<page-name>.md` for each page, grouped by topic, e.g. `docs/order-list.md`.
+- Write a `docs/<file-name>.md` for any other file that may not hold comments only when it has a hidden constraint, a workaround, or a flow its names cannot carry. Never write a doc that restates the code.
 - Never write section banners, such as a `Handlers` divider line between blocks of code.
 - When you edit a file that holds comments it may not have, move what they explain into its `docs/<file-name>.md` or `docs/<page-name>.md` and delete them from the file.
 - Add a `docs/<file-name>.md` or `docs/<page-name>.md` without being asked. It is the one kind of doc you may add unasked.
@@ -55,7 +56,7 @@
 
 ## Data and constants
 - Define each piece of data once, in one file, with one fully written type that lists every field.
-- Type data you read separately from data you send or collect in a form. Each entity has 2 to 3 types, one per use, kept in the same file.
+- Type data you read separately from data you send or collect in a form. Give an entity one type per use it has today, at most 3, kept in the same file. Never add a form type for an entity no form edits.
 - Use the final shape in the UI and callers. Do not add a layer that copies the data and renames its fields.
 - Use one name per concept in every layer. If the data says `order` and `line`, never also call them `purchase`, `row`, `child`, or `item`.
 - Keep nesting to two levels. Move a third level into its own named constant or type.
