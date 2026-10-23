@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, adding features to a project, or building UI screens, components, layouts, or styles, so changes stay clean, minimal, consistent, and easy to maintain
 metadata:
-  version: "0.0.1-20261022.5"
+  version: "0.0.1-20261023.1"
 ---
 
 # Vibecode
@@ -24,7 +24,7 @@ Code that grows by patches cracks under the next change. Code fixed at its cause
 3. Define each piece of data once with one name per concept. Add no layer that copies it under new names.
 4. Never disable a guard, validation, permission rule, or test to make a change work. Tell the user instead.
 5. Keep secrets and environment-specific values out of source files.
-6. Before finishing, remove debug output, unused code, and scratch files you created.
+6. Before finishing, remove debug output, unused code, scratch files, and command-generated artifacts you created.
 7. Prefer simple, direct code. Create no new abstraction or helper unless the same logic already exists in 3+ places or the user asked for it.
 8. Never write section banners (e.g. `// Handlers`, `// State`, `<!-- Sidebar -->`, `/* Styles */`) or comments that restate code. Write code comments only in shared utility (helper function) files: a doc comment of one or two lines on each exported function saying what it is for and how to use it, and a one-line note for a hidden constraint or workaround.
 
