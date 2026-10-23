@@ -27,6 +27,7 @@ logs/
 *.tmp
 *.temp
 .cache/
+.worktrees/
 
 # IDE & Editor Configurations
 .idea/

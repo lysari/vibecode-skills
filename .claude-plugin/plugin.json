@@ -12,7 +12,8 @@
     "./.agents/skills/vibecode-review",
     "./.agents/skills/vibecode-init",
     "./.agents/skills/vibecode-update",
-    "./.agents/skills/use-vibecode"
+    "./.agents/skills/use-vibecode",
+    "./.agents/skills/vibecode-modules"
   ],
   "keywords": [
     "vibecode",
