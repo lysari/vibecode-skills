@@ -30,6 +30,7 @@ The examples are short and simplified so they fit on one screen, but each one sh
 | ✂️ **Changing code** | Adds `handleLoginV2` beside the old function and comments the old one out. | Edits the function in place and deletes what it replaces. | `vibecode` |
 | 💬 **Comments** | Banners like `// ===== HANDLERS =====` and comments that repeat the code. | No banners. Comments only where a shared helper needs one. | `vibecode` |
 | 🎨 **UI values** | `#0369a1`, `margin-top: 13px`, a clickable `div`. | The project's tokens and spacing scale, a real `button`, a label and a focus ring. | `vibecode` |
+| 🌐 **Cross-project** | Frontend mocks fake APIs, while backend changes endpoints; types drift and break silently. | Discovers topology, freezes contract first, implements backend, syncs types, and tests both sides. | `vibecode-fullstacks` |
 | 🧹 **Long sessions** | By turn 15 it has forgotten the turn 1 conventions and duplicates a client. | Each task gets a new sub-agent that reads the rules again. | `vibecode-workflow` |
 | 🩹 **Errors** | `@ts-ignore`, an empty `catch`, or a disabled check to make it pass. | Fixes the cause. Never turns off a guard, type or test. | `vibecode` |
 | ✅ **Saying "done"** | "Everything follows best practices!" without looking at the diff. | A rule-by-rule report built from the real `git diff`. | `vibecode-review` |

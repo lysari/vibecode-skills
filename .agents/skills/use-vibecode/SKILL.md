@@ -49,7 +49,7 @@ Execute software and UI engineering tasks through the complete, end-to-end Vibec
 Before modifying or writing any file:
 
 1. **Determine Task Scope & Project Maturity**:
-   - Is this logic/backend-only, UI/frontend-only, or fullstack?
+   - Is this logic/backend-only, UI/frontend-only, or fullstack? When the task spans multiple independent projects or repositories (e.g. frontend project <-> backend project, or monorepo apps), activate `vibecode-fullstacks` to coordinate topology discovery, contract freeze, and cross-project verification.
    - Check if the project is a newly created, template-generated, or freshly scaffolded repository versus an established codebase. In a newly scaffolded project, never preserve CLI starter boilerplate, placeholder files, or co-located demo tests as legacy code; purge or restructure them immediately to conform to Vibecode rules.
    - If UI is touched, `vibecode/references/design.md` applies.
 2. **Detect Matching Frameworks**:

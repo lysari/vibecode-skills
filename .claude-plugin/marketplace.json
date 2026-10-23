@@ -24,7 +24,8 @@
         "./.agents/skills/vibecode-review",
         "./.agents/skills/vibecode-init",
         "./.agents/skills/vibecode-update",
-        "./.agents/skills/use-vibecode"
+        "./.agents/skills/use-vibecode",
+        "./.agents/skills/vibecode-fullstacks"
       ],
       "keywords": [
         "vibecode",
@@ -47,7 +48,8 @@
         "./.agents/skills/vibecode-review",
         "./.agents/skills/vibecode-init",
         "./.agents/skills/vibecode-update",
-        "./.agents/skills/use-vibecode"
+        "./.agents/skills/use-vibecode",
+        "./.agents/skills/vibecode-fullstacks"
       ],
       "keywords": [
         "vibecode",
@@ -90,6 +92,22 @@
         "orchestrator",
         "subagents",
         "workflow"
+      ]
+    },
+    {
+      "name": "vibecode-fullstacks",
+      "description": "Fullstack cross-project orchestrator for seamless frontend and backend coordination",
+      "version": "1.0.0",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./.agents/skills/vibecode-fullstacks"
+      ],
+      "keywords": [
+        "fullstack",
+        "cross-project",
+        "frontend-backend",
+        "api-contract"
       ]
     }
   ]

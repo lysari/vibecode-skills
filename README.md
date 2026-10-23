@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Claude%20Code-skills-D97757?logo=claude&logoColor=white" alt="Claude Code">
   <img src="https://img.shields.io/badge/Antigravity-skills-4285F4?logo=google&logoColor=white" alt="Google Antigravity">
   <img src="https://img.shields.io/badge/Cursor-skills-000000?logo=cursor&logoColor=white" alt="Cursor">
-  <img src="https://img.shields.io/badge/skills-6-8A63D2" alt="6 skills">
+  <img src="https://img.shields.io/badge/skills-7-8A63D2" alt="7 skills">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs welcome"></a>
 </p>
@@ -203,6 +203,7 @@ export async function handleLogin(
 | ✂️ **Small, in-place changes** | The agent searches for existing code before writing new code, edits it where it lives, and deletes what it replaces. No `_new`, `V2` or commented-out copies. |
 | 🧭 **Fits your project** | `vibecode-init` reads your folders, aliases, helpers and test setup once, and writes them to `.agents/project-rules.md` so every agent follows them. |
 | 🎨 **Real design values** | `vibecode` reuses your components and tokens, measures values from design references instead of guessing, and keeps the UI accessible. |
+| 🌐 **Seamless fullstack & cross-project** | `vibecode-fullstacks` detects monorepos and sibling repos, freezes API contracts first, and coordinates frontend and backend changes without drift. |
 | 🧹 **Fresh context for every task** | `vibecode-workflow` splits a goal into tasks and gives each one a new sub-agent, so rules are not forgotten twenty turns into a long chat. |
 | ✅ **Checked before it is "done"** | `vibecode-review` re-reads the rule files from disk, inspects the actual `git diff`, and marks every rule pass, fail, skipped or not applicable. |
 | 🧠 **Learns your corrections** | Tell it once with `/vibecode-update`, and the correction becomes a checkable rule for every later session. |
@@ -214,6 +215,7 @@ export async function handleLogin(
 | Skill | Command | What it does |
 | --- | --- | --- |
 | `vibecode-workflow` | `/vibecode-workflow <goal>` | Splits a goal into tasks and runs each in a new sub-agent that builds, reviews, reports and exits. |
+| `vibecode-fullstacks` | `/vibecode-fullstacks <feature>` | Coordinates end-to-end fullstack development across frontend and backend projects with contract-first synchronization. |
 | `use-vibecode` | `/use-vibecode <task>` | Runs one task in the current chat: prepare, implement, then review. |
 | `vibecode-init` | `/vibecode-init` | Profiles a repository and writes `.agents/project-rules.md`, and sets up `AGENTS.md` to use the workflow. |
 | `vibecode` | `/vibecode` | The coding and UI rules: search first, change in place, one name per concept, no fake fixes, reuse components and design tokens. Includes TypeScript, Angular, CSS and Firebase rules. |
