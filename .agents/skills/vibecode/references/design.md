@@ -27,3 +27,10 @@ Build UI that looks as if one careful designer and developer made every screen: 
 ## Corner radius
 - Set the corner radius of an inner element nested inside a rounded container with padding to the outer radius minus the padding (`inner_radius = outer_radius - padding`). Never give the inner element the same radius as the outer container or an uncalculated radius, e.g. an inner element with padding `8` inside a container of radius `24` uses radius `16`, never `24`.
 - Set the inner corner radius to `0` when the padding is greater than or equal to the outer radius, e.g. an inner element with padding `16` inside a container of radius `12` uses radius `0`.
+
+## Apple design craftsmanship
+- Research Apple Human Interface Guidelines and Apple design system conventions for the component or layout pattern before designing or styling UI; never construct UI elements without researching Apple design standards first, e.g. `research Apple modal sheet and navigation bar specifications before creating a dialog view`.
+- Build gradients as subtle, low-contrast multi-stop vertical transitions that simulate delicate surface lighting; never apply harsh multi-hue, steep diagonal, or high-contrast linear gradients across UI surfaces, e.g. `a card surface with a 2% vertical luminance gradient from top to bottom, never a 45-degree neon purple-to-orange gradient`.
+- Structure colors into a cohesive semantic palette with balanced light and dark mode appearance tokens and accessible contrast ratios; never apply arbitrary, uncalibrated high-saturation hex values directly to components, e.g. `a secondary label token defined with light and dark mode variants, never a raw #ff0000 hardcoded on a notice item`.
+- Animate interactive state changes, view presentations, and layout transitions using fluid spring physics or gentle ease-out timing curves between 150ms and 350ms; never use linear timing functions or instantaneous jarring visual jumps, e.g. `a dropdown sheet animating with a spring curve over 300ms, never a linear transition`.
+
