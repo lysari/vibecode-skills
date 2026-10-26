@@ -54,7 +54,7 @@ The skills are plain Markdown. They work in **Claude Code**, **Google Antigravit
 The easiest way is to let your agent do it. Copy this prompt and paste it into **Claude Code**, **Antigravity** or **Cursor**:
 
 ```text
-Install the Vibecode skills from https://github.com/lysari/vibecode-skills for me.
+Install or update the Vibecode skills from https://github.com/lysari/vibecode-skills for me.
 
 1. Check which of these agents I have, by checking whether the folder exists:
    Claude Code (~/.claude), Google Antigravity (~/.gemini), Cursor (~/.cursor).
@@ -69,20 +69,26 @@ Install the Vibecode skills from https://github.com/lysari/vibecode-skills for m
      (never ~/.cursor/skills-cursor/, which is reserved for Cursor)
 3. If I chose global:
    - Clone the repository to ~/vibecode-skills. If that folder already exists, run `git pull`
-     in it instead.
+     in it to pull latest changes.
    - For each agent I picked, create the global folder if needed and symlink every folder
-     in ~/vibecode-skills/.agents/skills/ into it with `ln -s <folder in the repo> <skills folder>/`.
+     in ~/vibecode-skills/.agents/skills/ into it with `ln -s -f <folder in the repo> <skills folder>/`.
+     (Symlinks update automatically whenever ~/vibecode-skills is pulled).
 4. If I chose the current project:
    - Do not create symlinks and do not write anything outside the current project, except
      a temporary clone.
    - Clone the repository into a temporary folder made with `mktemp -d`.
-   - For each agent I picked, create the project folder if needed and copy every folder
-     in <temporary clone>/.agents/skills/ into it with `cp -R <folder in the clone> <skills folder>/`.
+   - For each agent I picked, create the project folder if needed.
+   - For each skill folder in <temporary clone>/.agents/skills/:
+     - If the skill does not exist in the project folder, copy it in with
+       `cp -R <folder in the clone> <skills folder>/`.
+     - If the skill already exists in the project folder, check the version
+       (under `metadata.version` in `SKILL.md`) between the project skill and the clone:
+       - If the version has changed, replace the project's skill folder with the new version from the clone.
+       - If the version is unchanged, keep the existing skill.
    - Delete the temporary clone when you are done.
-   In both cases, skip skills that already exist in the target folder. Apart from the temporary
-   clone, do not overwrite, move or delete any file.
 5. Run `ls -l` on each skills folder you installed into, then tell me which skills are installed
-   for which agents, and whether they are linked or copied.
+   or updated for which agents (showing versions, whether each was newly installed, updated, or already
+   up to date, and whether linked or copied).
 6. Ask me whether to set up the current project for Vibecode now. If I say yes, read
    vibecode-init/SKILL.md from one of the skills folders you installed into and follow it
    for this project. If I say no, remind me to start a new session and run /vibecode-init
@@ -329,15 +335,27 @@ tmp=$(mktemp -d)
 git clone --depth 1 https://github.com/lysari/vibecode-skills.git "$tmp"
 
 # Claude Code: .claude/skills   Antigravity: .agents/skills   Cursor: .cursor/skills
-mkdir -p .claude/skills
+target_dir=".claude/skills"
+mkdir -p "$target_dir"
 for d in "$tmp"/.agents/skills/*/; do
-  [ -e ".claude/skills/$(basename "$d")" ] || cp -R "${d%/}" .claude/skills/
+  skill=$(basename "$d")
+  target="$target_dir/$skill"
+  if [ ! -d "$target" ]; then
+    cp -R "${d%/}" "$target_dir/"
+  else
+    old_ver=$(grep -m1 'version:' "$target/SKILL.md" 2>/dev/null || true)
+    new_ver=$(grep -m1 'version:' "$d/SKILL.md" 2>/dev/null || true)
+    if [ "$old_ver" != "$new_ver" ]; then
+      rm -rf "$target"
+      cp -R "${d%/}" "$target_dir/"
+    fi
+  fi
 done
 
 rm -rf "$tmp"
 ```
 
-To update later, delete the copied skill folders and run it again.
+Running it again checks each skill's version and updates only those whose version changed.
 
 </details>
 
