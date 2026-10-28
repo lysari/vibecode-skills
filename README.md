@@ -85,10 +85,14 @@ Install or update the Vibecode skills from https://github.com/lysari/vibecode-sk
        (under `metadata.version` in `SKILL.md`) between the project skill and the clone:
        - If the version has changed, replace the project's skill folder with the new version from the clone.
        - If the version is unchanged, keep the existing skill.
+   - Tailor the installed skills to this project:
+     - Check the project root against the "Framework rules" table in <skills folder>/vibecode/SKILL.md (e.g. angular.json, tsconfig.json, go.mod, pyproject.toml, artisan, etc.).
+     - In <skills folder>/vibecode/frameworks/, keep only the folders for technologies matched in the project (e.g. in an Angular project, keep angular/, typescript/, css/; remove golang/, python/, laravel/, vue/, react/, etc.).
+     - In <skills folder>/vibecode/SKILL.md, trim the "Framework rules" table to list only the rows matching this project.
    - Delete the temporary clone when you are done.
 5. Run `ls -l` on each skills folder you installed into, then tell me which skills are installed
    or updated for which agents (showing versions, whether each was newly installed, updated, or already
-   up to date, and whether linked or copied).
+   up to date, whether linked or copied, and which frameworks were kept for this project).
 6. Ask me whether to set up the current project for Vibecode now. If I say yes, read
    vibecode-init/SKILL.md from one of the skills folders you installed into and follow it
    for this project. If I say no, remind me to start a new session and run /vibecode-init
@@ -351,6 +355,17 @@ for d in "$tmp"/.agents/skills/*/; do
     fi
   fi
 done
+
+# Keep only frameworks matching this project
+if [ -d "$target_dir/vibecode/frameworks" ]; then
+  [ ! -f "angular.json" ] && rm -rf "$target_dir/vibecode/frameworks/angular"
+  [ ! -f "go.mod" ] && rm -rf "$target_dir/vibecode/frameworks/golang"
+  [ ! -f "artisan" ] && rm -rf "$target_dir/vibecode/frameworks/laravel"
+  [ ! -f "pyproject.toml" ] && [ ! -f "requirements.txt" ] && [ ! -f "setup.py" ] && rm -rf "$target_dir/vibecode/frameworks/python"
+  [ ! -f "nest-cli.json" ] && rm -rf "$target_dir/vibecode/frameworks/nestjs"
+  [ ! -f "bunfig.toml" ] && [ ! -f "bun.lock" ] && [ ! -f "bun.lockb" ] && rm -rf "$target_dir/vibecode/frameworks/bun"
+  [ ! -f "firebase.json" ] && rm -rf "$target_dir/vibecode/frameworks/firebase"
+fi
 
 rm -rf "$tmp"
 ```
