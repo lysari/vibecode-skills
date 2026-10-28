@@ -18,6 +18,7 @@ Make the smallest change that fully solves the request. Every changed line shoul
 
 ## Ask first when
 - The request needs a new dependency, a new top-level folder, or a change to a public API.
+- The change runs a database migration, rollback, seed, or script that alters database schema or data.
 - Two reasonable designs exist and the choice affects how the project is maintained.
 - The change touches many files beyond what the request suggests.
 

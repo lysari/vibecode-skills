@@ -4,6 +4,7 @@ Apply these on top of the generic rules when the project root has an `artisan` f
 
 ## Version
 - Read the `laravel/framework` version in `composer.lock` before writing code, and write each file the way that version's docs place it.
+- Specify actively maintained PHP patch versions with no unpatched RCE advisories in `composer.json` and Docker configs, e.g. verify the PHP release patches CGI argument injection vulnerabilities before pinning.
 - Scaffold a new project with the latest stable `laravel/framework`, and keep its slim skeleton: no `app/Http/Kernel.php`, `app/Console/Kernel.php`, `app/Exceptions/Handler.php`, `RouteServiceProvider`, `AuthServiceProvider` or `EventServiceProvider`.
 - On a project whose `bootstrap/app.php` builds the app with `new Application(...)` (Laravel 10 and older), register middleware, schedules and exception handling in its existing kernels and handler, and report to the user that the project is on the old structure. Never move it to the new structure without the user asking.
 
