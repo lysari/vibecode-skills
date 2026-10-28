@@ -18,7 +18,7 @@ It prevents code collisions, dirty-tree clashes, lockfile divergence, and git in
 2. **Disjoint Boundary Partitioning**: Each parallel worker is strictly confined to a disjoint set of files and directories ($A \cap B = \emptyset$).
 3. **Same-File Protocol**: When changes must touch the same file, applies structured patterns (Wave 2 Stitcher, Pre-Decomposition, or Worktree Section Branching).
 4. **Workspace Isolation**: Each sub-agent operates in an isolated physical directory (Git worktrees for Claude Code/Cursor, or branch workspaces in Antigravity).
-5. **Automated Reconciliation Gate & AI Merge Resolver**: Merges branches, resolves any textual or semantic conflicts using an AI Merge Resolver, wires central registration, and validates cross-module builds.
+5. **Merge-on-Pass & Integration Gate**: Merges each branch as soon as its worker passes, resolves any textual or semantic conflicts using an AI Merge Resolver, then wires central registration and validates cross-module builds once the whole wave is merged.
 
 ```mermaid
 flowchart TD
@@ -37,30 +37,32 @@ flowchart TD
             WA_Worktree["Worktree / Branch A"]
             WA_Impl["use-vibecode on Module 1"]
             WA_Audit["vibecode-review [PASS]"]
-            WA_Worktree --> WA_Impl --> WA_Audit
+            WA_Merge["Merge Branch A into Integration"]
+            WA_Worktree --> WA_Impl --> WA_Audit --> WA_Merge
         end
 
         subgraph WorkerB ["Worker B: Module 2"]
             WB_Worktree["Worktree / Branch B"]
             WB_Impl["use-vibecode on Module 2"]
             WB_Audit["vibecode-review [PASS]"]
-            WB_Worktree --> WB_Impl --> WB_Audit
+            WB_Merge["Merge Branch B into Integration"]
+            WB_Worktree --> WB_Impl --> WB_Audit --> WB_Merge
         end
 
         subgraph WorkerC ["Worker C: Module 3"]
             WC_Worktree["Worktree / Branch C"]
             WC_Impl["use-vibecode on Module 3"]
             WC_Audit["vibecode-review [PASS]"]
-            WC_Worktree --> WC_Impl --> WC_Audit
+            WC_Merge["Merge Branch C into Integration"]
+            WC_Worktree --> WC_Impl --> WC_Audit --> WC_Merge
         end
     end
 
-    subgraph Wave2 ["Wave 2: Reconciliation & Integration Gate"]
-        Merge["1. Sequential Fast-Forward / Merge to Integration Branch"]
-        Wire["2. Central Wiring (Routes, Navigation, Root Exports)"]
-        Build["3. Cross-Module Build & Test Verification"]
-        Cleanup["4. Prune Worktrees & Terminate Branches"]
-        Merge --> Wire --> Build --> Cleanup
+    subgraph Wave2 ["Wave 2: Integration Gate"]
+        Wire["1. Central Wiring (Routes, Navigation, Root Exports)"]
+        Build["2. Cross-Module Build & Test Verification"]
+        Cleanup["3. Prune Worktrees & Terminate Branches"]
+        Wire --> Build --> Cleanup
     end
 
     Decomp --> Wave0
@@ -115,7 +117,7 @@ flowchart TD
    ```
 3. **Default**: `3`, when `config.json` is missing, unreadable, or has no `maxConcurrentWorkers` field.
 
-The value must be a whole number of 1 or more; if it is not, use the default and tell the user. A value of `1` runs modules one at a time while keeping worktree isolation. When a wave has more modules than `maxConcurrentWorkers`, start the next queued module as soon as a running worker returns its `[PASS]` report.
+The value must be a whole number of 1 or more; if it is not, use the default and tell the user. A value of `1` runs modules one at a time while keeping worktree isolation. When a wave has more modules than `maxConcurrentWorkers`, start the next queued module as soon as a running worker returns its `[PASS]` report and its branch is merged, so the new worktree branches from the updated integration branch. Skip any queued module whose dependencies are not merged yet.
 
 ---
 
@@ -133,7 +135,7 @@ flowchart TD
     
     Type -- "Monolithic Legacy File (>500 lines)" --> P2["Pattern 2: Wave 0 Pre-Decomposition\nExtract file into domain sub-files first;\nWorkers edit distinct files in Wave 1"]
     
-    Type -- "Single File Cannot Be Split" --> P3["Pattern 3: Worktree Branching + AI Merge Resolver\nWorkers edit distinct sections in isolated worktrees;\nWave 2 AI Merge Resolver reconciles diffs & markers"]
+    Type -- "Single File Cannot Be Split" --> P3["Pattern 3: Worktree Branching + AI Merge Resolver\nWorkers edit distinct sections in isolated worktrees;\nAI Merge Resolver reconciles diffs & markers on merge"]
 ```
 
 ### Pattern 1: Wave 2 Central Stitcher (Recommended)
@@ -146,10 +148,10 @@ Use when a large, existing file has multiple responsibilities that need updating
 1. **Wave 0 (Contract Freeze)**: Refactor the monolithic file into separate domain sub-files (e.g. `user-auth.ts`, `user-billing.ts`, `user-profile.ts`).
 2. **Wave 1**: Parallel workers each modify their own separate extracted sub-file with zero chance of conflict.
 
-### Pattern 3: Worktree Branching + Wave 2 AI Merge Resolver
+### Pattern 3: Worktree Branching + AI Merge Resolver
 Use when two tasks **must** modify distinct functions or sections of the exact same file and it cannot be split:
 1. **Wave 1**: Assign each worker an isolated worktree on a separate branch (`agent/feature-a`, `agent/feature-b`). Ensure each worker knows which function/section it is assigned to touch.
-2. **Wave 2**: When merging `agent/feature-b` into the integration branch:
+2. **Merge-on-Pass**: When merging `agent/feature-b` into the integration branch after its worker passes:
    - If Git 3-way auto-merges cleanly $\to$ run build & tests.
    - If Git halts with a merge conflict $\to$ spawn an **AI Merge Resolver** sub-agent to reconcile conflict markers (`<<<<<<< HEAD`), preserve both features, unify imports, and verify with tests.
 
@@ -160,11 +162,12 @@ Use when two tasks **must** modify distinct functions or sections of the exact s
 ### Stage 1: Fast Scoping & Dependency Partitioning
 
 1. Analyze the user's request and map out target modules and file boundaries.
-2. Check if shared contracts (types, schemas, database models) or shared dependencies (npm packages) are required:
+2. List each module's dependencies (the other modules whose code it imports or calls) and state them in the plan. A module with no dependencies is ready to start; the rest wait in the queue until every module they depend on is merged. If two modules depend on each other, combine them into one module or move the shared part into Wave 0.
+3. Check if shared contracts (types, schemas, database models) or shared dependencies (npm packages) are required:
    - If **yes**: Schedule **Wave 0 (Contract Freeze)**.
    - If **no** (modules are completely self-contained): Proceed directly to **Wave 1**.
-3. Resolve `maxConcurrentWorkers` (see [Concurrency Setting](#concurrency-setting)) and state the value in the plan.
-4. Create an integration branch to host the unified changes:
+4. Resolve `maxConcurrentWorkers` (see [Concurrency Setting](#concurrency-setting)) and state the value in the plan.
+5. Create an integration branch to host the unified changes:
    ```bash
    git checkout -b feat/epic-integration
    ```
@@ -182,7 +185,7 @@ Use when two tasks **must** modify distinct functions or sections of the exact s
 
 ### Stage 3: Wave 1 – Parallel Module Execution
 
-For each independent module (up to `maxConcurrentWorkers` at a time):
+For each module whose dependencies are all merged (up to `maxConcurrentWorkers` at a time):
 
 #### 1. Setup Isolated Workspace
 
@@ -201,21 +204,13 @@ Use the [Parallel Module Worker Brief Template](#parallel-module-worker-brief-te
 - Sub-agents run concurrently in their separate file paths.
 - Each sub-agent executes `use-vibecode`, writes code only within its scope, runs `vibecode-review`, and returns its `[PASS]` report.
 
----
-
-### Stage 4: Wave 2 – Reconciliation & Integration Gate
-
-Once all Wave 1 workers return with passing verdicts:
-
-#### 1. Sequential Merge & Conflict Handling
-In the main workspace on `feat/epic-integration`:
+#### 4. Merge on Pass & Conflict Handling
+As soon as a worker returns `[PASS]`, merge its branch in the main workspace on `feat/epic-integration`. Do not wait for the rest of the wave. When several workers pass together, merge them one at a time.
 ```bash
-for branch in agent/module-1 agent/module-2 agent/module-3; do
-  if ! git merge $branch --no-edit; then
-    echo "Merge conflict detected on $branch! Dispatching AI Merge Resolver..."
-    # Invoke AI Merge Resolver sub-agent to reconcile conflict markers
-  fi
-done
+if ! git merge agent/<module-name> --no-edit; then
+  echo "Merge conflict detected on agent/<module-name>! Dispatching AI Merge Resolver..."
+  # Invoke AI Merge Resolver sub-agent to reconcile conflict markers
+fi
 ```
 
 If a merge conflict occurs on shared files:
@@ -223,11 +218,19 @@ If a merge conflict occurs on shared files:
 2. **Dispatch AI Merge Resolver**: Spawn a sub-agent with the [AI Merge Resolver Brief Template](#ai-merge-resolver-brief-template).
 3. **Resolve & Commit**: The sub-agent inspects `<<<<<<< HEAD`, `=======`, `>>>>>>>` markers, combines both workers' edits without dropping logic, fixes duplicate imports, runs typecheck (`tsc --noEmit`), and stages the resolved file (`git add <file> && git commit --no-edit`).
 
-#### 2. Central Wiring & Hookup
+Once the merge is committed, start the next queued module whose dependencies are all merged (see [Concurrency Setting](#concurrency-setting)).
+
+---
+
+### Stage 4: Wave 2 – Integration Gate
+
+Once all Wave 1 workers have passed and their branches are merged:
+
+#### 1. Central Wiring & Hookup
 If central registration is required (Pattern 1: Wave 2 Stitcher):
 - Register new routes, component mounts, navigation links, or barrel exports in the central entrypoint.
 
-#### 3. Holistic Verification Gate
+#### 2. Holistic Verification Gate
 Run the project's aggregate verification commands:
 ```bash
 # Typecheck, test, and build
@@ -236,7 +239,7 @@ npm run build # or tsc --noEmit
 ```
 Confirm all integrated modules function seamlessly together.
 
-#### 4. Worktree Cleanup & Termination
+#### 3. Worktree Cleanup & Termination
 Safely remove all ephemeral worktrees and delete local agent branches:
 ```bash
 # Clean worktrees
@@ -284,7 +287,7 @@ Report Status: [PASS], changed files, verification results, and review checklist
 
 ## AI Merge Resolver Brief Template
 
-When Git reports a merge conflict on a shared file during Wave 2, dispatch an AI Merge Resolver sub-agent using this brief:
+When Git reports a merge conflict on a shared file while merging a passed branch, dispatch an AI Merge Resolver sub-agent using this brief:
 
 ```text
 You are an AI Merge Resolver running under the vibecode-modules lifecycle.
@@ -332,4 +335,6 @@ Base Branch: <BASE_BRANCH>
 | Forgetting to add `.worktrees/` to `.gitignore` | Ensure `.worktrees/` is ignored so temporary directories never contaminate git tracking |
 | Forgetting to remove worktrees after completion | Always run `git worktree remove --force` and `git worktree prune` in Wave 2 |
 | Exceeding API token limits | Cap concurrent workers at `maxConcurrentWorkers` (default 3); queue additional modules until a worker finishes |
+| Leaving passed branches unmerged until the whole wave finishes | Merge each `agent/<module-name>` branch as soon as its worker returns `[PASS]` |
+| Starting a module before the modules it depends on are merged | Keep it queued until every dependency is merged, then branch its worktree from the updated integration branch |
 
