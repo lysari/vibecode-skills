@@ -92,13 +92,30 @@ flowchart TD
 ### 1. Main Agent (Parallel Orchestrator)
 - **Zero In-Depth Code Editing**: The Main Agent coordinates the pipeline, handles Git worktree creation/cleanup, merges branches, and monitors sub-agents.
 - **Defines Boundary Contracts**: Identifies modules, determines the file globs for each worker, and enforces that file sets are completely disjoint.
-- **Manages Concurrency**: Spawns workers in parallel waves (recommended: maximum 3 concurrent workers to respect token limits).
+- **Manages Concurrency**: Spawns workers in parallel waves, never more than [`maxConcurrentWorkers`](#concurrency-setting) at a time.
 - **Executes the Integration Gate**: In Wave 2, resolves central wiring, runs the full test/typecheck suite, and cleans up worktrees.
 
 ### 2. Ephemeral Module Worker (Sub-Agent)
 - **Runs in Workspace Isolation**: Operates exclusively inside its assigned Git worktree or branch workspace.
 - **Respects Assigned Boundary**: Writes and edits code **only** within its designated file glob. Never modifies files outside its boundary or files created by Wave 0.
 - **Runs the Full Vibecode Lifecycle**: Reads `use-vibecode/SKILL.md` first, executes implementation, and achieves a `[PASS]` verdict from `vibecode-review` inside its own worktree before reporting back.
+
+---
+
+## Concurrency Setting
+
+`maxConcurrentWorkers` is the number of module workers that may run at the same time. Resolve it once in Stage 1, in this order:
+
+1. **User request**: a number stated in the current request (e.g. "run 5 workers at a time").
+2. **Config file**: the `maxConcurrentWorkers` field in `config.json`, in the same folder as this `SKILL.md`:
+   ```json
+   {
+     "maxConcurrentWorkers": 3
+   }
+   ```
+3. **Default**: `3`, when `config.json` is missing, unreadable, or has no `maxConcurrentWorkers` field.
+
+The value must be a whole number of 1 or more; if it is not, use the default and tell the user. A value of `1` runs modules one at a time while keeping worktree isolation. When a wave has more modules than `maxConcurrentWorkers`, start the next queued module as soon as a running worker returns its `[PASS]` report.
 
 ---
 
@@ -146,7 +163,8 @@ Use when two tasks **must** modify distinct functions or sections of the exact s
 2. Check if shared contracts (types, schemas, database models) or shared dependencies (npm packages) are required:
    - If **yes**: Schedule **Wave 0 (Contract Freeze)**.
    - If **no** (modules are completely self-contained): Proceed directly to **Wave 1**.
-3. Create an integration branch to host the unified changes:
+3. Resolve `maxConcurrentWorkers` (see [Concurrency Setting](#concurrency-setting)) and state the value in the plan.
+4. Create an integration branch to host the unified changes:
    ```bash
    git checkout -b feat/epic-integration
    ```
@@ -164,7 +182,7 @@ Use when two tasks **must** modify distinct functions or sections of the exact s
 
 ### Stage 3: Wave 1 – Parallel Module Execution
 
-For each independent module (up to max concurrency, default 3):
+For each independent module (up to `maxConcurrentWorkers` at a time):
 
 #### 1. Setup Isolated Workspace
 
@@ -313,5 +331,5 @@ Base Branch: <BASE_BRANCH>
 | Parallel workers modifying `package.json` concurrently | Install dependencies once during Wave 0 (Contract Freeze) |
 | Forgetting to add `.worktrees/` to `.gitignore` | Ensure `.worktrees/` is ignored so temporary directories never contaminate git tracking |
 | Forgetting to remove worktrees after completion | Always run `git worktree remove --force` and `git worktree prune` in Wave 2 |
-| Exceeding API token limits | Cap concurrent workers to 3 at a time; queue additional tasks in subsequent waves |
+| Exceeding API token limits | Cap concurrent workers at `maxConcurrentWorkers` (default 3); queue additional modules until a worker finishes |
 
