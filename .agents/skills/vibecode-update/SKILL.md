@@ -1,6 +1,8 @@
 ---
 name: vibecode-update
 description: Use when the user gives a coding or UI rule or correction to keep ("add to vibecode", "update vibecode", "make this a rule", "make this a design rule", "from now on"), or runs /vibecode-update with no rule to turn the current session's corrections into vibecode rules
+metadata:
+  version: "0.0.1-20261026.1"
 ---
 
 # Vibecode update

@@ -104,6 +104,7 @@ When dispatching, use this standard brief:
 ```text
 You are an ephemeral task worker running under the vibecode-workflow lifecycle.
 Task: <EXPLICIT_DESCRIPTION_OF_THE_TASK>
+Done means: <EVERY_ACCEPTANCE_ITEM>. A part or phase boundary is not a stopping point unless this brief says so.
 
 === MANDATORY FIRST ACTION (DO NOT SKIP OR DELAY) ===
 Before any planning, searching, or writing code, you MUST:
@@ -131,6 +132,7 @@ Only after the skill content is actually in context may you proceed.
    - Files Modified/Created: <list of file paths>
    - Tests/Verification: <commands run and results>
    - Vibecode Review Verdict: <paste the review checklist>
+   - Not done / not verified: <every acceptance item not finished or not checked, or "none">
 ```
 
 ---
@@ -188,6 +190,7 @@ The Main Agent uses the `Agent` tool:
 | Main agent writes code directly while running `vibecode-workflow` | Main agent must delegate code edits to sub-agents to preserve a clean orchestrator context |
 | Spawning sub-agent without explicitly instructing it to read `use-vibecode` | Always use the standard brief template requiring `use-vibecode` as step 1 |
 | Sub-agent finishes without running `vibecode-review` | The sub-agent must run the full compliance audit gate and achieve `[PASS]` before exiting |
+| Sub-agent stops at a part or phase boundary, or reports done with acceptance items unchecked | The brief states what "done" means (every acceptance item); the report ends with an explicit "Not done / not verified" list |
 | Running multiple sub-agents in parallel on the same files | Run sub-agents sequentially to avoid race conditions and merge conflicts |
 | Sub-agent stays alive waiting for new instructions | Sub-agents in this workflow are ephemeral: the Main Agent must explicitly terminate/kill the sub-agent (`manage_subagents`) once the `[PASS]` report is received |
 

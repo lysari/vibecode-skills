@@ -19,7 +19,9 @@
 ## Tests
 - Add or update a test for each behaviour you change, with a real assertion.
 - Do not add empty or placeholder tests, such as generated stubs that only check the unit exists.
-- Run the existing tests before finishing. Report failing tests with their output instead of leaving them silently red.
+- Before you replace or rewrite code, add a test for each behaviour on the replaced code's list that no test covers yet, and run it against the old code first, e.g. a test that Enter submits the form passes before the rewrite and after it.
+- Check a behaviour through the input the user uses. A check that reaches it another way does not count for that input, e.g. calling the handler directly does not show the key press reaches it. Report each behaviour you could not check that way as unchecked.
+- Run all existing tests before finishing, not only the ones for your change. Report failing tests with their output instead of leaving them silently red.
 
 ## Docs
 - Keep the README accurate for what the project is, how to run it, its config and environment, and how to deploy. Update it when your change alters one of those.

@@ -3,7 +3,7 @@
 Apply these on top of the generic rules when the project root has an `angular.json`.
 
 ## Directory structure
-- With one feature, put its pages, components, stores and services in folders by kind directly under `src/app/`, e.g. `src/app/pages/order-list.page.ts`, beside `environments/` and `specs/`. Move them into `features/<feature>/` when a second feature is added.
+- With one feature, put its pages, components, stores and services in folders by kind directly under `src/app/`, e.g. `src/app/pages/order-list/order-list.page.ts`, beside `environments/` and `specs/`. Move them into `features/<feature>/` when a second feature is added.
 - With 2 or more features, organize the application under `src/` into `app/` (`core/`, `features/`, `shared/`), `environments/`, and `specs/`; never place feature components, pages, or domain logic in a flat `src/app/components/` directory or loose in `src/app/`:
 
 ```text
@@ -51,15 +51,16 @@ src/
 - Put singleton infrastructure services, guards, interceptors, and app configuration in `src/app/core/`, e.g. `src/app/core/services/token.service.ts`.
 - Put app-wide global signal stores in `src/app/core/stores/`, e.g. `src/app/core/stores/auth.store.ts`; never put feature-specific state in `core/`.
 - Put reusable UI primitives (buttons, inputs, dialogs), shared pipes, directives, validators, and pure utility helpers in `src/app/shared/components/`, `src/app/shared/pipes/`, `src/app/shared/directives/`, `src/app/shared/validators/`, or `src/app/shared/utils/`; never put domain-specific business components, stateful domain services, or route guards in `shared/`.
+- Put each component and each page in its own folder named after it, holding its `.ts`, `.html` and `.scss` files, in `components/`, `pages/` and layout folders alike, e.g. `src/app/shared/components/date-badge/date-badge.component.ts` and `src/app/features/billing/pages/invoice-list/invoice-list.page.html`; never place a component or page file directly in `components/` or `pages/`.
 - Put each layout shell component in its own folder at `src/app/shared/layout/<name>-layout/`, e.g. `src/app/shared/layout/main-layout/main-layout.component.ts` and `src/app/shared/layout/auth-layout/auth-layout.component.ts`; never put a layout shell in `core/`, a feature folder, or loose in `src/app/`.
 - Keep every part that only one layout uses (its subcomponents, directives and stores) inside that layout's folder, e.g. `src/app/shared/layout/main-layout/sidebar/sidebar.component.ts`.
 - Keep the directives and stores that pages use to fill one layout's regions inside that layout's folder too, e.g. `src/app/shared/layout/main-layout/header-actions.directive.ts` and `src/app/shared/layout/main-layout/header-actions.store.ts`.
 - Move a layout part to `shared/components/`, `shared/directives/` or `core/stores/` when a second layout uses it, or when a feature renders one of the layout's components on its own.
 - Write data transformations, formatters, and value conversions as pure functions in `src/app/shared/utils/` (or `src/app/shared/pipes/` for HTML templates); never create `@Injectable()` services for pure mappings or calculations.
 - Structure each feature module under `src/app/features/<feature>/` into `pages/`, `components/`, `stores/`, `services/`, and route definitions, creating each folder with its first file:
-  - `pages/` holds route-level screen components, e.g. `src/app/features/billing/pages/invoice-list.page.ts`.
+  - `pages/` holds route-level screen components, e.g. `src/app/features/billing/pages/invoice-list/invoice-list.page.ts`.
   - `stores/` holds feature reactive state and signals, e.g. `src/app/features/billing/stores/invoice.store.ts`.
-  - `components/` holds private presentational subcomponents, e.g. `src/app/features/billing/components/invoice-row.component.ts`.
+  - `components/` holds private presentational subcomponents, e.g. `src/app/features/billing/components/invoice-row/invoice-row.component.ts`.
   - `services/` holds API clients and data communication, e.g. `src/app/features/billing/services/invoice-api.service.ts`.
 
 ## Data flow
