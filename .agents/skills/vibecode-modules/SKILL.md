@@ -2,7 +2,7 @@
 name: vibecode-modules
 description: Orchestrates parallel multi-agent implementations across decoupled architectural boundaries without conflicts. Uses Git worktrees or branch workspaces, DAG wave scheduling, contract-first interfaces, and automated integration gates.
 metadata:
-  version: "0.1.0-20261029.1"
+  version: "0.1.0-20261029.2"
 ---
 
 # Vibecode Modules
@@ -118,7 +118,30 @@ flowchart TD
    ```
 3. **Default**: `3`, when `config.json` is missing, unreadable, or has no `maxConcurrentWorkers` field.
 
-The value must be a whole number of 1 or more; if it is not, use the default and tell the user. A value of `1` runs modules one at a time while keeping worktree isolation. When a wave has more modules than `maxConcurrentWorkers`, start the next queued module as soon as a running worker returns its `[PASS]` report and its branch is merged, so the new worktree branches from the updated integration branch. Skip any queued module whose dependencies are not merged yet.
+The value must be a whole number of 1 or more; if it is not, use the default and tell the user. A value of `1` runs modules one at a time while keeping worktree isolation. When a wave has more modules than `maxConcurrentWorkers`, start the next queued module as soon as a slot frees: when a running worker's branch is merged, so the new worktree branches from the updated integration branch, or when a worker is blocked (see [Parallel Execution & Monitoring](#3-parallel-execution--monitoring)). Skip any queued module whose dependencies are not merged yet.
+
+---
+
+## Progress File
+
+The Main Agent keeps one progress file (e.g. `task-progress.md`) in the main workspace. Only the Main Agent edits it; workers never touch it.
+
+- The header states the integration branch and `maxConcurrentWorkers`.
+- Each wave has one table with the columns `Module | Depends on | Boundary | Status | Commit`. The Wave 2 table lists the central files it wires.
+- Each module has exactly one row. When its status changes, edit that row in place. Never add a second row for the same module.
+- `Status` is one of `queued`, `running`, `passed`, `merged`, or `blocked` (with the reason). `Commit` holds the merge commit once the row is `merged`.
+
+```markdown
+Integration branch: `feat/user-billing` · `maxConcurrentWorkers`: 3
+
+## Wave 1
+| Module | Depends on | Boundary | Status | Commit |
+|---|---|---|---|---|
+| billing-api | — | `src/features/billing/api/**` | merged | `a1b2c3d` |
+| billing-ui | billing-api | `src/features/billing/ui/**` | running | |
+| invoices | — | `src/features/invoices/**` | running | |
+| receipts | invoices | `src/features/receipts/**` | queued | |
+```
 
 ---
 
@@ -167,13 +190,20 @@ Use when two tasks **must** modify distinct functions or sections of the exact s
 3. Check if shared contracts (types, schemas, database models) or shared dependencies (npm packages) are required:
    - If **yes**: Schedule **Wave 0 (Contract Freeze)**.
    - If **no** (modules are completely self-contained): Proceed directly to **Wave 1**.
-4. Resolve `maxConcurrentWorkers` (see [Concurrency Setting](#concurrency-setting)) and state the value in the plan.
-5. Record the current branch as `<start-branch>`, then create an integration branch from it to host the unified changes. Name it after the request (e.g. `feat/user-billing`):
+4. Check that every boundary is disjoint before any worker starts. Compare each pair, including the Wave 0 files and the central files reserved for Wave 2:
+   - Compare paths case-insensitively: `app/` and `App/` are the same folder on macOS and Windows.
+   - A boundary that contains another overlaps it (e.g. `app/**` contains `app/Features/Navigation/**`).
+   - Central entry points (e.g. `App/`, `routes.ts`, `App.tsx`) belong only to Wave 2. Never assign them to a Wave 1 module.
+
+   If two boundaries overlap, narrow them or apply the [Same-File Protocol](#same-file-protocol-working-with-the-same-file).
+5. Resolve `maxConcurrentWorkers` (see [Concurrency Setting](#concurrency-setting)) and state the value in the plan.
+6. Record the current branch as `<start-branch>`, then create an integration branch from it to host the unified changes. Name it after the request (e.g. `feat/user-billing`), never a generic name such as `feat/epic-integration`:
    ```bash
    git branch --show-current   # <start-branch>
    git checkout -b feat/<epic-name>
    ```
    If `feat/<epic-name>` already exists, ask the user whether to reuse it or choose another name.
+7. Write the [Progress File](#progress-file) with every module set to `queued`.
 
 ---
 
@@ -201,11 +231,13 @@ For each module whose dependencies are all merged (up to `maxConcurrentWorkers` 
 
 #### 2. Dispatch Sub-Agent with Disjoint Brief
 
-Use the [Parallel Module Worker Brief Template](#parallel-module-worker-brief-template).
+Use the [Parallel Module Worker Brief Template](#parallel-module-worker-brief-template), then set the module's progress row to `running`.
 
 #### 3. Parallel Execution & Monitoring
 - Sub-agents run concurrently in their separate file paths.
 - Each sub-agent executes `use-vibecode`, writes code only within its scope, runs `vibecode-review`, and returns its `[PASS]` report.
+
+If a worker returns without `[PASS]`, send it back once with the review findings. If it still fails, set its progress row to `blocked` with the reason, tell the user, and start the next queued module in its slot. Modules that depend on a blocked module stay queued.
 
 #### 4. Merge on Pass & Conflict Handling
 As soon as a worker returns `[PASS]`, merge its branch in the main workspace on `feat/<epic-name>`. Do not wait for the rest of the wave. When several workers pass together, merge them one at a time.
@@ -221,13 +253,13 @@ If a merge conflict occurs on shared files:
 2. **Dispatch AI Merge Resolver**: Spawn a sub-agent with the [AI Merge Resolver Brief Template](#ai-merge-resolver-brief-template).
 3. **Resolve & Commit**: The sub-agent inspects `<<<<<<< HEAD`, `=======`, `>>>>>>>` markers, combines both workers' edits without dropping logic, fixes duplicate imports, runs typecheck (`tsc --noEmit`), and stages the resolved file (`git add <file> && git commit --no-edit`).
 
-Once the merge is committed, start the next queued module whose dependencies are all merged (see [Concurrency Setting](#concurrency-setting)).
+Once the merge is committed, set the module's progress row to `merged` with the merge commit, then start the next queued module whose dependencies are all merged (see [Concurrency Setting](#concurrency-setting)).
 
 ---
 
 ### Stage 4: Wave 2 – Integration Gate
 
-Once all Wave 1 workers have passed and their branches are merged:
+Start Wave 2 once all Wave 1 workers have passed and their branches are merged. While any module is `blocked`, do not start it; ask the user how to proceed. Wave 2 merges no `agent/*` branches; each one was already merged in Stage 3 when its worker passed.
 
 #### 1. Central Wiring & Hookup
 If central registration is required (Pattern 1: Wave 2 Stitcher):
@@ -343,4 +375,7 @@ Base Branch: <BASE_BRANCH>
 | Exceeding API token limits | Cap concurrent workers at `maxConcurrentWorkers` (default 3); queue additional modules until a worker finishes |
 | Leaving passed branches unmerged until the whole wave finishes | Merge each `agent/<module-name>` branch as soon as its worker returns `[PASS]` |
 | Starting a module before the modules it depends on are merged | Keep it queued until every dependency is merged, then branch its worktree from the updated integration branch |
+| Giving two workers overlapping boundaries, such as `app/**` and `App/**` | Compare boundaries case-insensitively, including parent folders, before Wave 1 starts |
+| Adding a new progress row when a module's status changes | Edit the module's existing row in place; keep one row per module |
+| Leaving a failed worker holding its slot | Send it back once with the review findings; if it fails again, mark it `blocked`, tell the user, and give its slot to the next queued module |
 
