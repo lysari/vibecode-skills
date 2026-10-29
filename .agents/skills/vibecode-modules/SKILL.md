@@ -2,7 +2,7 @@
 name: vibecode-modules
 description: Orchestrates parallel multi-agent implementations across decoupled architectural boundaries without conflicts. Uses Git worktrees or branch workspaces, DAG wave scheduling, contract-first interfaces, and automated integration gates.
 metadata:
-  version: "0.1.0-20261023.1"
+  version: "0.1.0-20261029.1"
 ---
 
 # Vibecode Modules
@@ -62,7 +62,8 @@ flowchart TD
         Wire["1. Central Wiring (Routes, Navigation, Root Exports)"]
         Build["2. Cross-Module Build & Test Verification"]
         Cleanup["3. Prune Worktrees & Terminate Branches"]
-        Wire --> Build --> Cleanup
+        Handoff["4. Hand Off Integration Branch"]
+        Wire --> Build --> Cleanup --> Handoff
     end
 
     Decomp --> Wave0
@@ -167,10 +168,12 @@ Use when two tasks **must** modify distinct functions or sections of the exact s
    - If **yes**: Schedule **Wave 0 (Contract Freeze)**.
    - If **no** (modules are completely self-contained): Proceed directly to **Wave 1**.
 4. Resolve `maxConcurrentWorkers` (see [Concurrency Setting](#concurrency-setting)) and state the value in the plan.
-5. Create an integration branch to host the unified changes:
+5. Record the current branch as `<start-branch>`, then create an integration branch from it to host the unified changes. Name it after the request (e.g. `feat/user-billing`):
    ```bash
-   git checkout -b feat/epic-integration
+   git branch --show-current   # <start-branch>
+   git checkout -b feat/<epic-name>
    ```
+   If `feat/<epic-name>` already exists, ask the user whether to reuse it or choose another name.
 
 ---
 
@@ -178,7 +181,7 @@ Use when two tasks **must** modify distinct functions or sections of the exact s
 
 1. Dispatch a single worker to implement the shared types, interfaces, and schemas (e.g., `src/types/api.ts` or `src/shared/schema.ts`).
 2. If new third-party packages are needed, install them now and commit lockfiles.
-3. Verify contracts with `tsc` or linter, and commit to `feat/epic-integration`.
+3. Verify contracts with `tsc` or linter, and commit to `feat/<epic-name>`.
 4. **Freeze Contract**: Once committed, these files become strictly read-only for Wave 1 workers.
 
 ---
@@ -191,7 +194,7 @@ For each module whose dependencies are all merged (up to `maxConcurrentWorkers` 
 
 - **For Claude Code / Cursor / CLI (Git Worktrees)**:
   ```bash
-  git worktree add .worktrees/<module-name> -b agent/<module-name> feat/epic-integration
+  git worktree add .worktrees/<module-name> -b agent/<module-name> feat/<epic-name>
   ```
 - **For Google Antigravity**:
   Invoke sub-agent with `Workspace: 'branch'`.
@@ -205,7 +208,7 @@ Use the [Parallel Module Worker Brief Template](#parallel-module-worker-brief-te
 - Each sub-agent executes `use-vibecode`, writes code only within its scope, runs `vibecode-review`, and returns its `[PASS]` report.
 
 #### 4. Merge on Pass & Conflict Handling
-As soon as a worker returns `[PASS]`, merge its branch in the main workspace on `feat/epic-integration`. Do not wait for the rest of the wave. When several workers pass together, merge them one at a time.
+As soon as a worker returns `[PASS]`, merge its branch in the main workspace on `feat/<epic-name>`. Do not wait for the rest of the wave. When several workers pass together, merge them one at a time.
 ```bash
 if ! git merge agent/<module-name> --no-edit; then
   echo "Merge conflict detected on agent/<module-name>! Dispatching AI Merge Resolver..."
@@ -250,6 +253,9 @@ git worktree prune
 git branch -D agent/<module-name>
 ```
 Terminate idle sub-agents via platform tools (`manage_subagents` in Antigravity).
+
+#### 4. Hand Off Integration Branch
+Report `feat/<epic-name>` and its verification results to the user, then ask whether to merge it into `<start-branch>`, open a pull request, or keep it as is. Do not merge, push, or delete `feat/<epic-name>` without the user's approval.
 
 ---
 
