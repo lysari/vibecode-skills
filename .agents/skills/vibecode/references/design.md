@@ -24,6 +24,15 @@ Build UI that looks as if one careful designer and developer made every screen: 
 - Never squeeze a horizontal tab strip or segmented control into a narrow column or sidebar where tab labels cannot fit without clipping or overlapping; use a vertical navigation list, a dropdown selector, or horizontally scrollable pills instead, e.g. a vertical list of category links in a narrow sidebar, never five horizontal tab buttons stretched across a 240-wide column.
 - Never wrap a toolbar, header bar, or breadcrumb row of individual pill buttons or badges inside an enclosing pill-shaped container or bordered box; keep the container transparent and let the individual control pills define the interactive surfaces, e.g. a row of pill buttons on a transparent header strip, never an outer pill box enclosing pill buttons.
 
+## Icons
+- Give each object type one icon and use it everywhere that type appears, at every size: toolbar, navigation tree, tab, list row and detail panel. Never draw a second icon for the same type, e.g. `the invoice icon in the sidebar, the tab and the detail header is one glyph at three sizes`.
+- Draw object icons and action icons in two separate styles, and never mix the two styles inside one group, e.g. `filled folder and document icons in the tree, line edit and refresh icons in the action bar`.
+- Show an object's state with a small badge on the icon's bottom-right corner and keep the base icon unchanged. Never swap in a different icon per state, e.g. `a server icon with a small green check when online, the same server icon with a small red cross when offline`.
+- Draw a derived type as its base type's icon plus one modifier mark, never as an unrelated glyph, e.g. `a shared folder is the folder icon with a small person mark`.
+- When the project has an icon set, draw every new icon in that set's style. Never add an icon from another set or style, e.g. `a new export icon drawn at the set's stroke width and grid, never one pasted from a different library`.
+- When the project has no icon style, draw object icons as filled, multi-colour glyphs built from simple geometric shapes, with a subtle shade over each fill and colours from the palette tokens, e.g. `a document as a blue page with a lighter folded corner, never a flat one-colour outline`.
+- When the project has no icon style, draw action icons as thin, single-colour line glyphs, e.g. `an edit action as a one-colour line pencil, never a filled multi-colour pencil`.
+
 ## Corner radius
 - Set the corner radius of an inner element nested inside a rounded container with padding to the outer radius minus the padding (`inner_radius = outer_radius - padding`). Never give the inner element the same radius as the outer container or an uncalculated radius, e.g. an inner element with padding `8` inside a container of radius `24` uses radius `16`, never `24`.
 - Set the inner corner radius to `0` when the padding is greater than or equal to the outer radius, e.g. an inner element with padding `16` inside a container of radius `12` uses radius `0`.
