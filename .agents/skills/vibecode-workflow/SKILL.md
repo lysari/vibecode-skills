@@ -2,7 +2,7 @@
 name: vibecode-workflow
 description: Orchestrates multi-task development using dedicated, ephemeral sub-agents per task. Each sub-agent starts fresh by reading use-vibecode, executes clean implementation and compliance audit via vibecode-review, returns its report to the main agent, and terminates to prevent context dilution and skill forgetting.
 metadata:
-  version: "0.0.1-20261022.2"
+  version: "0.0.1-20261108.1"
 ---
 
 # Vibecode Workflow
@@ -158,6 +158,27 @@ Upon receiving the message from the sub-agent:
 
 ---
 
+### New Requests While a Sub-Agent Is Running (Main Agent)
+
+When the user sends a new problem while a sub-agent is still working, classify it from the user's description and the running brief's file boundary, with no code investigation. Check the rows top to bottom and take the first one that matches:
+
+| The new problem… | Action |
+|---|---|
+| Extends what the running sub-agent is building, e.g. one more action on the module it is creating | **Send it to the running sub-agent** as an added acceptance item. |
+| Needs the running task's output, e.g. it uses a module the running sub-agent is still building | **Hold it.** Dispatch it as the next task after the running sub-agent reports `[PASS]`. |
+| Needs files inside the running sub-agent's file boundary | **Hold it.** Dispatch it as the next task after the running sub-agent reports `[PASS]`. |
+| Is a separate concern, needs no output of the running task, and needs no file inside its boundary | **Spawn a new sub-agent immediately**, in parallel. Never add it to the running sub-agent's brief, and never hold it for that sub-agent. |
+
+When spawning in parallel:
+- Write a file boundary (the folders the sub-agent may edit) into the new brief, and message the running sub-agent that those folders are now off limits, e.g. `Do not edit files under <module-b>/; another worker owns them.`
+- Tell the new sub-agent to report a root cause outside its boundary in "Not done" with the file and proposed fix, and never to edit it.
+- When a new sub-agent reports a fix inside the running sub-agent's boundary, hold that fix as the next task after the running sub-agent reports `[PASS]`.
+- When a separate concern was already sent to a running sub-agent, message it to drop that item, then spawn the separate sub-agent.
+
+Example: a sub-agent is building a new list module; the user reports that an unrelated form overflows its container. Different concern, different folder, no shared output → spawn a form sub-agent now with the form's folder as its boundary, and tell the list sub-agent not to edit that folder.
+
+---
+
 ## Agent-Specific Invocation Guide
 
 ### In Antigravity
@@ -192,5 +213,7 @@ The Main Agent uses the `Agent` tool:
 | Sub-agent finishes without running `vibecode-review` | The sub-agent must run the full compliance audit gate and achieve `[PASS]` before exiting |
 | Sub-agent stops at a part or phase boundary, or reports done with acceptance items unchecked | The brief states what "done" means (every acceptance item); the report ends with an explicit "Not done / not verified" list |
 | Running multiple sub-agents in parallel on the same files | Run sub-agents sequentially to avoid race conditions and merge conflicts |
+| Adding a separate concern to the running sub-agent's brief, or holding it until that sub-agent finishes | Spawn a separate sub-agent immediately, with a file boundary in its brief (see "New Requests While a Sub-Agent Is Running") |
+| Spawning a parallel sub-agent for a problem that needs the running task's output or files inside its boundary | Hold it and dispatch it after the running sub-agent reports `[PASS]` |
 | Sub-agent stays alive waiting for new instructions | Sub-agents in this workflow are ephemeral: the Main Agent must explicitly terminate/kill the sub-agent (`manage_subagents`) once the `[PASS]` report is received |
 
