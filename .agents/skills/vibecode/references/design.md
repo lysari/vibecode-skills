@@ -30,7 +30,9 @@ Build UI that looks as if one careful designer and developer made every screen: 
 - Show an object's state with a small badge on the icon's bottom-right corner and keep the base icon unchanged. Never swap in a different icon per state, e.g. `a server icon with a small green check when online, the same server icon with a small red cross when offline`.
 - Draw a derived type as its base type's icon plus one modifier mark, never as an unrelated glyph, e.g. `a shared folder is the folder icon with a small person mark`.
 - When the project has an icon set, draw every new icon in that set's style. Never add an icon from another set or style, e.g. `a new export icon drawn at the set's stroke width and grid, never one pasted from a different library`.
-- When the project has no icon style, draw object icons as filled, multi-colour glyphs built from simple geometric shapes, with a subtle shade over each fill and colours from the palette tokens, e.g. `a document as a blue page with a lighter folded corner, never a flat one-colour outline`.
+- When the project has no object icon style, draw object icons as filled, multi-colour glyphs built from simple geometric shapes, with a subtle shade over each fill and colours from the palette tokens, e.g. `a document as a blue page with a lighter folded corner, never a flat one-colour outline`.
+- In that object icon style, draw each icon as the outline shape of the object it names. Never draw it as a filled rounded square or circle with a symbol cut out of it or laid on top, e.g. `a table as a grid sheet, a user as a head over shoulders, never a blue rounded square with two white bars`.
+- In that object icon style, fill the object's own parts as separate shapes in at least two tints of its colour, or in a second colour. Never use one fill with white symbol marks on it, e.g. `a table with a darker header row above lighter cells, a query as a front sheet over an offset back sheet of another colour`.
 - When the project has no icon style, draw action icons as thin, single-colour line glyphs, e.g. `an edit action as a one-colour line pencil, never a filled multi-colour pencil`.
 
 ## Corner radius
