@@ -4,10 +4,10 @@ Apply these on top of the generic rules when the project has `.css`, `.scss`, `.
 
 ## Custom properties
 - Declare a custom property that reads a custom property callers override on the element they override it on, never on `:root`, e.g. `--cell: calc(var(--line) + 2 * var(--pad))` on the component's host. A custom property resolves its `var()`s where it is declared.
-- Keep a component's own custom properties in that component's stylesheet, named `--<component>-*`, e.g. `--card-gap` in the card's stylesheet.
-- Declare a custom property named for one feature or layout, and read by several components inside it, on that feature's or layout's root element in its own stylesheet, e.g. `--checkout-panel-width` on the checkout layout's host, so the components inside inherit it. Never declare it on `:root` in a global file.
+- Declare custom properties only for colours, font families, easing curves, and the size properties of a component that offers more than one size. Write every size, spacing, radius, font size, weight, line height, letter spacing, border width, shadow and duration on the declaration that uses it, e.g. `gap: 12px` on `.card`, never `--card-gap: 12px` or `var(--space-3)`.
+- Never declare a preprocessor variable for a size, spacing, radius, font size, weight, line height, letter spacing, border width, shadow or duration, e.g. `font-size: 20px` on `.title`, never `$font-size-title: 20px`.
+- Change a value at a breakpoint with an `@media` inside the rule that sets it, e.g. `.name { font-size: 28px; @media (min-width: 1024px) { font-size: 36px; } }`, never a custom property redefined at the breakpoint.
 - Read a design colour with `var()` where it is used. Never declare a feature or component custom property whose whole value is one `var()`, e.g. `border-color: var(--border)`, never `--checkout-rim: var(--border)` read as `var(--checkout-rim)`.
-- Give a custom property read by two or more features a name with no feature prefix and declare it in a global styles file, e.g. `--panel-width` in `_variables.scss`, never `--checkout-panel-width` read by the account pages.
 - When a component offers more than one size, size every inner part (padding, gap, icon, handle, mark, default font) from its size custom properties, e.g. `height: calc(var(--_height) * 3 / 8)` for a handle. Never give such a component's inner part a fixed px value that only fits the default size.
 - Never add size custom properties to a component that has one size.
 
@@ -19,7 +19,7 @@ Apply these on top of the generic rules when the project has `.css`, `.scss`, `.
 ## Global styles
 - Declare every global style variable (a custom property read by two or more features, or a preprocessor variable read by 2 or more files) in a file of the project's global styles folder. Never declare one in the entry stylesheet or in a page or component stylesheet; the entry stylesheet only loads the global files, e.g. `@use 'palette';`.
 - Put every `@font-face` and every font variable in one fonts file, e.g. `--font-sans` in `_fonts.scss`. Serve the font files from the project's own static folder, never from a font CDN `<link>` or `@import url()`.
-- Put every other global variable (radius, shadow, layout size) in one variables file, e.g. `--radius-lg`, `--page-width` in `_variables.scss`.
+- Put every easing curve in one variables file, e.g. `--ease-out: cubic-bezier(0.2, 0, 0, 1)` in `_variables.scss`.
 - Put every global style rule (element defaults, form controls, shared classes such as `.eyebrow`) in one global rules file, e.g. `body { margin: 0; }` in `_global.scss`.
 
 ## Layout

@@ -11,7 +11,7 @@ metadata:
 
 Execute software and UI engineering tasks through the complete, end-to-end Vibecode lifecycle. It coordinates two interconnected disciplines into a single workflow:
 
-1. **`vibecode`**: Write minimal, clean, maintainable code following strict hygiene and framework rules, and token-driven, accessible UI through `references/design.md` whenever user interfaces or styling are touched.
+1. **`vibecode`**: Write minimal, clean, maintainable code following strict hygiene and framework rules, and accessible UI with colour tokens and inline sizes through `references/design.md` whenever user interfaces or styling are touched.
 2. **`vibecode-review`**: Conduct a mandatory post-implementation compliance review directly against the skill files on disk before considering the task complete.
 
 ```
@@ -87,7 +87,7 @@ Before declaring any coding or UI task complete, confirm:
 - [ ] Searched for existing code/utilities before adding new files or helpers.
 - [ ] Edited existing code in place without leaving `_old`, `New`, `V2`, or commented-out remnants.
 - [ ] Kept code clean of section banners and restating comments.
-- [ ] Extracted and used design tokens if UI was built or changed.
+- [ ] Read colours from colour tokens and wrote sizes inline if UI was built or changed.
 - [ ] Cleaned up all scratch files, debug logs, and unused imports.
 - [ ] Re-read skills from disk and executed `vibecode-review`.
 - [ ] Fixed any violations discovered during review.
@@ -100,7 +100,7 @@ Before declaring any coding or UI task complete, confirm:
 | Mistake | Correction |
 |---|---|
 | Stopping after writing code without running `vibecode-review` | `vibecode-review` is a mandatory gate; never conclude without the review checklist |
-| Hardcoding CSS spacing or colors instead of tokens | Define tokens first, then reference tokens in components |
+| Hardcoding colors instead of colour tokens, or wrapping a size in a token | Read colours from the palette; write sizes, spacing and type values on the element |
 | Leaving `_old` files or commented-out backup code | Delete replaced code completely in the same edit |
 | Skipping framework rules | Check the project root against the "Framework rules" table in `vibecode/SKILL.md` and read every matching file before coding |
 | Working from a summary of the rules | Read `vibecode/SKILL.md` and its matching framework and reference files themselves; this skill only points to them |

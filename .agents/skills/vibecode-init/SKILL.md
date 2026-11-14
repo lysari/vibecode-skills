@@ -99,7 +99,7 @@ Locate existing shared infrastructure so the agent never creates duplicate utili
 ### 6. Identify UI & Design System Patterns (If UI exists)
 If the project has a frontend or UI layer:
 - **Styling approach**: Tailwind CSS, CSS Modules, SCSS, Styled Components, Vanilla Extract, or UI libraries (Shadcn UI, Material UI, Ant Design, Chakra UI).
-- **Design token location**: Where are theme colors, font families, and spacing defined? (e.g. `tailwind.config.js`, `src/styles/tokens.css`, `theme.ts`).
+- **Design token location**: Where are theme colors, font families, and easing curves defined? (e.g. `tailwind.config.js`, `src/styles/tokens.css`, `theme.ts`).
 - **Icons**: What icon library does the project use? (e.g. Lucide, Heroicons, FontAwesome).
 
 ### 7. Map Verification & Quality Tooling

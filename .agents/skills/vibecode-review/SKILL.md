@@ -82,7 +82,7 @@ Compare the actual changes against every extracted rule from the re-read skills.
 
 - `[x] PASS`: The rule was strictly followed. Provide concise evidence (file and line numbers).
 - `[ ] FAIL`: The rule was violated. Provide file path, line number, offending snippet, and the specific rule text broken.
-- `[!] SKIPPED`: The rule applied to the work done, but the agent omitted or skipped it (e.g. forgot to check existing helpers, didn't extract design tokens, didn't remove scratch files).
+- `[!] SKIPPED`: The rule applied to the work done, but the agent omitted or skipped it (e.g. forgot to check existing helpers, wrote a colour literal instead of its token, didn't remove scratch files).
 - `[-] N/A`: The rule does not apply to the changes made in this session (e.g. no stylesheets modified for a backend-only change).
 
 ### 5. Generate the review report
@@ -125,13 +125,13 @@ Output the review formatted as a clear checklist:
 - [-] CSS / Styling: N/A (no styles changed)
 
 ### Design Rules (design.md) *(if UI touched)*
-- [!] Design tokens: Hardcoded `padding: 24px` instead of using project spacing token ([card.component.html:15](file:///...))
+- [!] Design tokens: Hardcoded `color: #1a73e8` instead of using the project's colour token ([card.component.html:15](file:///...))
 
 ## 4. Discrepancies & Violations
 | Status | File:Line | Violated / Skipped Rule | Remediation |
 |---|---|---|---|
 | `[ ] FAIL` | `src/stats.ts:104` | Function size limit (code-structure.md) | Break helper logic into smaller focused functions |
-| `[!] SKIPPED` | `src/card.html:15` | Never hardcode spacing (design.md) | Replace `24px` with `space-section` token |
+| `[!] SKIPPED` | `src/card.html:15` | Never write a colour literal (design.md) | Replace `#1a73e8` with the `brand` colour token |
 
 ## 5. Verdict
 - **[ACTION REQUIRED]**: 1 violation, 1 skipped rule. Fix discrepancies before marking done.
