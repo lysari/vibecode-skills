@@ -16,6 +16,7 @@
 - In a project with one feature, keep each UI region (header, sidebar, card) in the file that renders it until a second file renders it, e.g. the header written in `layout`.
 - In a project with 2 or more features, put each distinct UI region (layout, header, sidebar, content section, card) in its own file instead of combining them in the root or page file, e.g. `layout`, `header`, `sidebar`.
 - One responsibility per file. Split a file when it covers two unrelated concerns.
+- Put non-UI functions and classes of the same kind that read the same data in one file, and their tests in one test file; never give each its own file, e.g. the "can open" and "can close" checks on an order's status in one `order-status` file, never `order-can-open` and `order-can-close`.
 - Keep related files close: a module and its types sit side by side.
 - Move code from a feature into `shared/` only when 2 or more distinct modules consume it.
 - Organize every file in a shared directory into a subfolder grouped by its kind (components, utils, constants, interfaces, services). Never place files loose directly in the root of the shared directory, e.g. `shared/interfaces/user` or `shared/utils/date`, never `shared/user`.
