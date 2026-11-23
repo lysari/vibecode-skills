@@ -21,3 +21,6 @@ Apply these on top of the generic rules when the project root has a `go.mod`.
 - Pass `context.Context` as the first argument in all functions performing I/O, database queries, or external network requests (`ctx context.Context`).
 - Never start a goroutine without a deterministic cancellation path; manage goroutine lifecycles using `sync.WaitGroup`, channels, or `ctx.Done()`.
 
+## Dependencies
+- Run `go run golang.org/x/vuln/cmd/govulncheck@latest ./...` after adding or upgrading a module, and fix every vulnerability it reports by upgrading to the fixed version it names.
+

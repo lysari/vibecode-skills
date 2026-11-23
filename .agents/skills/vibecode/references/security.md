@@ -41,11 +41,12 @@
 - Show users a generic error message. Keep stack traces and internal details in server logs.
 
 ## Dependencies and config
-- Check runtime versions, system interpreters, and container base images against security advisories for known critical or high severity CVEs before pinning them. Never specify an end-of-life runtime or unpatched version with known remote code execution vulnerabilities, e.g. check advisories before declaring runtime constraints or base images.
+- Check the exact version of every package, CLI tool, runtime, system interpreter, and container base image against security advisories for known critical or high severity CVEs before installing, upgrading, or pinning it, and choose a patched version, e.g. look up `<package>@<version>` on `osv.dev` before adding it to the manifest. Never specify an end-of-life runtime or unpatched version with known remote code execution vulnerabilities.
 - Never expose script interpreters, runtime CLI binaries, or CGI handlers directly to external network input without sanitizing command-line arguments.
 - Verify a new dependency's name, maintainer activity, and authenticity on its official registry before installing. Never install a guessed, unverified, or hallucinated package name.
 - Inspect install scripts (such as preinstall, postinstall, or build hooks) for arbitrary command execution, network calls, or binary downloads before running them. Disable lifecycle scripts during initial install when evaluating an unfamiliar dependency, e.g. install with `--ignore-scripts`.
 - Check lockfile diffs after adding or upgrading a dependency to confirm no unexpected transitive packages or modified download sources were added.
-- Run the project's dependency audit after adding or upgrading a dependency when the project has one, and report the advisories it finds.
+- Run the project's dependency audit after adding or upgrading a dependency, and report every advisory it finds.
+- When the project has no dependency audit, run the ecosystem's official vulnerability scanner as a one-off command after adding or upgrading a dependency, e.g. run the scanner once without adding it to the manifest.
 - Keep debug modes, verbose errors, and test accounts out of production config.
 - Allow cross-origin access only from the origins the feature needs. Never combine a wildcard origin with credentials.
