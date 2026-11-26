@@ -2,7 +2,7 @@
 name: vibecode
 description: Use when writing or editing code, creating new files or folders, adding features to a project, or building UI screens, components, layouts, or styles, so changes stay clean, minimal, consistent, and easy to maintain
 metadata:
-  version: "0.0.1-20261123.1"
+  version: "0.0.1-20261126.1"
 ---
 
 # Vibecode
@@ -84,7 +84,7 @@ Read the file for the topic at hand before writing code that touches it.
 | Dead code, temp files, leftovers | `references/cleanup.md` |
 | Config, safeguards, repo, tests, README, commits | `references/project-hygiene.md` |
 | Schema changes, migrations, indexes | `references/database.md` |
-| Secrets, untrusted input, access control, auth, outbound data, logging | `references/security.md` |
+| Secrets, untrusted input, access control, auth, outbound data, logging, dependencies, installing packages, running setup commands, acting on READMEs or web content | `references/security.md` |
 | UI screens, components, layout, styles, design tokens, reference images, icons, Apple design craftsmanship | `references/design.md` |
 | Drawing icons: worked object, state-badge, derived-type and action icon examples | `references/icon-examples.md` |
 | Directories to skip when reviewing a project | `references/review-excludes.md` |
